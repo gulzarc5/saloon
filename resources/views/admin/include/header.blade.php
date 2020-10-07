@@ -84,20 +84,37 @@
                 <h3>General</h3>
                 <ul class="nav side-menu">
                   <li><a href="{{ route('admin.deshboard')}}"><i class="fa fa-home"></i> Home </a></li>
-                  {{-- <li>
-                      <a><i class="fa fa-gift" aria-hidden="true"></i> Package <span class="fa fa-chevron-down"></span></a>
+                  <li>
+                      <a><i class="fa fa-users" aria-hidden="true"></i> Users<span class="fa fa-chevron-down"></span></a>
                       <ul class="nav child_menu">
-                        <li><a href="{{ route('admin.package')}}">Add Package</a></li>
-                        <li><a href="{{ route('admin.package_list')}}">Package List</a></li>
+                        <li><a href="{{ route('admin.freelancer')}}">Freelancer</a></li>
+                        <li><a href="{{ route('admin.shop')}}">Shop List</a></li>
+                        <li><a href="{{ route('admin.customer')}}">Customers</a></li>
                       </ul>
-                  </li> --}}
-                  {{-- <li>
-                      <a><i class="fa fa-certificate" aria-hidden="true"></i> Testimonial <span class="fa fa-chevron-down"></span></a>
+                  </li>
+                  <li><a href="{{ route('admin.service_category')}}"><i class="fa fa-laptop" aria-hidden="true"></i> Service Category</a></li>
+                  <li>
+                      <a><i class="fa fa-shopping-cart" aria-hidden="true"></i> Orders <span class="fa fa-chevron-down"></span></a>
                       <ul class="nav child_menu">
-                        <li><a href="{{ route('admin.testimonial')}}">Post Testimonial</a></li>
-                        <li><a href="{{ route('admin.testimonial_list')}}">Testimonial List</a></li>
+                        <li><a href="{{ route('admin.orders')}}">Orders List</a></li>
+                        <li><a href="{{ route('admin.refunds')}}">Refund List</a></li>
                       </ul>
-                  </li> --}}
+                  </li>
+                  <li>
+                      <a><i class="fa fa-cog" aria-hidden="true"></i> Configuration <span class="fa fa-chevron-down"></span></a>
+                      <ul class="nav child_menu">
+                        <li><a href="{{ route('admin.state')}}">State List</a></li>
+                        <li><a href="{{ route('admin.city')}}">City List</a></li>
+                      </ul>
+                  </li>
+                  <li>
+                      <a><i class="fa fa-search-plus" aria-hidden="true"></i> Enquery <span class="fa fa-chevron-down"></span></a>
+                      <ul class="nav child_menu">
+                        <li><a href="{{ route('admin.feedback')}}">Feedback</a></li>
+                        <li><a href="{{ route('admin.enquery')}}">Enquery</a></li>
+                      </ul>
+                  </li>
+                  <li><a href="{{route('admin.change_password_form')}}"><i class="fa fa-key" aria-hidden="true"></i>Change Password</a></li>
                 </ul>
               </div>
 
