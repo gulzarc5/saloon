@@ -24,6 +24,12 @@ Route::group(['namespace' => 'Admin'],function(){
         // Service Category
         Route::group(['namespace' => 'ServiceCategory'], function () {
             Route::get('/service/category', 'ServiceCategoryController@index')->name('admin.service_category');
+            Route::get('/add/service/category', 'ServiceCategoryController@addServiceCategory')->name('admin.add.service_category');
+            Route::post('/store/service/category', 'ServiceCategoryController@storeServiceCategory')->name('admin.store_service_category');
+            Route::get('/service/category/list', 'ServiceCategoryController@serviceCategory')->name('admin.ajax.service_category');
+            Route::get('/service/category/status/{id}/{status}', 'ServiceCategoryController@status')->name('admin.service_category.status');
+            Route::get('/service/category/edit/{id}', 'ServiceCategoryController@edit')->name('admin.service_category.edit');
+            Route::post('/update/service/category', 'ServiceCategoryController@updateServiceCategory')->name('admin.update_service_category');
         });
 
         // Orders

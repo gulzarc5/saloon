@@ -92,7 +92,13 @@
                         <li><a href="{{ route('admin.customer')}}">Customers</a></li>
                       </ul>
                   </li>
-                  <li><a href="{{ route('admin.service_category')}}"><i class="fa fa-laptop" aria-hidden="true"></i> Service Category</a></li>
+                  <li>
+                        <a><i class="fa fa-laptop" aria-hidden="true"></i> Service Category <span class="fa fa-chevron-down"></span></a>
+                        <ul class="nav child_menu">
+                            <li><a href="{{ route('admin.add.service_category')}}">Add Service Category</a></li>
+                            <li><a href="{{ route('admin.service_category')}}">Service Category List</a></li>
+                        </ul>
+                  </li>
                   <li>
                       <a><i class="fa fa-shopping-cart" aria-hidden="true"></i> Orders <span class="fa fa-chevron-down"></span></a>
                       <ul class="nav child_menu">
