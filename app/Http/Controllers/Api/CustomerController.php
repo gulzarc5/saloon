@@ -34,6 +34,10 @@ class CustomerController extends Controller
 	        'name' => ['required', 'string', 'max:255'],
             'password' => ['required', 'string', 'min:8', 'same:confirm_password'],
             'mobile' =>  ['required','digits:10','numeric','unique:customers'],
+            'email' =>  'unique:customers',
+            'state' =>  'required',
+            'city' =>  'required',
+            'gender' =>  'required',
         ]);
 
         if ($validator->fails()) {
@@ -51,6 +55,10 @@ class CustomerController extends Controller
         $customer->name = $request->input('name');
         $customer->mobile = $request->input('mobile');
         $customer->password = Hash::make($request->input('password'));
+        $customer->email = $request->input('email');
+        $customer->state = $request->input('state');
+        $customer->city = $request->input('city');
+        $customer->gender = $request->input('gender');
         if ($customer->save()) {
             $response = [
                 'status' => true,
