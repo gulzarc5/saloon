@@ -137,4 +137,10 @@ class ConfigurationController extends Controller
         $state->save();
         return redirect()->back();
     }
+
+    public function cityListByState ($state_id)
+    {
+        $city = City::where('state_id',$state_id)->where('status',1)->get();
+        return $city;
+    }
 }

@@ -25,7 +25,7 @@
     <link href="{{asset('admin/vendors/nprogress/nprogress.css')}}" rel="stylesheet">
     <!-- iCheck -->
     <link href="{{asset('admin/vendors/iCheck/skins/flat/green.css')}}" rel="stylesheet">
-  
+
     <!-- bootstrap-progressbar -->
     <link href="{{asset('admin/vendors/bootstrap-progressbar/css/bootstrap-progressbar-3.3.4.min.css')}}" rel="stylesheet">
     <!-- JQVMap -->
@@ -41,7 +41,7 @@
     <link href="{{asset('admin/vendors/datatables.net-scroller-bs/css/scroller.bootstrap.min.css')}}" rel="stylesheet">
 
     {{-- pnotify --}}
-    
+
    {{--  <link href="{{asset('admin/src_files/vendors/pnotify/dist/pnotify.css')}}" rel="stylesheet">
     <link href="{{asset('admin/src_files/vendors/pnotify/dist/pnotify.buttons.css')}}" rel="stylesheet">
     <link href="{{asset('admin/src_files/vendors/pnotify/dist/pnotify.nonblock.css')}}" rel="stylesheet"> --}}
@@ -71,7 +71,7 @@
               </div> --}}
               <div class="profile_info">
                 <span>Welcome,<b>{{ Auth::guard('admin')->user()->name }}</b></span>
-                
+
               </div>
             </div>
             <!-- /menu profile quick info -->
@@ -89,7 +89,7 @@
                       <ul class="nav child_menu">
                         <li><a href="{{ route('admin.freelancer')}}">Freelancer</a></li>
                         <li><a href="{{ route('admin.shop')}}">Shop List</a></li>
-                        <li><a href="{{ route('admin.customer')}}">Customers</a></li>
+                        <li><a href="{{ route('admin.customer_list')}}">Customers</a></li>
                       </ul>
                   </li>
                   <li>

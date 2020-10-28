@@ -18,7 +18,12 @@ Route::group(['namespace' => 'Admin'],function(){
         Route::group(['namespace' => 'User'], function () {
             Route::get('/freelancer', 'UsersController@freelancer')->name('admin.freelancer');
             Route::get('/shop', 'UsersController@shop')->name('admin.shop');
-            Route::get('/customer', 'UsersController@customer')->name('admin.customer');
+
+            Route::get('/customer/list', 'UsersController@customerList')->name('admin.customer_list');
+            Route::get('/customer/list/ajax', 'UsersController@customerListAjax')->name('admin.customer_list_ajax');
+            Route::get('/customer/edit/{id}', 'UsersController@customerEdit')->name('admin.customer_edit');
+            Route::put('/customer/update/{id}', 'UsersController@customerUpdate')->name('admin.customer_update');
+            Route::get('/customer/status/update/{id}/{status}', 'UsersController@updateCustomerStatus')->name('admin.customer_status_update');
         });
 
         // Service Category
@@ -55,6 +60,7 @@ Route::group(['namespace' => 'Admin'],function(){
             Route::get('/city/edit/{id}', 'ConfigurationController@editCity')->name('admin.edit_city');
             Route::put('/city/update/{id}', 'ConfigurationController@updateCity')->name('admin.update_city');
             Route::get('/city/update/status/{id}/{status}', 'ConfigurationController@updateStatusCity')->name('admin.update_status_city');
+            Route::get('/city/list/byState/{state_id}', 'ConfigurationController@cityListByState')->name('admin.city_list_by_state');
         });
 
         // Enquery
