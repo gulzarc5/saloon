@@ -13,7 +13,9 @@ use Illuminate\Http\Request;
 |
 */
 Route::group(['namespace'=>'Api'], function(){
-    Route::get('send/otp/{mobile}','CustomerController@sendOtp');
+    Route::get('/signup/otp/send/{mobile}', 'CustomerController@signUpOtp');
+    Route::get('signUp/otp/verify/{mobile}/{otp}', 'CustomerController@signUpOtpVerify');
+
     Route::post('customer/registration','CustomerController@customerRegistration');
 });
 
