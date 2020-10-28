@@ -53,7 +53,7 @@ class Handler extends ExceptionHandler
     {
         return parent::render($request, $exception);
     }
-    
+
     protected function unauthenticated($request, AuthenticationException $exception)
     {
         if ($request->expectsJson()) {
@@ -64,13 +64,13 @@ class Handler extends ExceptionHandler
             case 'admin':
                 $login = 'admin.login_form';
                 break;
-            case 'api':
+            case 'customerApi':
                 $response = [
                     'status'=>false,
                     'login_error' => 1,
                     'message'=>'unauthorize'
                 ];
-                return response()->json($response, 200);              
+                return response()->json($response, 200);
             default:
                 $login = 'admin.login_form';
                 break;
