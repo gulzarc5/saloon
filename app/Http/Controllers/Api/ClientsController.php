@@ -8,6 +8,7 @@ use App\Models\Client;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
+use Illuminate\Support\Str;
 class ClientsController extends Controller
 {
     public function clientRegistration(Request $request){
@@ -72,7 +73,7 @@ class ClientsController extends Controller
 
     public function clientLogin(Request $request){
         $validator =  Validator::make($request->all(),[
-            'mobile'           => ['required','digits:10','numeric','unique:clients'],
+            'mobile'           => ['required','digits:10','numeric'],
             'password'         => ['required', 'string', 'min:8'],
         ]);
         if ($validator->fails()) {
@@ -85,6 +86,40 @@ class ClientsController extends Controller
             ];
             return response()->json($response, 200);
         }
+        $client = Client::where('mobile',$request->input('mobile'))->first();
+        if ($client) {
+            if(Hash::check($request->input('password'), $client->password)){
+                $client->api_token = Str::random(60);
+                $client->save();
+                $response = [
+                    'status' => true,
+                    'message' => 'Client Successfully Logged In',
+                    'error_code' => false,
+                    'error_message' => null,
+                    'data' => $client,
+                ];
+                return response()->json($response, 200);
+            }else {
+                $response = [
+                    'status' => false,
+                    'message' => 'Sorry !! Client Id Or Password Wrong',
+                    'error_code' => false,
+                    'error_message' => null,
+                ];
+                return response()->json($response, 200);
+            }
+        } else {
+            $response = [
+                'status' => false,
+                'message' => 'Sorry !! Client Id Or Password Wrong',
+                'error_code' => false,
+                'error_message' => null,
+            ];
+            return response()->json($response, 200);
+        }
+    }
+
+    public function clientProfile($id){
         
     }
 }
