@@ -13,7 +13,7 @@ class AddPasswordToFreelancersTable extends Migration
      */
     public function up()
     {
-        Schema::table('freelancers', function (Blueprint $table) {
+        Schema::table('clients', function (Blueprint $table) {
             $table->string('password');
         });
     }
