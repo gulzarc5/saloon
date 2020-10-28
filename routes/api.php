@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Route;
 
 /*
 |--------------------------------------------------------------------------
@@ -19,7 +20,7 @@ Route::group(['namespace'=>'Api'], function(){
     Route::post('customer/registration','CustomerController@customerRegistration');
 
     // Freelancer Regitration
-    Route::post('freelancer/registration', 'FreelancerController@freelancerRegistration');
+    Route::post('client/registration', 'ClientsController@clientRegistration');
 });
 
 Route::middleware('auth:api')->get('/user', function (Request $request) {

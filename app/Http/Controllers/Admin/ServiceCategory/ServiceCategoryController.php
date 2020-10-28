@@ -7,7 +7,8 @@ use Illuminate\Http\Request;
 use Intervention\Image\Facades\Image;
 use App\Models\JobCategory;
 use Carbon\Carbon;
-use File;
+use Illuminate\Contracts\Encryption\DecryptException;
+use Illuminate\Support\Facades\File;
 
 class ServiceCategoryController extends Controller
 {

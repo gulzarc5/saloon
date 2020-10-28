@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class AddPasswordToFreelancersTable extends Migration
+class RenameFieildToClientsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -14,7 +14,8 @@ class AddPasswordToFreelancersTable extends Migration
     public function up()
     {
         Schema::table('clients', function (Blueprint $table) {
-            $table->string('password');
+            $table->dropColumn('service');
+            $table->char('profile_status', 1)->default(1)->comment('1=Inactive,2=Active');
         });
     }
 
@@ -25,7 +26,7 @@ class AddPasswordToFreelancersTable extends Migration
      */
     public function down()
     {
-        Schema::table('freelancers', function (Blueprint $table) {
+        Schema::table('clients', function (Blueprint $table) {
             //
         });
     }
