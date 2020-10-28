@@ -10,6 +10,7 @@ use Validator;
 use App\Models\Customer;
 use Illuminate\Support\Facades\Hash;
 use App\Models\SignUpOtp;
+use Illuminate\Support\Str;
 
 class CustomerController extends Controller
 {
@@ -31,7 +32,7 @@ class CustomerController extends Controller
             $response = [
                 'status' => true,
                 'message' => 'Otp Sent to Your Mobile Number',
-                'data' => $customer,
+                'otp' => $customer->otp,
             ];
             return response()->json($response, 200);
         }else{
@@ -45,7 +46,8 @@ class CustomerController extends Controller
 
     public function signUpOtpVerify($mobile,$otp){
         $check = SignUpOtp::where('mobile',$mobile)->where('otp',$otp)->count();
-        if($check){
+        if($check > 0){
+            SignUpOtp::where('mobile',$mobile)->delete();
             $response = [
                 'status' => true,
                 'message' => 'OTP Verified Successfully'
@@ -69,7 +71,7 @@ class CustomerController extends Controller
             'email' =>  'unique:customers',
             'state' =>  'required',
             'city' =>  'required',
-            'gender' =>  'required',
+            'gender' =>  'required|in:M,F',
         ]);
 
         if ($validator->fails()) {
@@ -90,7 +92,11 @@ class CustomerController extends Controller
         $customer->email = $request->input('email');
         $customer->state = $request->input('state');
         $customer->city = $request->input('city');
+        $customer->address = $request->input('address');
+        $customer->pin = $request->input('pin');
         $customer->gender = $request->input('gender');
+        $customer->latitude = $request->input('latitude');
+        $customer->longitude = $request->input('longitude');
         if ($customer->save()) {
             $response = [
                 'status' => true,
@@ -103,6 +109,56 @@ class CustomerController extends Controller
         	$response = [
                 'status' => false,
                 'message' => 'Something Went Wrong Please Try Again',
+                'error_code' => false,
+                'error_message' => null,
+            ];
+            return response()->json($response, 200);
+        }
+    }
+
+    public function customerLogin(Request $request)
+    {
+        $validator =  Validator::make($request->all(), [
+            'mobile' => 'required|numeric|digits:10',
+            'password' => 'required|min:8',
+        ]);
+
+        if ($validator->fails()) {
+            $response = [
+                'status' => false,
+                'message' => 'Required Field Can not be Empty',
+                'error_code' => true,
+                'error_message' => $validator->errors(),
+            ];
+            return response()->json($response, 200);
+        }
+
+        $customer = Customer::where('mobile',$request->input('mobile'))->first();
+        if ($customer) {
+            if(Hash::check($request->input('password'), $customer->password)){
+                $customer->api_token = Str::random(60);
+                $customer->save();
+                $response = [
+                    'status' => true,
+                    'message' => 'User Successfully Logged In',
+                    'error_code' => false,
+                    'error_message' => null,
+                    'data' => $customer,
+                ];
+                return response()->json($response, 200);
+            }else {
+                $response = [
+                    'status' => false,
+                    'message' => 'Sorry !! User Id Or Password Wrong',
+                    'error_code' => false,
+                    'error_message' => null,
+                ];
+                return response()->json($response, 200);
+            }
+        } else {
+            $response = [
+                'status' => false,
+                'message' => 'Sorry !! User Id Or Password Wrong',
                 'error_code' => false,
                 'error_message' => null,
             ];

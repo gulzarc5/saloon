@@ -18,9 +18,7 @@ Route::group(['namespace'=>'Api'], function(){
     Route::get('signUp/otp/verify/{mobile}/{otp}', 'CustomerController@signUpOtpVerify');
 
     Route::post('customer/registration','CustomerController@customerRegistration');
-
-    // Freelancer Regitration
-    Route::post('client/registration', 'ClientsController@clientRegistration');
+    Route::post('customer/login','CustomerController@customerLogin');
 });
 
 Route::middleware('auth:api')->get('/user', function (Request $request) {
