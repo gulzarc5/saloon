@@ -15,6 +15,9 @@ use Illuminate\Http\Request;
 Route::group(['namespace'=>'Api'], function(){
     Route::get('send/otp/{mobile}','CustomerController@sendOtp');
     Route::post('customer/registration','CustomerController@customerRegistration');
+
+    // Freelancer Regitration
+    Route::post('freelancer/registration', 'FreelancerController@freelancerRegistration');
 });
 
 Route::middleware('auth:api')->get('/user', function (Request $request) {
