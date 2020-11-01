@@ -17,16 +17,15 @@ Route::group(['namespace'=>'Api'], function(){
     Route::get('/signup/otp/send/{mobile}', 'CustomerController@signUpOtp');
     Route::get('signUp/otp/verify/{mobile}/{otp}', 'CustomerController@signUpOtpVerify');
 
+    // Customer
     Route::post('customer/registration','CustomerController@customerRegistration');
     Route::post('customer/login','CustomerController@customerLogin');
 
-    Route::get('/customer/forgot/otp/send/{mobile}', 'CustomerController@forgotOtp');
-    Route::post('customer/forgot/password/change', 'CustomerController@forgotPasswordChange');
-
-    Route::group(['middleware'=>'auth:customerApi','prefix' =>'customer'], function () {
-        Route::get('profile/{id}','CustomerController@profileFetch');
-        Route::put('profile/update/{id}','CustomerController@profileUpdate');
-        Route::put('password/change/{id}','CustomerController@passwordChange');
+    // Client Regitration
+    Route::post('client/registration', 'ClientsController@clientRegistration');
+    Route::post('client/login', 'ClientsController@clientLogin');
+    Route::group(['middleware' => 'auth:api'], function () {
+        Route::get('/client/profile/{id}', 'ClientsController@clientProfile');
     });
 });
 

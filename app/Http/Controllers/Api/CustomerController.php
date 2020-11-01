@@ -117,8 +117,7 @@ class CustomerController extends Controller
         }
     }
 
-    public function customerLogin(Request $request)
-    {
+    public function customerLogin(Request $request){
         $validator =  Validator::make($request->all(), [
             'mobile' => 'required|numeric|digits:10',
             'password' => 'required|min:8',
