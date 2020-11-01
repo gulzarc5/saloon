@@ -78,7 +78,7 @@ return [
             'driver' => 'eloquent',
             'model' => App\Models\Admin::class,
         ],
-        'users' => [
+        'customer' => [
             'driver' => 'eloquent',
             'model' => App\Models\Customer::class,
         ],

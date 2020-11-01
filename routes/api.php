@@ -19,6 +19,15 @@ Route::group(['namespace'=>'Api'], function(){
 
     Route::post('customer/registration','CustomerController@customerRegistration');
     Route::post('customer/login','CustomerController@customerLogin');
+
+    Route::get('/customer/forgot/otp/send/{mobile}', 'CustomerController@forgotOtp');
+    Route::post('customer/forgot/password/change', 'CustomerController@forgotPasswordChange');
+
+    Route::group(['middleware'=>'auth:customerApi','prefix' =>'customer'], function () {
+        Route::get('profile/{id}','CustomerController@profileFetch');
+        Route::put('profile/update/{id}','CustomerController@profileUpdate');
+        Route::put('password/change/{id}','CustomerController@passwordChange');
+    });
 });
 
 Route::middleware('auth:api')->get('/user', function (Request $request) {
