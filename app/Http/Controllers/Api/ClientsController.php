@@ -3,11 +3,12 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\ClientResource;
 use Illuminate\Http\Request;
 use App\Models\Client;
+use App\Models\SignUpOtp;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
-use Illuminate\Validation\Rule;
 use Illuminate\Support\Str;
 class ClientsController extends Controller
 {
@@ -15,17 +16,10 @@ class ClientsController extends Controller
         $validator =  Validator::make($request->all(),[
 	        'name'             => ['required', 'string', 'max:255'],
             'mobile'           => ['required','digits:10','numeric','unique:clients'],
-            'email'            => 'unique:clients',
-            'password'         => ['required', 'string', 'min:8', 'same:confirm_password'],
+            'password'         => ['required', 'string', 'min:8'],
             'otp'              => 'required|digits:5|numeric',
-            'state'            => 'required|numeric',
-            'city'             => 'required|numeric',
-            'address'          => 'required|string',
-            'opening_time'     => 'required|date_format:H:i:s',
-            'closing_time'     => 'required|date_format:H:i:s',
-            'clientType'       => ['required',  Rule::in(['1', '2'])],
+            'clientType'       => 'required|in:1,2',
         ]);
-
         if ($validator->fails()) {
             $response = [
                 'status' => false,
@@ -37,20 +31,23 @@ class ClientsController extends Controller
             return response()->json($response, 200);
         }
 
+        $otp = $request->input('otp');
+        $mobile = $request->input('mobile');
+        $check_otp = SignUpOtp::where('otp', $otp)->where('mobile',$mobile)->where('user_type',2)->count();
+        if ($check_otp == 0) {
+            $response = [
+                'status' => false,
+                'message' => 'Sorry OTP Does Not Matched',
+                'error_code' => false,
+                'error_message' => null,
+            ];
+            return response()->json($response, 200);
+        }
+
         $client = new Client;
         $client->name = $request->input('name');
         $client->mobile = $request->input('mobile');
-        $client->email = $request->input('email');
         $client->password = Hash::make($request->input('password'));
-        $client->otp = $request->input('otp');
-        $client->work_experience = $request->input('work_experience');
-        $client->state = $request->input('state');
-        $client->city = $request->input('city');
-        $client->address = $request->input('address');
-        $client->latitude = $request->input('latitude');
-        $client->longitude = $request->input('longitude');
-        $client->opening_time = $request->input('opening_time');
-        $client->closing_time = $request->input('closing_time');
         $client->clientType = $request->input('clientType');
         if ($client->save()) {
             $response = [
@@ -96,7 +93,7 @@ class ClientsController extends Controller
                     'message' => 'Client Successfully Logged In',
                     'error_code' => false,
                     'error_message' => null,
-                    'data' => $client,
+                    'data' => new ClientResource($client),
                 ];
                 return response()->json($response, 200);
             }else {
@@ -120,6 +117,19 @@ class ClientsController extends Controller
     }
 
     public function clientProfile($id){
-        
+        $client = Client::find($id);
+        $response = [
+            'status' => true,
+            'message' => 'Client Profile',
+            'data' => new ClientResource($client),
+        ];
+        return response()->json($response, 200);
+    }
+
+    public function clientProfileUpdate(Request $request)
+    {
+        $validator =  Validator::make($request->all(),[
+
+        ]);
     }
 }

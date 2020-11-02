@@ -71,6 +71,13 @@ class Handler extends ExceptionHandler
                     'message'=>'unauthorize'
                 ];
                 return response()->json($response, 200);
+            case 'clientApi':
+                $response = [
+                    'status'=>false,
+                    'login_error' => 1,
+                    'message'=>'unauthorize'
+                ];
+                return response()->json($response, 200);
             default:
                 $login = 'admin.login_form';
                 break;

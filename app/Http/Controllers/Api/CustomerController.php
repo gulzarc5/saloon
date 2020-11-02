@@ -12,21 +12,32 @@ use Illuminate\Support\Facades\Hash;
 use App\Models\SignUpOtp;
 use Illuminate\Support\Str;
 use App\Http\Resources\CustomerResource;
+use App\Models\Client;
 
 class CustomerController extends Controller
 {
-    public function signUpOtp($mobile){
-        $customer = Customer::where('mobile',$mobile);
-        if ($customer->count() > 0) {
+    public function signUpOtp($mobile,$user_type){
+        // user_type  1 = Customer, 2 = Client
+
+        if ($user_type == '1') {
+            $check_user = Customer::where('mobile',$mobile)->count();
+        } else {
+            $check_user = Client::where('mobile',$mobile)->count();
+        }
+
+        if ($check_user > 0) {
             $response = [
-                'status' => true,
-                'message' => 'Sorry Mobile Number Already Registered With Us'
+                'status' => false,
+                'message' => 'Sorry User Already Registered With Us',
+                'otp' => null,
             ];
             return response()->json($response, 200);
         }
 
-        $customer = SignUpOtp::firstOrCreate(['mobile' => $mobile]);
+
+        $customer = SignUpOtp::firstOrCreate(['mobile' => $mobile,'user_type'=>$user_type]);
         $customer->otp =  rand(11111,99999);
+        $customer->user_type =  $user_type;
         if($customer->save()) {
             $message = "OTP is $customer->otp . Please Do Not Share With Anyone";
             // Sms::smsSend($customer->mobile,$message);
@@ -45,10 +56,10 @@ class CustomerController extends Controller
         }
     }
 
-    public function signUpOtpVerify($mobile,$otp){
-        $check = SignUpOtp::where('mobile',$mobile)->where('otp',$otp)->count();
+    public function signUpOtpVerify($mobile,$otp,$user_type){
+        $check = SignUpOtp::where('mobile',$mobile)->where('otp',$otp)->where('user_type',$user_type)->count();
         if($check > 0){
-            SignUpOtp::where('mobile',$mobile)->delete();
+            SignUpOtp::where('mobile',$mobile)->where('user_type',$user_type)->delete();
             $response = [
                 'status' => true,
                 'message' => 'OTP Verified Successfully'

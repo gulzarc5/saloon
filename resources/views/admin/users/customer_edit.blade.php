@@ -81,6 +81,16 @@
                         <div class="well" style="overflow: auto">
                             <div class="form-row mb-10" >
                                 <div class="col-md-4 col-sm-12 col-xs-12 mb-3">
+                                    <label for="state">State</label>
+                                    <input type="text" class="form-control" placeholder="Enter State Name" name="state" value="{{$customer->state}}" disabled>
+                                    @if($errors->has('state'))
+                                        <span class="invalid-feedback" role="alert" style="color:red">
+                                            <strong>{{ $errors->first('state') }}</strong>
+                                        </span>
+                                    @enderror
+                                </div>
+
+                                {{-- <div class="col-md-4 col-sm-12 col-xs-12 mb-3">
                                     <label for="state">Select State</label>
                                     <select class="form-control" name="state" id="state" disabled>
                                         <option value="">Select State</option>
@@ -95,9 +105,9 @@
                                             <strong>{{ $errors->first('state') }}</strong>
                                         </span>
                                     @enderror
-                                </div>
+                                </div> --}}
 
-                                <div class="col-md-4 col-sm-12 col-xs-12 mb-3">
+                                {{-- <div class="col-md-4 col-sm-12 col-xs-12 mb-3">
                                     <label for="city">Select City</label>
                                     <select class="form-control" name="city" id="city" disabled>
                                         <option value="">Select City</option>
@@ -107,6 +117,16 @@
                                             @endforeach
                                         @endif
                                     </select>
+                                    @if($errors->has('city'))
+                                        <span class="invalid-feedback" role="alert" style="color:red">
+                                            <strong>{{ $errors->first('city') }}</strong>
+                                        </span>
+                                    @enderror
+                                </div> --}}
+
+                                <div class="col-md-4 col-sm-12 col-xs-12 mb-3">
+                                    <label for="city">City</label>
+                                    <input type="text" class="form-control" name="city"  placeholder="Enter City Name" value="{{$customer->city}}" disabled>
                                     @if($errors->has('city'))
                                         <span class="invalid-feedback" role="alert" style="color:red">
                                             <strong>{{ $errors->first('city') }}</strong>
@@ -161,27 +181,27 @@
 @section('script')
 
     <script>
-        $(document).ready(function(){
-            $("#state").change(function(){
-                var state_id = $(this).val();
-                $.ajaxSetup({
-                    headers: {
-                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                    }
-                });
-                $.ajax({
-                    type:"GET",
-                    url:"{{ url('/admin/city/list/byState/')}}"+"/"+state_id+"",
-                    success:function(data){
-                        $("#city").html("<option value=''>Please Select City</option>");
-                        $.each( data, function( key, value ) {
-                            $("#city").append("<option value='"+value.id+"'>"+value.name+"</option>");
-                        });
+        // $(document).ready(function(){
+        //     $("#state").change(function(){
+        //         var state_id = $(this).val();
+        //         $.ajaxSetup({
+        //             headers: {
+        //                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+        //             }
+        //         });
+        //         $.ajax({
+        //             type:"GET",
+        //             url:"{{ url('/admin/city/list/byState/')}}"+"/"+state_id+"",
+        //             success:function(data){
+        //                 $("#city").html("<option value=''>Please Select City</option>");
+        //                 $.each( data, function( key, value ) {
+        //                     $("#city").append("<option value='"+value.id+"'>"+value.name+"</option>");
+        //                 });
 
-                    }
-                });
-            });
-        });
+        //             }
+        //         });
+        //     });
+        // });
 
         function editForm(){
             $("#edit_form :input").prop("disabled", false);

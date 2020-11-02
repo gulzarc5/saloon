@@ -40,10 +40,14 @@ return [
             'driver' => 'session',
             'provider' => 'users',
         ],
-
         'customerApi' => [
             'driver' => 'token',
             'provider' => 'customer',
+            'hash' => false,
+        ],
+        'clientApi' => [
+            'driver' => 'token',
+            'provider' => 'client',
             'hash' => false,
         ],
         'admin' => [
@@ -81,6 +85,10 @@ return [
         'customer' => [
             'driver' => 'eloquent',
             'model' => App\Models\Customer::class,
+        ],
+        'client' => [
+            'driver' => 'eloquent',
+            'model' => App\Models\Client::class,
         ],
     ],
 

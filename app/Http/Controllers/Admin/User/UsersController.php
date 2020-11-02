@@ -41,12 +41,7 @@ class UsersController extends Controller
 
     public function customerEdit($id){
         $customer = Customer::find($id);
-        $state = State::where('status',1)->get();
-        $city = null;
-        if (!empty($customer->state)) {
-            $city = City::where('state_id',$customer->state)->where('status',1)->get();
-        }
-        return view('admin.users.customer_edit',compact('customer','state','city'));
+        return view('admin.users.customer_edit',compact('customer'));
     }
 
     public function customerUpdate(Request $request,$id){
