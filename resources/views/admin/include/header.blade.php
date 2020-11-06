@@ -111,6 +111,8 @@
                       <ul class="nav child_menu">
                         <li><a href="{{ route('admin.state')}}">State List</a></li>
                         <li><a href="{{ route('admin.city')}}">City List</a></li>
+                        <li><a href="{{ route('admin.serviceCity')}}">Service City List</a></li>
+                        <li><a href="{{ route('admin.app_slider_list')}}">Aapp Sliders</a></li>
                       </ul>
                   </li>
                   <li>

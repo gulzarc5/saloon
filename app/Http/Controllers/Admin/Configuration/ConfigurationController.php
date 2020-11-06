@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Validator;
 use App\Models\State;
 use App\Models\City;
+use App\Models\ServiceCity;
 use DataTables;
 
 class ConfigurationController extends Controller
@@ -143,4 +144,49 @@ class ConfigurationController extends Controller
         $city = City::where('state_id',$state_id)->where('status',1)->get();
         return $city;
     }
+
+    public function serviceCity(){
+        $serviceCity = ServiceCity::orderBy('id','desc')->get();
+        return view('admin.configuration.serviceCity.service_city',compact('serviceCity'));
+    }
+
+    public function addServiceCity()
+    {
+        return view('admin.configuration.serviceCity.service_city_add_form');
+    }
+
+    public function insertServiceCity(Request $request)
+    {
+        $this->validate($request, [
+            'name' => 'required',
+        ]);
+        ServiceCity::create(['name'=>$request->input('name')]);
+        return redirect()->back()->with('message','State Added successfully');
+    }
+
+    public function editServiceCity($id)
+    {
+        $serviceCity = ServiceCity::find($id);
+        return view('admin.configuration.serviceCity.service_city_add_form',compact('serviceCity'));
+    }
+
+    public function updateServiceCity(Request $request,$id)
+    {
+        $this->validate($request, [
+            'name' => 'required',
+        ]);
+        $state = ServiceCity::find($id);
+        $state->name = $request->input('name');
+        $state->save();
+        return redirect()->back()->with('message','Service City Updated successfully');
+    }
+
+    public function updateStatusServiceCity($id,$status)
+    {
+        $state = ServiceCity::find($id);
+        $state->status = $status;
+        $state->save();
+        return redirect()->back();
+    }
+
 }

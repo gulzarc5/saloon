@@ -81,8 +81,6 @@ class CustomerController extends Controller
             'password' => ['required', 'string', 'min:8', 'same:confirm_password'],
             'mobile' =>  ['required','digits:10','numeric','unique:customers'],
             'email' =>  'unique:customers',
-            'state' =>  'required',
-            'city' =>  'required',
             'gender' =>  'required|in:M,F',
         ]);
 

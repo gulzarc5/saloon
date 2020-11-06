@@ -62,6 +62,26 @@ Route::group(['namespace' => 'Admin'],function(){
             Route::put('/city/update/{id}', 'ConfigurationController@updateCity')->name('admin.update_city');
             Route::get('/city/update/status/{id}/{status}', 'ConfigurationController@updateStatusCity')->name('admin.update_status_city');
             Route::get('/city/list/byState/{state_id}', 'ConfigurationController@cityListByState')->name('admin.city_list_by_state');
+
+
+            Route::group(['prefix' =>'service'],function(){
+                Route::get('/city', 'ConfigurationController@serviceCity')->name('admin.serviceCity');
+                Route::get('/city/add', 'ConfigurationController@addServiceCity')->name('admin.add_serviceCity');
+                Route::post('/city/insert', 'ConfigurationController@insertServiceCity')->name('admin.insert_service_city');
+                Route::get('/city/edit/{id}', 'ConfigurationController@editServiceCity')->name('admin.edit_service_city');
+                Route::put('/city/update/{id}', 'ConfigurationController@updateServiceCity')->name('admin.update_service_city');
+                Route::get('/city/update/status/{id}/{status}', 'ConfigurationController@updateStatusServiceCity')->name('admin.update_status_serviceCity');
+            });
+
+            Route::group(['prefix'=>'slider'],function(){
+                Route::get('list','SliderController@appSliderList')->name('admin.app_slider_list');
+                Route::get('add/form', 'SliderController@appSliderAddForm')->name('admin.app_slider_add_form');
+                Route::post('insert/form', 'SliderController@insertAppSlider')->name('admin.insert_app_slider');
+                Route::get('delete/{id}', 'SliderController@SliderDelete')->name('admin.slider_delete');
+            });
+
+
+
         });
 
         // Enquery
