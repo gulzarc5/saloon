@@ -6,7 +6,7 @@
         <div class="col-md-12" style="margin-top:50px;">
             <div class="x_panel">
                 <div class="x_title">
-                    <h2>Update Service Category</h2>
+                    <h2>Edit Service Category</h2>
                     <div class="clearfix"></div>
                 </div>
                     @if (Session::has('message'))
@@ -28,7 +28,7 @@
                                             <strong>{{ $errors->first('name') }}</strong>
                                         </span>
                                     @enderror
-                                </div>                     
+                                </div>
                                 <div class="col-md-4 col-sm-12 col-xs-12 mb-3">
                                     <label for="image">Image</label>
                                     <input type="file" name="image" id="image" class="form-control">
@@ -40,7 +40,7 @@
                                     <div>
                                         <img src="{{ asset('admin/service_category/thumb/'.$job_category->image) }}" alt="photo" width="300" height="300">
                                     </div>
-                                </div>                     
+                                </div>
                                 <div class="col-md-4 col-sm-12 col-xs-12 mb-3">
                                     <div class="form-inline">
                                         <input type="checkbox" class="form-control" id="man" name="man" value="{{ $job_category->man }}" {{ $job_category->man == 1 ? 'checked' : '' }}>
@@ -53,15 +53,15 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="form-group">    	            	
-                            {{ Form::submit('Update', array('class'=>'btn btn-success pull-right')) }}  
+                        <div class="form-group">
+                            {{ Form::submit('Update', array('class'=>'btn btn-success pull-right')) }}
                         </div>
                     {{ Form::close() }}
                 </div>
             </div>
         </div>
     </div>
-</div>    
+</div>
 <!-- /page content -->
 @endsection
 

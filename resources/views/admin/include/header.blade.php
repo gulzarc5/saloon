@@ -57,7 +57,7 @@
           <div class="left_col scroll-view">
             <div class="navbar nav_title" style="border: 0;">
               <a href="{{route('admin.deshboard')}}" class="site_title">
-                Saloon App
+                 App
                 {{-- <img src="{{ asset('logo/logo.png')}}" height="50" style=" width: 90%;"> --}}
               </a>
             </div>
@@ -87,8 +87,8 @@
                   <li>
                       <a><i class="fa fa-users" aria-hidden="true"></i> Users<span class="fa fa-chevron-down"></span></a>
                       <ul class="nav child_menu">
-                        <li><a href="{{ route('admin.freelancer')}}">Freelancer</a></li>
-                        <li><a href="{{ route('admin.shop')}}">Shop List</a></li>
+                        <li><a href="{{ route('admin.freelancer_list')}}">Freelancer</a></li>
+                        <li><a href="{{ route('admin.shop_list')}}">Shop List</a></li>
                         <li><a href="{{ route('admin.customer_list')}}">Customers</a></li>
                       </ul>
                   </li>

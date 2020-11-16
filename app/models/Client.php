@@ -21,4 +21,9 @@ class Client extends Authenticatable
     {
         return $this->hasMany('App\Models\Job','user_id','id');
     }
+
+    public function serviceCity()
+    {
+        return $this->belongsTo('App\Models\ServiceCity','service_city_id','id');
+    }
 }

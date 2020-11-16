@@ -11,14 +11,6 @@ use App\Models\City;
 
 class UsersController extends Controller
 {
-    public function freelancer(){
-        return view('admin.users.freelancer');
-    }
-
-    public function shop(){
-        return view('admin.users.shop');
-    }
-
     public function customerList(){
         return view('admin.users.customer');
     }

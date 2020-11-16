@@ -14,6 +14,9 @@ use Illuminate\Support\Str;
 use App\Http\Resources\CustomerResource;
 use App\Models\Client;
 
+use App\Models\Order;
+use App\Http\Resources\CustomerOrderHistoryResource;
+
 class CustomerController extends Controller
 {
     public function signUpOtp($mobile,$user_type){
@@ -365,5 +368,17 @@ class CustomerController extends Controller
             ];
             return response()->json($response, 200);
         }
+    }
+
+    public function orderHistory($user_id)
+    {
+        $order = Order::where('customer_id', $user_id)->limit(50)->get();
+        $response = [
+            'status' => true,
+            'message' => 'Order history',
+            'data' => CustomerOrderHistoryResource::collection($order),
+        ];
+
+        return response()->json($response, 200);
     }
 }

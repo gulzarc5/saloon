@@ -30,4 +30,9 @@ return [
         'region' => env('AWS_DEFAULT_REGION', 'us-east-1'),
     ],
 
+    'razorpay' => [
+        'id'       => env('RAZOR_PAY_ID'),
+        'key'    => env('RAZOR_PAY_KEY'),
+    ],
+
 ];

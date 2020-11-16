@@ -15,11 +15,26 @@ Route::group(['namespace' => 'Admin'],function(){
         Route::get('/change/password/form', 'LoginController@changePasswordForm')->name('admin.change_password_form');
         Route::post('/change/password', 'LoginController@changePassword')->name('admin.change_password');
 
+        Route::group(['prefix' =>'client'],function(){
+            Route::get('/freelancer/list', 'ClientController@freelancerList')->name('admin.freelancer_list');
+            Route::get('/freelancer/list/ajax', 'ClientController@freelancerListAjax')->name('admin.freelancer_list_ajax');
+
+            Route::get('/shop', 'ClientController@shop')->name('admin.shop_list');
+            Route::get('/shop/list/ajax', 'ClientController@shopListAjax')->name('admin.shop_list_ajax');
+
+            Route::get('/details/{client_id}', 'ClientController@clientDetails')->name('admin.client_details');
+            Route::get('/edit/{client_id}', 'ClientController@clientEdit')->name('admin.client_edit');
+            Route::put('/update/{client_id}', 'ClientController@clientUpdate')->name('admin.client_update');
+            Route::get('/images/{client_id}', 'ClientController@clientImages')->name('admin.client_images');
+
+            Route::get('/images/cover/{client_id}/{image_id}', 'ClientController@clientImagesCover')->name('admin.client_images_cover');
+            Route::get('/images/delete/{image_id}', 'ClientController@clientImagesDelete')->name('admin.client_images_delete');
+
+            Route::get('/services/edit/{client_id}', 'ClientController@clientServicesEdit')->name('admin.client_services_edit');
+            Route::put('/services/update/{client_id}', 'ClientController@clientServicesUpdate')->name('admin.client_services_update');
+        });
         // Users
         Route::group(['namespace' => 'User'], function () {
-            Route::get('/freelancer', 'UsersController@freelancer')->name('admin.freelancer');
-            Route::get('/shop', 'UsersController@shop')->name('admin.shop');
-
             Route::get('/customer/list', 'UsersController@customerList')->name('admin.customer_list');
             Route::get('/customer/list/ajax', 'UsersController@customerListAjax')->name('admin.customer_list_ajax');
             Route::get('/customer/edit/{id}', 'UsersController@customerEdit')->name('admin.customer_edit');

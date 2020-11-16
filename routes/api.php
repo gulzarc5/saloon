@@ -25,10 +25,27 @@ Route::group(['namespace'=>'Api'], function(){
     Route::get('/customer/forgot/otp/send/{mobile}', 'CustomerController@forgotOtp');
     Route::post('customer/forgot/password/change', 'CustomerController@forgotPasswordChange');
 
+    Route::get('/client/forgot/otp/send/{mobile}', 'ClientsController@forgotOtp');
+    Route::post('client/forgot/password/change', 'ClientsController@forgotPasswordChange');
+
+    Route::group(['prefix'=> 'service'],function () {
+        Route::get('list/{service_city}/{category_id}/{page}/{client_type?}','ServiceController@serviceList');
+        Route::get('details/{service_id}','ServiceController@serviceDetails');
+    });
+    //customer Section
     Route::group(['middleware'=>'auth:customerApi','prefix' =>'customer'], function () {
         Route::get('profile/{id}','CustomerController@profileFetch');
         Route::put('profile/update/{id}','CustomerController@profileUpdate');
         Route::put('password/change/{id}','CustomerController@passwordChange');
+        Route::post('order/place','OrderController@orderPlace');
+        Route::post('payment/verify','OrderController@paymentVerify');
+        Route::get('order/history/{user_id}','CustomerController@orderHistory');
+
+        Route::group(['prefix' => 'address'], function (){
+            Route::post('add','AddressController@addAddress');
+            Route::get('fetch/{id}','AddressController@addressFetch');
+            Route::put('update/{id}','AddressController@addressUpdate');
+        });
     });
 
     // Client Regitration
@@ -44,6 +61,12 @@ Route::group(['namespace'=>'Api'], function(){
 
         Route::put('client/gallery/image/add/{client_id}','ClientsController@galleryImageAdd');
         Route::get('client/gallery/image/delete/{client_id}/{image_id}','ClientsController@galleryImageDelete');
+        Route::get('client/gallery/image/set/thumb/{client_id}/{image_id}','ClientsController@galleryImageSetThumb');
+
+        Route::put('client/change/password/{client_id}','ClientsController@clientChangePassword');
+
+        Route::get('client/order/history/{client_id}','ClientsController@orderHistory');
+
     });
 });
 

@@ -13,6 +13,11 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 use File;
 use Image;
+use App\SmsHelper\Sms;
+
+use App\Models\Order;
+use App\Http\Resources\Order\ClientOrderHistoryResource;
+
 class ClientsController extends Controller
 {
     public function clientRegistration(Request $request){
@@ -37,7 +42,7 @@ class ClientsController extends Controller
 
         $otp = $request->input('otp');
         $mobile = $request->input('mobile');
-        $check_otp = SignUpOtp::where('otp', $otp)->where('mobile',$mobile)->where('user_type',2)->count();
+        $check_otp = SignUpOtp::where('otp', $otp)->where('mobile',$mobile)->where('client_type',2)->count();
         if ($check_otp == 0) {
             $response = [
                 'status' => false,
@@ -146,7 +151,7 @@ class ClientsController extends Controller
         }
         $validator =  Validator::make($request->all(),[
             'name' => 'required',
-            'mobile' =>  'required|unique:customers,id,'.$client_id,
+            'mobile' =>  'required|unique:clients,id,'.$client_id,
             'state' => 'required',
             'city' =>  'required',
             'address' => 'required',
@@ -333,6 +338,159 @@ class ClientsController extends Controller
             'status' => true,
             'message' => 'Image Deleted Successfully',
         ];
+        return response()->json($response, 200);
+    }
+
+    public function galleryImageSetThumb($client_id, $image_id)
+    {
+        $image = ClientImage::where('id',$image_id)->first();
+        $client = Client::find($client_id);
+        $client->image = $image->image;
+        $client->save();
+        $response = [
+            'status' => true,
+            'message' => 'Image Set As Profile Picture',
+        ];
+        return response()->json($response, 200);
+    }
+
+    public function clientChangePassword(Request $request,$client_id)
+    {
+        $validator =  Validator::make($request->all(),[
+            'current_password' => 'required|string|min:8',
+            'new_password' => 'required|string|min:8',
+        ]);
+        if ($validator->fails()) {
+            $response = [
+                'status' => false,
+                'message' => 'Required Field Can not be Empty',
+                'error_code' => true,
+                'error_message' => $validator->errors(),
+            ];
+            return response()->json($response, 200);
+        }
+
+        $client = Client::find($client_id);
+
+        if ($client) {
+            if(Hash::check($request->input('current_password'), $client->password)){
+                $client->password = Hash::make($request->input('new_password'));
+                if ($client->save()) {
+                    $response = [
+                        'status' => true,
+                        'message' => 'Password Changed Successfully',
+                        'error_code' => false,
+                        'error_message' => null,
+                    ];
+                    return response()->json($response, 200);
+                }else{
+                    $response = [
+                        'status' => false,
+                        'message' => 'Something Went Wrong Please Try Again',
+                        'error_code' => false,
+                        'error_message' => null,
+                    ];
+                    return response()->json($response, 200);
+                }
+            }else{
+                $response = [
+                    'status' => false,
+                    'message' => 'Please Enter Correct Corrent Password',
+                    'error_code' => false,
+                    'error_message' => null,
+                ];
+                return response()->json($response, 200);
+           }
+        } else {
+            $response = [
+                'status' => false,
+                'message' => 'User Not Found Please Try Again',
+                'error_code' => false,
+                'error_message' => null,
+            ];
+            return response()->json($response, 200);
+        }
+
+    }
+
+    public function forgotOtp($mobile)
+    {
+        $client = Client::where('mobile',$mobile);
+        if ($client->count() == 0) {
+            $response = [
+                'status' => false,
+                'message' => 'Sorry User Does Not Exist'
+            ];
+            return response()->json($response, 200);
+        }
+
+        $client = $client->first();
+        $client->otp = rand(11111,99999);
+        if ($client->save()) {
+            $message = "OTP is $client->otp . Please Do Not Share With Anyone";
+            // Sms::smsSend($client->mobile,$message);
+            $response = [
+                'status' => true,
+                'message' => 'OTP Sent Successfully To Registered Mobile Number',
+                'otp' => $client->otp,
+            ];
+            return response()->json($response, 200);
+        } else {
+            $response = [
+                'status' => false,
+                'message' => 'Something Went Wrong Please Try Again'
+            ];
+            return response()->json($response, 200);
+        }
+    }
+
+    public function forgotPasswordChange(Request $request){
+        $validator =  Validator::make($request->all(),[
+            'mobile' => ['required', 'numeric', 'digits:10'],
+            'otp' => ['required', 'numeric', 'digits:5'],
+            'password' => ['required', 'string', 'min:8', 'same:confirm_password'],
+        ]);
+
+        if ($validator->fails()) {
+            $response = [
+                'status' => false,
+                'message' => 'Required Field Can not be Empty',
+                'error_code' => true,
+                'error_message' => $validator->errors(),
+            ];
+            return response()->json($response, 200);
+        }
+        $mobile = $request->input('mobile');
+        $otp = $request->input('otp');
+        $client = Client::where('mobile',$mobile)->where('otp',$otp);
+        if($client->count() > 0){
+            $client = $client->first();
+            $client->password =  Hash::make($request->input('confirm_password'));
+            $client->otp = null;
+            $client->save();
+            $response = [
+                'status' => true,
+                'message' => 'Password Changed Successfully'
+            ];
+            return response()->json($response, 200);
+        }else {
+            $response = [
+                'status' => false,
+                'message' => 'Sorry OTP is Invalid'
+            ];
+            return response()->json($response, 200);
+        }
+    }
+
+    public function orderHistory($client_id)
+    {
+        $order = Order::where('customer_id', $client_id)->where('payment_status',2)->limit(50)->get();
+        $response = [
+            'status' => true,
+            'message' => 'Order history',
+            'data' => ClientOrderHistoryResource::collection($order),
+        ];
+
         return response()->json($response, 200);
     }
 }
