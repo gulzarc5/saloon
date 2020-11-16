@@ -42,7 +42,7 @@ class ClientsController extends Controller
 
         $otp = $request->input('otp');
         $mobile = $request->input('mobile');
-        $check_otp = SignUpOtp::where('otp', $otp)->where('mobile',$mobile)->where('client_type',2)->count();
+        $check_otp = SignUpOtp::where('otp', $otp)->where('mobile',$mobile)->where('clientType',2)->count();
         if ($check_otp == 0) {
             $response = [
                 'status' => false,
