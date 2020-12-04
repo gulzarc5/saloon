@@ -15,11 +15,16 @@ class OrderController extends Controller
 {
     public function orderPlace(Request $request)
     {
+        // service type 1 = man, 2 = woman, 3= kids
         $validator =  Validator::make($request->all(),[
             'user_id' =>'required',
             'service_id' =>'required|array|min:1',
             'service_id.*' =>'required',
+            'service_type' =>'required|array|min:1',
+            'service_type.*' =>'required',
             'service_time' =>'required|date_format:Y-m-d H:i:s',
+            'address_id'=>'required',
+            'vendor_id' => 'required'
         ]);
 
         if ($validator->fails()) {
@@ -32,9 +37,37 @@ class OrderController extends Controller
             return response()->json($response, 200);
         }
         $service_id = $request->input('service_id');
-        //check service is for freelauncer or not
+        $service_type = $request->input('service_type');
+        $vendor_id = $request->input('vendor_id');
+        //check service is available or not
         $vendor_id = null;
-        foreach ($service_id as $key => $value) {
+        for ($i=0; $i < count($service_id); $i++) { 
+            if (isset($service_id[$i]) && !empty($service_id[$i]) && isset($service_type[$i]) && !empty($service_type[$i])) {
+                $checkService = Job::where('status',1);
+                if($service_id[$i] = 1){
+                    $checkService->where('is_man',2);
+                }elseif ($service_id[$i] = 2) {
+                    $checkService->where('is_woman',2);
+                }else {
+                    $checkService->where('is_kids',2);
+                }
+                if ($checkService->count() == 0) {
+                    $response = [
+                        'status' => false,
+                        'message' => 'Service Not Available',
+                        'error_code' => false,
+                        'error_message' => null,
+                    ];
+                    return response()->json($response, 200);
+                }
+            }
+        }
+
+        //check Vendor is available or not in scheduled date
+        // $checkSchedule = 
+
+
+        foreach ($service_id as $key => $item) {
             $job_count = Job::select('jobs.id','jobs.user_id')->where('jobs.status',1)
             ->join('clients','clients.id','=','jobs.user_id')
             ->where('clients.clientType',1);

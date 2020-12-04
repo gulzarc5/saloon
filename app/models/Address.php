@@ -10,6 +10,6 @@ class Address extends Model
     protected $primary_key = 'id';
 
     protected $fillable = [
-        'name','mobile','email','state','city','pin','address','latitude','longitude'
+        'user_id','name','mobile','email','state','city','pin','address','latitude','longitude'
     ];
 }

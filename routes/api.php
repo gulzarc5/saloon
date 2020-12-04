@@ -42,6 +42,7 @@ Route::group(['namespace'=>'Api'], function(){
         Route::get('order/history/{user_id}','CustomerController@orderHistory');
 
         Route::group(['prefix' => 'address'], function (){
+            Route::get('list/{customer_id}','AddressController@addressList');
             Route::post('add','AddressController@addAddress');
             Route::get('fetch/{id}','AddressController@addressFetch');
             Route::put('update/{id}','AddressController@addressUpdate');
@@ -55,6 +56,9 @@ Route::group(['namespace'=>'Api'], function(){
         Route::get('client/profile/{id}', 'ClientsController@clientProfile');
         Route::put('client/profile/update/{id}', 'ClientsController@clientProfileUpdate');
 
+        Route::get('client/service/list/{client_id}','JobController@clientServiceList');
+        Route::get('client/service/edit/{service_list_id}','JobController@clientServiceEdit');
+        Route::put('client/service/update/{service_list_id}','JobController@clientServiceUpdate');
         Route::put('client/service/add/{client_id}','JobController@clientServiceAdd');
         Route::get('client/service/status/update/{service_id}/{status}','JobController@clientServiceStatusUpdate');
         Route::put('client/service/schedule/update/{service_id}','JobController@clientServiceScheduleUpdate');

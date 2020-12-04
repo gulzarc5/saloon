@@ -30,6 +30,7 @@ class AddressController extends Controller
         }
 
         $address = new Address();
+        $address->user_id = $request->input('user_id');
         $address->name = $request->input('name');
         $address->email = $request->input('email');
         $address->mobile = $request->input('mobile');
@@ -46,6 +47,17 @@ class AddressController extends Controller
             'message' => 'Address Added Successfully',
             'error_code' => false,
             'error_message' => null,
+        ];
+        return response()->json($response, 200);
+    }
+
+    public function addressList($customer_id)
+    {
+        $address =  Address::where('user_id',$customer_id)->get();
+        $response = [
+            'status' => true,
+            'message' => 'Address List',
+            'data' => $address,
         ];
         return response()->json($response, 200);
     }

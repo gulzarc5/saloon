@@ -30,6 +30,7 @@ class ClientResource extends JsonResource
             'longitude' => $this->longitude,
             'opening_time' => $this->opening_time,
             'closing_time' => $this->closing_time,
+            'description' => $this->description,
             'client_type' => $this->clientType,
             'status' => $this->status,
             'profile_status' => $this->profile_status,
