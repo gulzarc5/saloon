@@ -136,9 +136,10 @@ class ClientsController extends Controller
         return response()->json($response, 200);
     }
 
-    public function clientProfileUpdate(Request $request,$client_id)
+    public function clientProfileUpdate(Request $request)
     {
         $validator =  Validator::make($request->all(),[
+            'client_id' => 'required',
             'name' => 'required',
             'mobile' =>  'required|unique:clients,id,'.$client_id,
             'profile_image' => 'image|mimes:jpeg,png,jpg,gif|max:2048',
@@ -160,6 +161,7 @@ class ClientsController extends Controller
             ];
             return response()->json($response, 200);
         }
+        $client_id = $request->input('client_id');
         $client = Client::find($client_id);
         $client->name = $request->input('name');
         $client->mobile = $request->input('mobile');

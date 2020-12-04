@@ -54,7 +54,7 @@ Route::group(['namespace'=>'Api'], function(){
     Route::post('client/login', 'ClientsController@clientLogin');
     Route::group(['middleware' => 'auth:clientApi'], function () {
         Route::get('client/profile/{id}', 'ClientsController@clientProfile');
-        Route::put('client/profile/update/{id}', 'ClientsController@clientProfileUpdate');
+        Route::post('client/profile/update', 'ClientsController@clientProfileUpdate');
 
         Route::get('client/service/list/{client_id}','JobController@clientServiceList');
         Route::get('client/service/edit/{service_list_id}','JobController@clientServiceEdit');
