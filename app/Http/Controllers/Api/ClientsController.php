@@ -148,7 +148,6 @@ class ClientsController extends Controller
             'pin' =>  'required',
             'service_city_id' =>  'required',
             'work_experience' => 'required',
-            'images.*' => 'image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
 
         if ($validator->fails()) {
