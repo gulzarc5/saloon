@@ -221,8 +221,9 @@ class ClientsController extends Controller
 
     }
 
-    public function galleryImageAdd(Request $request,$client_id)
+    public function galleryImageAdd(Request $request)
     {
+        $client_id = $request->input('client_id');
         $image_count = ClientImage::where('client_id',$client_id)->count();
         $image_max = (12 - $image_count);
         if ($image_max == 0) {
@@ -239,6 +240,7 @@ class ClientsController extends Controller
         $validator =  Validator::make($request->all(),[
             'images' => 'required|max:'.$image_max,
             'images.*' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'client_id' => 'required'
         ],$messages);
 
         if ($validator->fails()) {
