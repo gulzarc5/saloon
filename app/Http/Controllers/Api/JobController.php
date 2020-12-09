@@ -179,46 +179,5 @@ class JobController extends Controller
         return response()->json($response, 200);
     }
 
-    public function clientServiceScheduleUpdate(Request $request, $job_id)
-    {
-        $validator =  Validator::make($request->all(),[
-            'date' => ['required','date_format:Y-m-d'],
-            'status' => 'required|in:1,2',
-            'client_id' => 'required|numeric',
-        ]);
-        if ($validator->fails()) {
-            $response = [
-                'status' => false,
-                'message' => 'Required Field Can not be Empty',
-                'error_code' => true,
-                'error_message' => $validator->errors(),
-            ];
-            return response()->json($response, 200);
-        }
-        $date = $request->input('date');
-        $client_id = $request->input('client_id');
-        $status = $request->input('status');
-        if ($status == '1') {
-            $job = JobSchedule::firstOrNew(['id'=>$job_id,'date'=>$date,'user_id'=>$client_id]);
-            if ($job) {
-                $job->job_id = $job_id;
-                $job->user_id = $client_id;
-                $job->date = $date;
-                $job->status = $status;
-                $job->save();
-            }
-        } else {
-            $job = JobSchedule::firstOrNew(['id'=>$job_id,'date'=>$date,'user_id'=>$client_id]);
-            if ($job) {
-                $job->delete();
-            }
-        }
-        $response = [
-            'status' => true,
-            'message' => 'Job Scheduled Successfully',
-            'error_code' => false,
-            'error_message' => null,
-        ];
-        return response()->json($response, 200);
-    }
+   
 }

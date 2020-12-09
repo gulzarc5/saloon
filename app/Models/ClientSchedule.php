@@ -4,11 +4,11 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class JobSchedule extends Model
+class ClientSchedule extends Model
 {
-    protected $table = 'job_schedules';
+    protected $table = 'client_schedules';
     protected $primaryKey = 'id';
     protected $fillable = [
-        'user_id','job_id','date','status',
+        'user_id','date','status',
     ];
 }

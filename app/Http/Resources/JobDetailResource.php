@@ -24,7 +24,6 @@ class JobDetailResource extends JsonResource
             'is_man' => $this->is_man,
             'is_woman' => $this->is_woman,
             'is_kids' => $this->is_kids,
-            'job_schedules' => $this->jobSchedule,
             'user_data' => isset($this->clientData) ? new ClientResource($this->clientData) : '',
         ];
     }

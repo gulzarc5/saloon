@@ -18,11 +18,7 @@ class Job extends Model
         return $this->belongsTo('App\Models\JobCategory','job_category','id');
     }
 
-    public function jobSchedule()
-    {
-        // $date = Carbon::now()->setTimezone('Asia/Kolkata')->toDateString();
-        return $this->hasMany('App\Models\JobSchedule','job_id','id')->whereDate('created_at', '>=', Carbon::now());
-    }
+
     public function clientData()
     {
         return $this->belongsTo('App\Models\Client','user_id','id');

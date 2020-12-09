@@ -13,10 +13,9 @@ class CreateJobSchedulesTable extends Migration
      */
     public function up()
     {
-        Schema::create('job_schedules', function (Blueprint $table) {
+        Schema::create('client_schedules', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->string('user_id')->nullable();
-            $table->string('job_id')->nullable();
             $table->date('date')->nullable();
             $table->tinyInteger('status')->comment('1=Enable,2=Disable')->default(1);
             $table->timestamps();
@@ -30,6 +29,6 @@ class CreateJobSchedulesTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('job_schedules');
+        Schema::dropIfExists('client_schedules');
     }
 }

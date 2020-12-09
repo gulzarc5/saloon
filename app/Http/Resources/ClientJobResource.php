@@ -28,8 +28,7 @@ class ClientJobResource extends JsonResource
             'kids_mrp' => $this->kids_mrp,
             'kids_price' => $this->kids_price,
             'status' => $this->status,
-            'description' => $this->description,
-            'job_schedules' => $this->jobSchedule,
+            'description' => $this->description
         ];
     }
 }

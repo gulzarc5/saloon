@@ -3,6 +3,7 @@ namespace App\Models;
 
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Carbon\Carbon;
 class Client extends Authenticatable
 {
     protected $table ='clients';
@@ -25,5 +26,10 @@ class Client extends Authenticatable
     public function serviceCity()
     {
         return $this->belongsTo('App\Models\ServiceCity','service_city_id','id');
+    }
+
+    public function clientSchedules()
+    {
+        return $this->hasMany('App\Models\ClientSchedule','user_id','id')->whereDate('date','>=' ,Carbon::now());
     }
 }

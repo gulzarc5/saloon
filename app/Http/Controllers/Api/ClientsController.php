@@ -17,6 +17,7 @@ use App\SmsHelper\Sms;
 
 use App\Models\Order;
 use App\Http\Resources\Order\ClientOrderHistoryResource;
+use App\Models\ClientSchedule;
 
 class ClientsController extends Controller
 {
@@ -138,6 +139,7 @@ class ClientsController extends Controller
 
     public function clientProfileUpdate(Request $request)
     {
+        $client_id = $request->input('client_id');
         $validator =  Validator::make($request->all(),[
             'client_id' => 'required',
             'name' => 'required',
@@ -161,7 +163,6 @@ class ClientsController extends Controller
             ];
             return response()->json($response, 200);
         }
-        $client_id = $request->input('client_id');
         $client = Client::find($client_id);
         $client->name = $request->input('name');
         $client->mobile = $request->input('mobile');
@@ -476,6 +477,47 @@ class ClientsController extends Controller
             'data' => ClientOrderHistoryResource::collection($order),
         ];
 
+        return response()->json($response, 200);
+    }
+
+    public function clientScheduleUpdate(Request $request, $job_id)
+    {
+        $validator =  Validator::make($request->all(),[
+            'date' => ['required','date_format:Y-m-d'],
+            'status' => 'required|in:1,2',
+            'client_id' => 'required|numeric',
+        ]);
+        if ($validator->fails()) {
+            $response = [
+                'status' => false,
+                'message' => 'Required Field Can not be Empty',
+                'error_code' => true,
+                'error_message' => $validator->errors(),
+            ];
+            return response()->json($response, 200);
+        }
+        $date = $request->input('date');
+        $client_id = $request->input('client_id');
+        $status = $request->input('status');
+        if ($status == '1') {
+            $job = ClientSchedule::firstOrNew(['date'=>$date,'user_id'=>$client_id]);
+            if ($job) {
+                $job->user_id = $client_id;
+                $job->date = $date;
+                $job->save();
+            }
+        } else {
+            $job = ClientSchedule::firstOrNew(['date'=>$date,'user_id'=>$client_id]);
+            if ($job) {
+                $job->delete();
+            }
+        }
+        $response = [
+            'status' => true,
+            'message' => 'Job Scheduled Successfully',
+            'error_code' => false,
+            'error_message' => null,
+        ];
         return response()->json($response, 200);
     }
 }
