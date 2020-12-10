@@ -480,7 +480,7 @@ class ClientsController extends Controller
         return response()->json($response, 200);
     }
 
-    public function clientScheduleUpdate(Request $request, $job_id)
+    public function clientScheduleUpdate(Request $request)
     {
         $validator =  Validator::make($request->all(),[
             'date' => ['required','date_format:Y-m-d'],
