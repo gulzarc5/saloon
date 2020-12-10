@@ -37,4 +37,15 @@ class AppSettingController extends Controller
         ];
         return response()->json($response, 200);
     }
+
+    public function serviceList()
+    {
+        $category_list = JobCategory::where('status',1)->get();
+        $response = [
+            'status' => true,
+            'message' => 'Service Category List',
+            'data' => $category_list,
+        ];
+        return response()->json($response, 200);
+    }
 }

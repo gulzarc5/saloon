@@ -18,6 +18,7 @@ Route::group(['namespace'=>'Api'], function(){
     Route::get('signUp/otp/verify/{mobile}/{otp}/{user_type}', 'CustomerController@signUpOtpVerify');
     Route::get('service/city/list', 'AppSettingController@serviceCity');
     Route::get('app/loade/api', 'AppSettingController@AppLoadApi');
+    Route::get('service/list/category', 'AppSettingController@serviceList');
 
     // Customer
     Route::post('customer/registration','CustomerController@customerRegistration');
