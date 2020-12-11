@@ -54,7 +54,7 @@ class JobController extends Controller
         $length = count($job_id);
    
         for ($i = 0; $i < $length; $i++) {
-            $check_job = Job::where('job_category',$job_id[$i])->count();
+            $check_job = Job::where('job_category',$job_id[$i])->where('user_id',$client_id)->count();
 
             if ($check_job == 0) {
                 $job = new Job();
