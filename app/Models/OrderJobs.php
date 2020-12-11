@@ -8,7 +8,7 @@ class OrderJobs extends Model
 {
     protected $table = 'order_job';
     protected $fillable = [
-        'order_id','job_id',
+        'order_id','job_id','service_for','amount'
     ];
 
     public function job()

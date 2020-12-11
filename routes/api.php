@@ -30,7 +30,7 @@ Route::group(['namespace'=>'Api'], function(){
     Route::post('client/forgot/password/change', 'ClientsController@forgotPasswordChange');
 
     Route::group(['prefix'=> 'service'],function () {
-        Route::get('list/{service_city}/{category_id}/{page}/{client_type?}','ServiceController@serviceList');
+        Route::post('list','ServiceController@serviceList');
         Route::get('details/{service_id}','ServiceController@serviceDetails');
     });
     //customer Section

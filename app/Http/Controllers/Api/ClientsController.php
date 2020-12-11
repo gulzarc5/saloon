@@ -470,7 +470,7 @@ class ClientsController extends Controller
 
     public function orderHistory($client_id)
     {
-        $order = Order::where('customer_id', $client_id)->where('payment_status',2)->limit(50)->get();
+        $order = Order::where('vendor_id', $client_id)->where('payment_status',2)->orderBy('id', 'desc')->limit(50)->get();
         $response = [
             'status' => true,
             'message' => 'Order history',

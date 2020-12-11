@@ -3,11 +3,13 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Models\ClientSchedule;
 use App\Models\Job;
 use App\Models\Order;
 use App\Models\OrderJobs;
 use Illuminate\Http\Request;
 use Validator;
+use Carbon\Carbon;
 
 use Razorpay\Api\Api;
 
@@ -20,8 +22,8 @@ class OrderController extends Controller
             'user_id' =>'required',
             'service_id' =>'required|array|min:1',
             'service_id.*' =>'required',
-            'service_type' =>'required|array|min:1',
-            'service_type.*' =>'required',
+            'service_for' =>'required|array|min:1',
+            'service_for.*' =>'required',
             'service_time' =>'required|date_format:Y-m-d H:i:s',
             'address_id'=>'required',
             'vendor_id' => 'required'
@@ -37,24 +39,24 @@ class OrderController extends Controller
             return response()->json($response, 200);
         }
         $service_id = $request->input('service_id');
-        $service_type = $request->input('service_type');
+        $service_for = $request->input('service_for');
         $vendor_id = $request->input('vendor_id');
+        $service_date = $request->input('service_time');
         //check service is available or not
-        $vendor_id = null;
         for ($i=0; $i < count($service_id); $i++) { 
-            if (isset($service_id[$i]) && !empty($service_id[$i]) && isset($service_type[$i]) && !empty($service_type[$i])) {
-                $checkService = Job::where('status',1);
-                if($service_id[$i] = 1){
+            if (isset($service_id[$i]) && !empty($service_id[$i]) && isset($service_for[$i]) && !empty($service_for[$i])) {
+                $checkService = Job::where('id',$service_id[$i])->where('status',1);
+                if($service_id[$i] = '1'){
                     $checkService->where('is_man',2);
-                }elseif ($service_id[$i] = 2) {
+                }elseif ($service_id[$i] = '2') {
                     $checkService->where('is_woman',2);
-                }else {
+                }elseif ($service_for[$i] = '3') {
                     $checkService->where('is_kids',2);
                 }
                 if ($checkService->count() == 0) {
                     $response = [
                         'status' => false,
-                        'message' => 'Service Not Available',
+                        'message' => 'Service Not Found',
                         'error_code' => false,
                         'error_message' => null,
                     ];
@@ -66,28 +68,22 @@ class OrderController extends Controller
         //check Vendor is available or not in scheduled date
         // $checkSchedule = 
 
-
-        foreach ($service_id as $key => $item) {
-            $job_count = Job::select('jobs.id','jobs.user_id')->where('jobs.status',1)
-            ->join('clients','clients.id','=','jobs.user_id')
-            ->where('clients.clientType',1);
-            $vendor_data = $job_count->first();
-            $vendor_id = $vendor_data->user_id;
-            if ($job_count->count() > 0) {
-                $validator =  Validator::make($request->all(),[
-                    'address_id' =>'required',
-                ]);
-                if ($validator->fails()) {
-                    $response = [
-                        'status' => false,
-                        'message' => 'Required data Can not Be Empty',
-                        'error_code' => true,
-                        'error_message' => $validator->errors(),
-                    ];
-                    return response()->json($response, 200);
-                }
+        $service_date_check = Carbon::parse($service_date)->toDateString();
+        if (!empty($service_date_check)) {
+            $checkSchedule = ClientSchedule::where('user_id',$vendor_id)->where('date',$service_date_check)->count();
+            if ($checkSchedule > 0) {
+                $response = [
+                    'status' => false,
+                    'message' => 'Service Not Available At Scheduled Date',
+                    'error_code' => false,
+                    'error_message' => null,
+                ];
+                return response()->json($response, 200);
             }
         }
+
+        ////////////// Validation End////////////////////
+        
 
         $total_amount = 0;
         //Order Creation
@@ -97,20 +93,48 @@ class OrderController extends Controller
         $order->service_time = $request->input('service_time');
         $order->vendor_id = $vendor_id;
         if ($order->save()) {
-            foreach ($service_id as $key => $service) {
-                $order_job = new OrderJobs();
-                $order_job->order_id = $order->id;
-                $order_job->job_id = $service;
-                $order_job->save();
-                $amount_fetch = Job::find($service);
-                $total_amount+=$amount_fetch->price;
+            for ($i=0; $i < count($service_id); $i++) { 
+                if (isset($service_id[$i]) && !empty($service_id[$i]) && isset($service_for[$i]) && !empty($service_for[$i])) {
+                    $checkService = Job::where('id',$service_id[$i])->where('status',1);
+                    if($service_for[$i] = '1'){
+                        $checkService->where('is_man',2);
+                    }elseif ($service_for[$i] = '2') {
+                        $checkService->where('is_woman',2);
+                    }elseif ($service_for[$i] = '3') {
+                        $checkService->where('is_kids',2);
+                    }
+                    if ($checkService->count() > 0) {
+                        $job_fetch = $checkService->first();
+                        $order_job = new OrderJobs();
+                        $order_job->order_id = $order->id;                        
+                        $order_job->job_id = $service_id[$i];
+                        $order_job->service_for = $service_for[$i];
+                        if($service_for[$i] = '1'){
+                            $order_job->amount = $job_fetch->man_price;
+                            $total_amount+=$job_fetch->man_price;
+                        }elseif ($service_for[$i] = '2') {
+                            $order_job->amount = $job_fetch->woman_price;
+                            $total_amount+=$job_fetch->woman_price;
+                        }elseif ($service_for[$i] = '3') {
+                            $order_job->amount = $job_fetch->kids_price;
+                            $total_amount+=$job_fetch->kids_price;
+                        }
+                        $order_job->save();
+                    }
+                }
             }
+
             $order->amount = $total_amount;
+            $advance_amount = 0;
+            if ($total_amount > 0) {
+                $advance_amount = (($total_amount*20)/100);
+            }
+            $order->advance_amount = $advance_amount;
 
             $api = new Api(config('services.razorpay.id'), config('services.razorpay.key'));
                 $orders = $api->order->create(array(
                     'receipt' =>$order->id,
-                    'amount' => $total_amount*100,
+                    'amount' => $advance_amount*100,
                     'currency' => 'INR',
                     )
                 );
@@ -120,7 +144,7 @@ class OrderController extends Controller
 
                 $payment_data = [
                     'key_id' => config('services.razorpay.id'),
-                    'amount' => $total_amount*100,
+                    'amount' => $advance_amount*100,
                     'order_id' => $orders['id'],
                     'name' => $order->customer->name,
                     'email' => $order->customer->email,
@@ -136,6 +160,7 @@ class OrderController extends Controller
                         'order_id' => $order->id,
                         'payment_status' => 1,
                         'amount' => $total_amount,
+                        'advance_amount' => $advance_amount,
                         'payment_data' => $payment_data,
                     ],
                 ];

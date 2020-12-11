@@ -372,7 +372,7 @@ class CustomerController extends Controller
 
     public function orderHistory($user_id)
     {
-        $order = Order::where('customer_id', $user_id)->limit(50)->get();
+        $order = Order::where('customer_id', $user_id)->orderBy('id', 'desc')->limit(50)->get();
         $response = [
             'status' => true,
             'message' => 'Order history',

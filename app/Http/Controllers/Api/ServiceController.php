@@ -7,14 +7,36 @@ use App\Http\Resources\JobListResource;
 use App\Http\Resources\JobDetailResource;
 use App\Models\Job;
 use Illuminate\Http\Request;
+use Validator;
 
 class ServiceController extends Controller
 {
-    public function serviceList($service_city,$category_id,$page,$client_type = null)
+    public function serviceList(Request $request)
     {
+        $validator =  Validator::make($request->all(),[
+            'service_city' => 'required',
+            'category_id' => 'required',
+            'page' => 'required|in:1,2',
+        ]);
+
+        if ($validator->fails()) {
+            $response = [
+                'status' => false,
+                'message' => 'Required data Can not Be Empty',
+                'error_code' => true,
+                'error_message' => $validator->errors(),
+            ];
+            return response()->json($response, 200);
+        }
+        $service_city = $request->input('service_city');
+        $category_id = $request->input('category_id');
+        $client_type = $request->input('client_type');
+        $service_for = $request->input('service_for');
+        $page = $request->input('page');
+
         $jobs = Job::select('jobs.*')->where('jobs.status',1)
         ->join('clients','clients.id','=','jobs.user_id');
-        if (!empty($jobs)) {
+        if (!empty($category_id)) {
             $jobs->where('jobs.job_category',$category_id);
         }
         if (!empty($service_city)) {
@@ -22,6 +44,15 @@ class ServiceController extends Controller
         }
         if (!empty($client_type)) {
             $jobs->where('clients.clientType',$client_type);
+        }
+        if (!empty($service_for)) {
+            if ($service_for == '1') {
+                $jobs->where('jobs.is_man',2);
+            }elseif ($service_for == '2') {
+                $jobs->where('jobs.is_woman',2);
+            }elseif ($service_for == '3') {
+                $jobs->where('jobs.is_kids',2);
+            }
         }
         $jobs->where('clients.status',1)
         ->where('clients.profile_status',2)
