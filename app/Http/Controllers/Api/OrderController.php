@@ -46,11 +46,11 @@ class OrderController extends Controller
         for ($i=0; $i < count($service_id); $i++) { 
             if (isset($service_id[$i]) && !empty($service_id[$i]) && isset($service_for[$i]) && !empty($service_for[$i])) {
                 $checkService = Job::where('id',$service_id[$i])->where('status',1);
-                if($service_id[$i] = '1'){
+                if($service_for[$i] == '1'){
                     $checkService->where('is_man',2);
-                }elseif ($service_id[$i] = '2') {
+                }elseif ($service_for[$i] == '2') {
                     $checkService->where('is_woman',2);
-                }elseif ($service_for[$i] = '3') {
+                }elseif ($service_for[$i] == '3') {
                     $checkService->where('is_kids',2);
                 }
                 if ($checkService->count() == 0) {
@@ -96,11 +96,11 @@ class OrderController extends Controller
             for ($i=0; $i < count($service_id); $i++) { 
                 if (isset($service_id[$i]) && !empty($service_id[$i]) && isset($service_for[$i]) && !empty($service_for[$i])) {
                     $checkService = Job::where('id',$service_id[$i])->where('status',1);
-                    if($service_for[$i] = '1'){
+                    if($service_for[$i] == '1'){
                         $checkService->where('is_man',2);
-                    }elseif ($service_for[$i] = '2') {
+                    }elseif ($service_for[$i] == '2') {
                         $checkService->where('is_woman',2);
-                    }elseif ($service_for[$i] = '3') {
+                    }elseif ($service_for[$i] == '3') {
                         $checkService->where('is_kids',2);
                     }
                     if ($checkService->count() > 0) {
@@ -109,13 +109,13 @@ class OrderController extends Controller
                         $order_job->order_id = $order->id;                        
                         $order_job->job_id = $service_id[$i];
                         $order_job->service_for = $service_for[$i];
-                        if($service_for[$i] = '1'){
+                        if($service_for[$i] == '1'){
                             $order_job->amount = $job_fetch->man_price;
                             $total_amount+=$job_fetch->man_price;
-                        }elseif ($service_for[$i] = '2') {
+                        }elseif ($service_for[$i] == '2') {
                             $order_job->amount = $job_fetch->woman_price;
                             $total_amount+=$job_fetch->woman_price;
-                        }elseif ($service_for[$i] = '3') {
+                        }elseif ($service_for[$i] == '3') {
                             $order_job->amount = $job_fetch->kids_price;
                             $total_amount+=$job_fetch->kids_price;
                         }
