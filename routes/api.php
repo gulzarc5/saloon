@@ -42,6 +42,11 @@ Route::group(['namespace'=>'Api'], function(){
         Route::post('payment/verify','OrderController@paymentVerify');
         Route::get('order/history/{user_id}','CustomerController@orderHistory');
 
+        Route::put('bank/info/add/{customer_id}','CustomerController@bankInfoInsert');
+        Route::get('bank/info/list/{customer_id}','CustomerController@bankInfoList');
+        Route::get('bank/info/fetch/{bank_info_id}','CustomerController@bankInfoFetch');
+        Route::put('bank/info/update/{bank_info_id}','CustomerController@bankInfoUpdate');
+
         Route::group(['prefix' => 'address'], function (){
             Route::get('list/{customer_id}','AddressController@addressList');
             Route::post('add','AddressController@addAddress');

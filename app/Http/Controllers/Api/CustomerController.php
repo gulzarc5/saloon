@@ -16,6 +16,7 @@ use App\Models\Client;
 
 use App\Models\Order;
 use App\Http\Resources\CustomerOrderHistoryResource;
+use App\Models\UserBankAccount;
 
 class CustomerController extends Controller
 {
@@ -243,6 +244,99 @@ class CustomerController extends Controller
         }
     }
 
+    public function bankInfoInsert(Request $request,$user_id)
+    {
+        $validator =  Validator::make($request->all(), [
+            'bank_name' => 'required|string',
+            'ac_no' =>  'required',
+            'ifsc' =>  'required',
+            'branch_name' => 'required|string',
+        ]);
+
+        if ($validator->fails()) {
+            $response = [
+                'status' => false,
+                'message' => 'Required Field Can not be Empty',
+                'error_code' => true,
+                'error_message' => $validator->errors(),
+            ];
+            return response()->json($response, 200);
+        }
+        $bankInfo = new UserBankAccount();
+        $bankInfo->user_id = $user_id;
+        $bankInfo->bank_name = $request->input('bank_name');
+        $bankInfo->ac_no = $request->input('ac_no');
+        $bankInfo->ifsc = $request->input('ifsc');
+        $bankInfo->branch_name = $request->input('branch_name');
+        $bankInfo->save();
+
+        $response = [
+            'status' => true,
+            'message' => 'Bank Account Added Successfully',
+            'error_code' => false,
+            'error_message' => null,
+        ];
+        return response()->json($response, 200);
+    }
+
+    public function bankInfoList($user_id)
+    {
+        $bankAccountList = UserBankAccount::where('user_id', $user_id)->orderBy('id','desc')->get();
+        $response = [
+            'status' => true,
+            'message' => 'Bank Account List',
+            'data' => $bankAccountList,
+        ];
+        return response()->json($response, 200);
+    }
+
+    public function bankInfoFetch($bank_info_id)
+    {
+        $bankAccount = UserBankAccount::find($bank_info_id);
+        $response = [
+            'status' => true,
+            'message' => 'Bank Account Data',
+            'data' => $bankAccount,
+        ];
+        return response()->json($response, 200);
+    }
+
+    public function bankInfoUpdate(Request $request,$bank_info_id)
+    {
+        $validator =  Validator::make($request->all(), [
+            'bank_name' => 'required|string',
+            'ac_no' =>  'required',
+            'ifsc' =>  'required',
+            'branch_name' => 'required|string',
+        ]);
+
+        if ($validator->fails()) {
+            $response = [
+                'status' => false,
+                'message' => 'Required Field Can not be Empty',
+                'error_code' => true,
+                'error_message' => $validator->errors(),
+            ];
+            return response()->json($response, 200);
+        }
+
+        $bankAccount = UserBankAccount::find($bank_info_id);
+        if ($bankAccount) {
+            $bankAccount->bank_name = $request->input('bank_name');
+            $bankAccount->ac_no = $request->input('ac_no');
+            $bankAccount->ifsc = $request->input('ifsc');
+            $bankAccount->branch_name = $request->input('branch_name');
+            $bankAccount->save();
+        }
+        $response = [
+            'status' => true,
+            'message' => 'Bank Account Updated Successfully',
+            'error_code' => false,
+            'error_message' => null,
+        ];
+        return response()->json($response, 200);
+    }
+
     public function passwordChange(Request $request,$id)
     {
         $validator =  Validator::make($request->all(),[
@@ -381,4 +475,6 @@ class CustomerController extends Controller
 
         return response()->json($response, 200);
     }
+
+
 }

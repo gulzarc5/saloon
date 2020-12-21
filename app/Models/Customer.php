@@ -18,4 +18,9 @@ class Customer extends Authenticatable
     protected $hidden = [
         'password',
     ];
+
+    public function bankAccount()
+    {
+        return $this->hasMany('App\Models\UserBankAccount','user_id','id');
+    }
 }

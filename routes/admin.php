@@ -54,8 +54,12 @@ Route::group(['namespace' => 'Admin'],function(){
         });
 
         // Orders
-        Route::group(['namespace' => 'Order'], function () {
-            Route::get('/orders', 'OrdersController@index')->name('admin.orders');
+        Route::group(['namespace' => 'Order','prefix'=>'order'], function () {
+            Route::get('/list', 'OrdersController@index')->name('admin.orders');
+            Route::get('/details/{order_id}', 'OrdersController@orderDetails')->name('admin.order_details');
+            Route::get('accept/{order_id}/{status}','OrdersController@acceptOrder')->name('admin.order_accept');
+            Route::get('/cancel/{order_id}/{account_id}', 'OrdersController@orderCancel')->name('admin.order_cancel');
+
             Route::get('/refund', 'OrdersController@refund')->name('admin.refunds');
         });
 
@@ -95,8 +99,10 @@ Route::group(['namespace' => 'Admin'],function(){
                 Route::get('delete/{id}', 'SliderController@SliderDelete')->name('admin.slider_delete');
             });
 
-
-
+            Route::group(['prefix'=>'setting'],function(){
+                Route::get('invoice', 'ConfigurationController@invoiceForm')->name('admin.invoice_form');
+                Route::post('invoice/update/', 'ConfigurationController@invoiceUpdate')->name('admin.invoiceUpdate');
+            });
         });
 
         // Enquery
@@ -104,5 +110,7 @@ Route::group(['namespace' => 'Admin'],function(){
             Route::get('/feedback', 'EnqueryController@feedback')->name('admin.feedback');
             Route::get('/enquery', 'EnqueryController@enquery')->name('admin.enquery');
         });
+
+        
     });
 });

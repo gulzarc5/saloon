@@ -113,6 +113,7 @@
                         <li><a href="{{ route('admin.city')}}">City List</a></li>
                         <li><a href="{{ route('admin.serviceCity')}}">Service City List</a></li>
                         <li><a href="{{ route('admin.app_slider_list')}}">Aapp Sliders</a></li>
+                        <li class="sub_menu"><a href="{{route('admin.invoice_form')}}">Invoice Setting</a></li>
                       </ul>
                   </li>
                   <li>

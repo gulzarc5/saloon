@@ -16,6 +16,11 @@ class Order extends Model
         return $this->belongsTo('App\Models\Customer','customer_id','id');
     }
 
+    public function address()
+    {
+        return $this->belongsTo('App\Models\Address','customer_address_id','id');
+    }
+
     public function client()
     {
         return $this->belongsTo('App\Models\Client','vendor_id','id');
