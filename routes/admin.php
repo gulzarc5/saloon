@@ -58,9 +58,16 @@ Route::group(['namespace' => 'Admin'],function(){
             Route::get('/list', 'OrdersController@index')->name('admin.orders');
             Route::get('/details/{order_id}', 'OrdersController@orderDetails')->name('admin.order_details');
             Route::get('accept/{order_id}/{status}','OrdersController@acceptOrder')->name('admin.order_accept');
-            Route::get('/cancel/{order_id}/{account_id}', 'OrdersController@orderCancel')->name('admin.order_cancel');
+            Route::get('/cancel/{order_id}/{is_refund}/{account_id?}', 'OrdersController@orderCancel')->name('admin.order_cancel');
+            Route::get('/reschedule/{order_id}/{date}', 'OrdersController@orderReSchedule')->name('admin.order_re_schedule');
+            Route::get('/search', 'OrdersController@orderSearch')->name('admin.order_search');
 
-            Route::get('/refund', 'OrdersController@refund')->name('admin.refunds');
+        });
+        
+        Route::group(['prefix'=>'refund'],function(){
+            Route::get('/list', 'RefundController@refund')->name('admin.refunds');
+            Route::get('/update/{refund_id}', 'RefundController@refundUpdate')->name('admin.refund_update');
+
         });
 
         // Configuartion

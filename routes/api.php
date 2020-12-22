@@ -65,7 +65,7 @@ Route::group(['namespace'=>'Api'], function(){
         Route::get('client/service/list/{client_id}','JobController@clientServiceList');
         Route::get('client/service/edit/{service_list_id}','JobController@clientServiceEdit');
         Route::put('client/service/update/{service_list_id}','JobController@clientServiceUpdate');
-        Route::put('client/service/add/{client_id}','JobController@clientServiceAdd');
+        Route::post('client/service/add','JobController@clientServiceAdd');
         Route::get('client/service/status/update/{service_id}/{status}','JobController@clientServiceStatusUpdate');
         Route::post('client/schedule/update','ClientsController@clientScheduleUpdate');
 

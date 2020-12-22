@@ -17,7 +17,8 @@
                         <h2>Orders</h2>
                     </div>
                     <div class="col-md-4">
-                        <form action="">
+                        <form action="{{ route('admin.order_search')}}" method="get">
+                           
                             <div class="col-md-10">
                                 <input type="text" name="search_key" id="" class="form-control" placeholder="Search By Order Id">
                             </div>
@@ -111,13 +112,17 @@
                                             @endif
                                           @else
                                             @if ($order->order_status != '4')
-                                              <button class="btn btn-xs btn-danger" onclick="openModelCancel({{$order->id}},{{$bank_account}},{{$count}})">Cancel</button>
+                                                @if ($order->order_status == '5')                                                
+                                                    <button class="btn btn-xs btn-danger" disabled>Cancelled</button>
+                                                @else
+                                                    <button class="btn btn-xs btn-danger" onclick="openModelCancel({{$order->id}},{{$bank_account}},{{$count}})">Cancel</button>
+                                                @endif
                                             @endif
                                             @if ($order->order_status < '2')
                                               <button class="btn btn-xs btn-primary" onclick="openModal({{$order->id}},'2',{{$count}},'Are You Sure To Accept')">Accept</button>
                                             @endif
                                             @if ($order->order_status < '4')
-                                              <button class="btn btn-xs btn-primary" onclick="openModal({{$order->id}},'2',{{$count}},'Are You Sure To Accept')">Reschedule</button>
+                                              <button class="btn btn-xs btn-primary" onclick="openModelReschedule({{$order->id}},{{$count}})">Reschedule</button>
                                             @endif
                                           @endif
                                         </b>
@@ -132,7 +137,7 @@
                                 @endif
                             </tbody>
                         </table>
-                        {{-- {!! $orders->onEachSide(2)->links() !!} --}}
+                        {!! $orders->onEachSide(2)->links() !!}
                     </div>
 
                 </div>
@@ -142,7 +147,7 @@
 </div>
 
 
-{{-- Model for assign Delivery Boy --}}
+{{-- Model for Cancel Order --}}
 
 <div class="modal fade bs-example-modal-sm" tabindex="-1" role="dialog" aria-hidden="true" id="myModel">
     <div class="modal-dialog modal-sm">
@@ -156,13 +161,60 @@
         <div class="modal-body">
           <input type="hidden" name="order_id" id="model_order_id">
           <input type="hidden" id="action_input_id">
-          <select name="account_no" class="form-control" id="account_no_model">
-              
-          </select>
+          <div class="col-md-6 col-sm-12 col-xs-12 mb-3">
+              <label for="prescription">Is Refundable?</label>
+          </div>
+          <div class="col-md-6 col-sm-12 col-xs-12 mb-3">
+              <p> Yes : <input type="radio"  name="is_refund"  value="2"  />
+                  No : <input type="radio" name="is_refund"  value="1"    checked/>
+              </p>
+          </div>
+
+            <div class="col-md-12 col-sm-12 col-xs-12 mb-3" id="account_no_div" style="display: none;">
+                <label for="prescription">Select Account No</label>
+                <select name="account_no" class="form-control" id="account_no_model" ></select> 
+                <span id="account_error"></span>
+            </div>
+
+          
         </div>
+
         <div class="modal-footer">
           <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-          <button type="button" class="btn btn-primary" onclick="hideModelCancel() ">Submit</button>
+          <button type="button" class="btn btn-primary" onclick="checkModelInput() ">Submit</button>
+        </div>
+      </div>
+    </div>
+</div>
+
+{{-- Model for Reschedule Order --}}
+
+<div class="modal fade bs-example-modal-sm" tabindex="-1" role="dialog" aria-hidden="true" id="reScheduleModel">
+    <div class="modal-dialog modal-sm">
+      <div class="modal-content">
+
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span>
+          </button>
+          <h4 class="modal-title" id="myModalLabel2">Select Account Number</h4>
+        </div>
+        <div class="modal-body">
+          <input type="hidden" name="order_id" id="re_model_order_id">
+          <input type="hidden" id="re_action_input_id">
+          <div class="col-md-12 col-sm-12 col-xs-12 mb-3">
+              <label for="prescription">Select Schedule Date</label>
+          </div>
+          <div class="col-md-12 col-sm-12 col-xs-12 mb-3">
+              <input type="datetime-local" class="form-control"  name="schedule_date"  id="schedule_date"/>
+              <span id="reschedule_error"></span>
+          </div>
+          <br>
+          <br>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+          <button type="button" class="btn btn-primary" onclick="checkModelReschduleInput() ">Submit</button>
         </div>
       </div>
     </div>
@@ -176,6 +228,17 @@
     <script src="{{asset('admin/dialog_master/simple-modal.js')}}"></script>
 
     <script>
+
+        $(document).ready(function() {
+            $("input[name='is_refund']").click(function(){
+                if($("input[name='is_refund']:checked").val() == '2'){
+                    $("#account_no_div").show();
+                }else{
+                    $("#account_no_div").hide();
+                }
+            });
+        })
+
         async function openModal(order_id,status,action_id,msg) {
             this.myModal = new SimpleModal("Attention!", msg);
             try {
@@ -221,6 +284,7 @@
         }
     </script>
 
+    {{-- // Cancel Order --}}
     <script>
         function openModelCancel(order_id,bank_account,action_id) {
             $('#myModel').modal({
@@ -242,18 +306,34 @@
             })
         }
 
+        function checkModelInput() {
+            $("#account_error").html('');
+            if($("input[name='is_refund']:checked").val() == '2'){
+                if (!$('#account_no_model').val()) {
+                    $("#account_error").html('<p style="color:red">Please Select Account No</p>');
+                }else{
+                    hideModelCancel();
+                }
+            }else{
+                hideModelCancel();
+            }
+        }
+
         function hideModelCancel() {
             $('#myModel').modal('hide');
             $('#myModel').on('hidden.bs.modal', function (e) {
                 var model_order_id = $("#model_order_id").val();
                 var account_no_id =  $("#account_no_model").val();
                 var action_input =  $("#action_input_id").val();
-                console.log(account_no_id);
-                console.log(model_order_id);
-                if (Delivery_boy_id) {
+                var is_refund =  $("input[name='is_refund']:checked").val();
+                console.log('account_no_id '+account_no_id);
+                console.log('model_order_id '+model_order_id);
+                console.log('is_refund '+is_refund);
+                console.log('action_input '+action_input);
+                if (model_order_id && is_refund) {
                     $.ajax({
                         type:"GET",
-                        url:"{{url('admin/order/cancel/{order_id}/')}}"+"/"+model_order_id+"/"+account_no_id,
+                        url:"{{url('admin/order/cancel/')}}"+"/"+model_order_id+"/"+is_refund+"/"+account_no_id,
 
                         beforeSend: function() {
                             // setting a timeout
@@ -262,7 +342,7 @@
                         },
                         success:function(data){
                             if (data) {
-                                $("#status"+action_input).html('<button class="btn btn-xs btn-info" disabled>Cancelled</button>');
+                                $("#status"+action_input).html('<button class="btn btn-xs btn-danger" disabled>Cancelled</button>');
                                 $("#action"+action_input).html(`<button class="btn btn-xs btn-danger" >Cancelled</button>`);
                             }else{
                                 $("#status"+action_input).html("");
@@ -275,4 +355,64 @@
             })
         }
     </script>
+
+    {{-- //reschedule --}}
+    <script>
+        function openModelReschedule(order_id,action_id) {
+            $('#reScheduleModel').modal({
+                keyboard: false,
+                backdrop: 'static'
+            });
+            $('#reScheduleModel').on('shown.bs.modal', function (e) {
+                $("#re_model_order_id").val(order_id);
+                $("#re_action_input_id").val(action_id);
+                $(this).off('shown.bs.modal');
+            })
+        }
+
+        function checkModelReschduleInput() {
+            $("#reschedule_error").html('');
+            if (!$('#schedule_date').val()) {
+                $("#reschedule_error").html('<p style="color:red">Please Select Schedule Date</p>');
+            }else{
+                hideModelReSchedule();
+            }
+        }
+
+        function hideModelReSchedule() {
+            $('#reScheduleModel').modal('hide');
+            $('#reScheduleModel').on('hidden.bs.modal', function (e) {
+                var re_model_order_id = $("#re_model_order_id").val();
+                var re_action_input_id =  $("#re_action_input_id").val();
+                var schedule_date =  $("#schedule_date").val();
+                console.log('re_model_order_id '+re_model_order_id);
+                console.log('re_action_input_id '+re_action_input_id);
+                console.log('schedule_date '+schedule_date);
+                if (re_model_order_id && schedule_date) {
+                    $.ajax({
+                        type:"GET",
+                        url:"{{url('admin/order/reschedule/')}}"+"/"+re_model_order_id+"/"+schedule_date,
+
+                        beforeSend: function() {
+                            // setting a timeout
+                            $("#action"+re_action_input_id).html('<i class="fa fa-spinner fa-spin"></i>');
+                            $("#status"+re_action_input_id).html('<i class="fa fa-spinner fa-spin"></i>');
+                        },
+                        success:function(data){
+                            if (data) {
+                                $("#status"+re_action_input_id).html('<button class="btn btn-xs btn-info" disabled>Re Scheduled</button>');
+                                $("#action"+re_action_input_id).html(`<button class="btn btn-xs btn-info" >Re Scheduled</button>`);
+                            }else{
+                                $("#status"+re_action_input_id).html("");
+                                $("#action"+re_action_input_id).html('<button class="btn btn-xs btn-danger" disabled>Try Again</button>');
+                            }
+                        }
+                    });
+                }
+                $(this).off('hidden.bs.modal');
+            })
+        }
+    </script>
+
+
  @endsection

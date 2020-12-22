@@ -11,9 +11,10 @@ use  Validator;
 
 class JobController extends Controller
 {
-    public function clientServiceAdd(Request $request,$client_id)
+    public function clientServiceAdd(Request $request)
     {
         $validator =  Validator::make($request->all(),[
+            'client_id' => 'required',
             'job_id.*' => 'required|numeric',
             'is_man.*' => 'required|in:1,2',
             'man_mrp.*' => 'required',
@@ -36,7 +37,7 @@ class JobController extends Controller
             ];
             return response()->json($response, 200);
         }
-
+        $client_id = $request->input('client_id');
         $job_id = $request->input('job_id');
         $man_mrp    = $request->input('man_mrp');
         $man_price = $request->input('man_price');
