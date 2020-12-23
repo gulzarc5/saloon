@@ -32,4 +32,9 @@ class Client extends Authenticatable
     {
         return $this->hasMany('App\Models\ClientSchedule','user_id','id')->whereDate('date','>=' ,Carbon::now());
     }
+
+    public function review()
+    {
+        return $this->hasMany('App\Models\Review','client_id','id');
+    }
 }

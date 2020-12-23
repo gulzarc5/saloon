@@ -18,6 +18,8 @@ use App\SmsHelper\Sms;
 use App\Models\Order;
 use App\Http\Resources\Order\ClientOrderHistoryResource;
 use App\Models\ClientSchedule;
+use App\Models\RefundInfo;
+use App\Models\UserBankAccount;
 
 class ClientsController extends Controller
 {
@@ -517,6 +519,34 @@ class ClientsController extends Controller
             'message' => 'Job Scheduled Successfully',
             'error_code' => false,
             'error_message' => null,
+        ];
+        return response()->json($response, 200);
+    }
+
+    public function orderStatus($order_id,$status)
+    {
+        $order = Order::find($order_id);
+        if ($order) {
+            $order->order_status = $status;
+            $order->save();
+
+            $user_account = UserBankAccount::where('user_id', $order->customer_id)->first();
+            if ($status == '5') {
+                $refund = new RefundInfo();
+                $refund->order_id = $order->id;
+                if ($user_account) {
+                    $refund->account_id = $user_account->id;
+                }
+                $refund->amount = $order->advance_amount;
+                if ($refund->save()) {
+                    $order->refund_request = 2;
+                    $order->save();
+                }
+            }
+        }
+        $response = [
+            'status' => true,
+            'message' => 'Order Status Updated Successfully',
         ];
         return response()->json($response, 200);
     }

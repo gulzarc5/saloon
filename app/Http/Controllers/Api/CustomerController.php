@@ -16,6 +16,7 @@ use App\Models\Client;
 
 use App\Models\Order;
 use App\Http\Resources\CustomerOrderHistoryResource;
+use App\Models\RefundInfo;
 use App\Models\UserBankAccount;
 
 class CustomerController extends Controller
@@ -476,5 +477,54 @@ class CustomerController extends Controller
         return response()->json($response, 200);
     }
 
+    public function orderCancel(Request $request)
+    {
+        $messages = [
+            'required_if' => 'Please Select Account',
+        ];
+        //is_refund 2 = yes, 1 = No
+        $validator =  Validator::make($request->all(),[
+            'order_id' => 'required',
+            'is_refund' => 'required',
+            'account_id' =>  'required_if:is_refund,2'
+        ],$messages);
+       
+        if ($validator->fails()) {
+            $response = [
+                'status' => false,
+                'message' => 'Required Field Can not be Empty',
+                'error_code' => true,
+                'error_message' => $validator->errors(),
+            ];
+            return response()->json($response, 200);
+        }
+        $order_id = $request->input('order_id');
+        $is_refund = $request->input('is_refund');
+        $account_id = $request->input('account_id');
+
+        $order = Order::find($order_id);
+        if ($order) {
+            $order->order_status = 5;
+            $order->save();
+            if ($is_refund == 2) {
+                $refund = new RefundInfo();
+                $refund->order_id = $order->id;
+                $refund->account_id = $account_id;
+                $refund->amount = $order->advance_amount;
+                if ($refund->save()) {
+                    $order->refund_request = 2;
+                    $order->save();
+                }
+            }
+        }
+        $response = [
+            'status' => true,
+            'message' => 'Order Cancelled Successfully',
+            'error_code' => false,
+            'error_message' => null,
+        ];
+        return response()->json($response, 200);
+
+    }
 
 }

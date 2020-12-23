@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Resources\JobListResource;
 use App\Http\Resources\JobDetailResource;
 use App\Models\Job;
+use App\Models\Review;
 use Illuminate\Http\Request;
 use Validator;
 
@@ -92,6 +93,41 @@ class ServiceController extends Controller
             'status' => true,
             'message' => 'Service Details',
             'data' => new JobDetailResource($jobs),
+        ];
+        return response()->json($response, 200);
+    }
+
+    public function insertReview(Request $request)
+    {
+        $validator =  Validator::make($request->all(),[
+            'client_id' => 'required',
+            'customer_id' => 'required',
+            'comment' => 'required|string',
+            'rating' => 'required|numeric|min:1|max:5',
+        ]);
+
+        if ($validator->fails()) {
+            $response = [
+                'status' => false,
+                'message' => 'Required data Can not Be Empty',
+                'error_code' => true,
+                'error_message' => $validator->errors(),
+            ];
+            return response()->json($response, 200);
+        }
+
+        $review = new Review();   
+        $review->customer_id = $request->input('customer_id');
+        $review->client_id = $request->input('client_id');
+        $review->comment = $request->input('comment');
+        $review->rating = $request->input('rating');
+        $review->save();
+
+        $response = [
+            'status' => true,
+            'message' => 'Thank You For The Review',
+            'error_code' => false,
+            'error_message' => null,
         ];
         return response()->json($response, 200);
     }

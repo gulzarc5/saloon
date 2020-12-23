@@ -41,6 +41,7 @@ Route::group(['namespace'=>'Api'], function(){
         Route::post('order/place','OrderController@orderPlace');
         Route::post('payment/verify','OrderController@paymentVerify');
         Route::get('order/history/{user_id}','CustomerController@orderHistory');
+        Route::post('order/cancel','CustomerController@orderCancel');
 
         Route::put('bank/info/add/{customer_id}','CustomerController@bankInfoInsert');
         Route::get('bank/info/list/{customer_id}','CustomerController@bankInfoList');
@@ -52,6 +53,10 @@ Route::group(['namespace'=>'Api'], function(){
             Route::post('add','AddressController@addAddress');
             Route::get('fetch/{id}','AddressController@addressFetch');
             Route::put('update/{id}','AddressController@addressUpdate');
+        });
+
+        Route::group(['prefix'=>'service/review'], function (){
+            Route::post('insert','ServiceController@insertReview');
         });
     });
 
@@ -76,6 +81,7 @@ Route::group(['namespace'=>'Api'], function(){
         Route::put('client/change/password/{client_id}','ClientsController@clientChangePassword');
 
         Route::get('client/order/history/{client_id}','ClientsController@orderHistory');
+        Route::get('client/order/status/{order_id}/{status}','ClientsController@orderStatus');
 
     });
 });
