@@ -42,7 +42,6 @@
                                     <th class="column-title">OrderType</th>
                                     <th class="column-title">PayableAmount</th>
                                     <th class="column-title">AdvanceAmount</th>
-                                    {{-- <th class="column-title">TotalAmount</th> --}}
                                     <th class="column-title">PaymentStatus</th>
                                     <th class="column-title">OrderStatus</th>
                                     <th class="column-title">ScheduleTime</th>
