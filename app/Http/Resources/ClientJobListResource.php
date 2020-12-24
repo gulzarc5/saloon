@@ -25,7 +25,7 @@ class ClientJobListResource extends JsonResource
             'closing_time' => $this->closing_time,
             'client_type' => $this->clientType,
             'avarage_rating' => isset($this->review) ? $this->review->avg('rating') : 0,
-            'reviews' => isset($this->review) ? $this->review : [],
+            'reviews' => isset($this->review) ? ReviewResource::collection($this->review) : [],
         ];
     }
 }

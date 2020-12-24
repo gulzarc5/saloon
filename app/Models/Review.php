@@ -12,4 +12,9 @@ class Review extends Model
     protected $fillable = [
         'customer_id','client_id','comment','rating'
     ];
+
+    public function customer()
+    {
+        return $this->belongsTo('App\Models\Customer','customer_id','id');
+    }
 }
