@@ -33,8 +33,6 @@ class AppSettingController extends Controller
         $top_free_launcer = Client::where('profile_status',2)->where('job_status',2)->where('status',1)->where('clientType',2)->withCount(['review as average_rating' => function($query) {
             $query->select(DB::raw('coalesce(avg(rating),0)'));
         }])->orderByDesc('average_rating')->limit(10)->get();
-
-        dd($top_saloon);
         $response = [
             'status' => true,
             'message' => 'Service City List',
