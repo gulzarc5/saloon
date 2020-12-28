@@ -174,6 +174,7 @@ class ClientsController extends Controller
         $client->city = $request->input('city');
         $client->service_city_id = $request->input('service_city_id');
         $client->address = $request->input('address');
+        $client->pin = $request->input('pin');
         $client->gst = $request->input('gst');
         $client->latitude = $request->input('latitude');
         $client->longitude = $request->input('longitude');
