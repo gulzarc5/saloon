@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use App\Models\ServiceCity;
 use App\Models\Slider;
 use DB;
+use App\Http\Resources\ClientResource;
 
 class AppSettingController extends Controller
 {
@@ -39,8 +40,8 @@ class AppSettingController extends Controller
             'data' => [
                 'sliders' => $Sliders,
                 'category' => $category_list,
-                'top_saloon' => $top_saloon,
-                'top_free_launcer' => $top_free_launcer,
+                'top_saloon' => ClientResource::collection($top_saloon),
+                'top_free_launcer' => ClientResource::collection($top_free_launcer),
             ],
         ];
         return response()->json($response, 200);
