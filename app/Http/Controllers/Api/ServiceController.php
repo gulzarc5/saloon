@@ -9,6 +9,8 @@ use App\Models\Job;
 use App\Models\Review;
 use Illuminate\Http\Request;
 use Validator;
+use App\Http\Resources\ClientResource;
+use App\Models\Client;
 
 class ServiceController extends Controller
 {
@@ -89,53 +91,34 @@ class ServiceController extends Controller
 
     public function serviceSearch($search_key,$page)
     {
-        $jobs = Job::select('jobs.*')->where('jobs.status',1)
-            ->join('clients','clients.id','=','jobs.user_id');
+        $client = Client::where('status',1)->where('profile_status',2)->where('job_status',2);
             if (!empty($search_key)) {
-                $jobs->where('clients.service_city_id',$service_city);
+                $client->where('clients.name','like', '%'.$search_key.'%');
             }
-            if (!empty($service_city)) {
-                $jobs->where('clients.service_city_id',$service_city);
-            }
-            if (!empty($client_type)) {
-                $jobs->where('clients.clientType',$client_type);
-            }
-            if (!empty($service_for)) {
-                if ($service_for == '1') {
-                    $jobs->where('jobs.is_man',2);
-                }elseif ($service_for == '2') {
-                    $jobs->where('jobs.is_woman',2);
-                }elseif ($service_for == '3') {
-                    $jobs->where('jobs.is_kids',2);
-                }
-            }
-            $jobs->where('clients.status',1)
-            ->where('clients.profile_status',2)
-            ->where('clients.job_status',2)
-            ->count();
+            $client->count();
 
-            $jobs_query = clone $jobs;
-            $total_job = $jobs->count('jobs.id');
-            $total_page = intval(ceil($total_job / 12 ));
+            $client_query = clone $client;
+            $total_client = $client->count('id');
+            $total_page = intval(ceil($total_client / 12 ));
             $limit = ($page*12)-12;
 
-            if ($total_job == 0) {
+            if ($total_client == 0) {
                 $response = [
                     'status' => false,
-                    'message' => 'Sorry No Job Found',
+                    'message' => 'Sorry No Data Found',
                     'data' => [],
                 ];
                 return response()->json($response, 200);
             }
 
-            $job_data = $jobs->skip($limit)->take(12)->get();
+            $client_data = $client->skip($limit)->take(12)->get();
             $response = [
                 'status' => true,
-                'message' => 'Service List',
+                'message' => 'Data List',
                 'tatal_page' => $total_page,
                 'current_page' => $page,
-                'total_item' => $total_job,
-                'data' => JobListResource::collection($job_data),
+                'total_item' => $total_client,
+                'data' => ClientResource::collection($client_data),
             ];
             return response()->json($response, 200);
     }

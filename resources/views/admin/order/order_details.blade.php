@@ -17,7 +17,7 @@
 
                     <div class="col-xs-12 col-sm-12 col-md-12">
                         {{--///////////////////// Company Address ///////////////////////--}}
-                        <div class="col-md-8 col-sm-8 col-xs-8">
+                        <div class="col-md-4 col-sm-4 col-xs-4">
                             {{-- <img src="uploads/logo.png" height="150" style="height: 38px;margin-bottom: 18px; margin-right: -9px;"> --}}
                             <b style="font-size: 35px;color: #0194ea;">Sal</b>
                             <b style="font-size: 35px;color: #262161;">oon</b>
@@ -44,6 +44,7 @@
                             </table>
                         </div>
 
+                        
                         {{--///////////////// Invoice Details ////////////////////--}}
                         <div class="col-md-4 col-sm-4 col-xs-4">
                             <span style="font-size: 38px;color: black;font-weight: bold;">INVOICE</span>
@@ -80,6 +81,46 @@
                                     </td>
                                 </tr>
                             </table>
+                        </div>
+
+                        {{--///////////////// Invoice Details ////////////////////--}}
+                        <div class="col-md-4 col-sm-4 col-xs-4">
+                            <span style="    font-size: 34px;color: #0493f8ab;font-weight: bold;">Vendor Details</span>
+                            @if($order->client()->exists())
+                                <table>
+                                    <tr>
+                                        <th>Name : </th>
+                                        <td>{{$order->client->name }}</td>
+                                    </tr>
+
+                                    <tr>
+                                        <th>Mobile : </th>
+                                        <td>{{$order->client->mobile}}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Email : </th>
+                                        <td>{{$order->client->email}}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Service City : </th>
+                                        <td>{{$order->client->serviceCity->name}}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Client Type : </th>
+                                        <td>
+                                            @if ($order->client->clientType == '1')
+                                                Freelauncer
+                                            @else
+                                                ShopKeeper
+                                            @endif
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th>Address : </th>
+                                        <td>{{$order->client->address}},{{$order->client->city}},{{$order->client->state}} - {{$order->client->pin}}</td>
+                                    </tr>
+                                </table>
+                            @endif
                         </div>
                     </div>
 
