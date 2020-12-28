@@ -32,6 +32,7 @@ Route::group(['namespace'=>'Api'], function(){
     Route::group(['prefix'=> 'service'],function () {
         Route::post('list','ServiceController@serviceList');
         Route::get('details/{service_id}','ServiceController@serviceDetails');
+        Route::get('search/{search_key}/{page}','ServiceController@serviceSearch');
     });
     //customer Section
     Route::group(['middleware'=>'auth:customerApi','prefix' =>'customer'], function () {
