@@ -106,6 +106,7 @@ class ServiceController extends Controller
                 $response = [
                     'status' => false,
                     'message' => 'Sorry No Data Found',
+                    'search_key' => $search_key,
                     'data' => [],
                 ];
                 return response()->json($response, 200);
@@ -118,6 +119,7 @@ class ServiceController extends Controller
                 'tatal_page' => $total_page,
                 'current_page' => $page,
                 'total_item' => $total_client,
+                'search_key' => $search_key,
                 'data' => ClientResource::collection($client_data),
             ];
             return response()->json($response, 200);
