@@ -8,7 +8,7 @@ class Client extends Authenticatable
 {
     protected $table ='clients';
     protected $fillable = [
-        'name','mobile','email','otp','work_experience','state','city','address','pin','image','gst','latitude','longitude','opening_time','closing_time','clientType','status','password','profile_status','api_token','service_city_id','job_status',
+        'name','mobile','email','otp','work_experience','state','city','address','pin','image','gst','latitude','longitude','opening_time','closing_time','clientType','status','password','profile_status','api_token','service_city_id','job_status','address_proof','address_proof_file','photo_proof','photo_proof_file','business_proof','business_proof_file','verify_status'
     ];
     protected $hidden = ['password'];
 

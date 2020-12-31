@@ -147,6 +147,9 @@ class ClientsController extends Controller
             'name' => 'required',
             'mobile' =>  'required|unique:clients,id,'.$client_id,
             'profile_image' => 'image|mimes:jpeg,png,jpg,gif|max:2048',
+            'address_proof_file' => 'image|mimes:jpeg,png,jpg,gif|max:2048',
+            'photo_proof_file' => 'image|mimes:jpeg,png,jpg,gif|max:2048',
+            'business_proof_file' => 'image|mimes:jpeg,png,jpg,gif|max:2048',
             'state' => 'required',
             'city' =>  'required',
             'address' => 'required',
@@ -205,6 +208,40 @@ class ClientsController extends Controller
                     $constraint->aspectRatio();
                 })->save($destination.'/'.$image_name);
                 $client->image = $image_name;
+                $client->save();
+            }
+
+            if($request->hasfile('photo_proof_file')){   
+                $photo_proof = $request->file('photo_proof_file');
+                $photo_proof_name = time().date('Y-M-d').'.'.$photo_proof->getClientOriginalExtension();
+
+                //Product Original Image
+                $photo_proof->move(public_path('/images/client/files/'), $photo_proof_name);
+
+                $client->photo_proof_file = $photo_proof_name;
+                $client->address_proof = $request->input('address_proof');
+                $client->save();
+            }
+            if($request->hasfile('address_proof_file')){   
+                $address_proof = $request->file('address_proof_file');
+                $address_proof_name = time().date('Y-M-d').'.'.$address_proof->getClientOriginalExtension();
+
+                //Product Original Image
+                $address_proof->move(public_path('/images/client/files/'), $address_proof_name);
+
+                $client->address_proof_file = $address_proof_name;
+                $client->photo_proof = $request->input('photo_proof');
+                $client->save();
+            }
+            if($request->hasfile('business_proof_file')){   
+                $business_proof = $request->file('business_proof_file');
+                $business_proof_name = time().date('Y-M-d').'.'.$business_proof->getClientOriginalExtension();
+
+                //Product Original Image
+                $business_proof->move(public_path('/images/client/files/'), $business_proof_name);
+
+                $client->business_proof_file = $business_proof_name;
+                $client->business_proof = $request->input('business_proof');
                 $client->save();
             }
 
