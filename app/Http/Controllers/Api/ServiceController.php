@@ -60,6 +60,7 @@ class ServiceController extends Controller
         $jobs->where('clients.status',1)
         ->where('clients.profile_status',2)
         ->where('clients.job_status',2)
+        ->where('clients.verify_status',2)
         ->count();
 
         $jobs_query = clone $jobs;
@@ -91,7 +92,8 @@ class ServiceController extends Controller
 
     public function serviceSearch($search_key,$page)
     {
-        $client = Client::where('status',1)->where('profile_status',2)->where('job_status',2);
+        $client = Client::where('status',1)->where('profile_status',2)->where('job_status',2)
+        ->where('clients.verify_status',2);
             if (!empty($search_key)) {
                 $client->where('clients.name','like', '%'.$search_key.'%');
             }
