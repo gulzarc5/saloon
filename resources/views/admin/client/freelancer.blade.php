@@ -23,6 +23,7 @@
                     <th>Mobile</th>
                     <th>Service City</th>
                     <th>Status</th>
+                    <th>Verify</th>
                     <th>Action</th>
                   </tr>
                 </thead>
@@ -53,6 +54,13 @@
                     return "<button class='btn btn-info'>Enable</a>"
                   }else{
                     return "<button class='btn btn-danger'>Disabled</a>"
+                  }
+                }},
+                {data: 'verify_status', name: 'verify_status', render:function(data, type, row){
+                  if (row.verify_status == '2') {
+                    return "<button class='btn btn-info'>Yes</a>"
+                  }else{
+                    return "<button class='btn btn-danger'>No</a>"
                   }
                 }},
                 {data: 'action', name: 'action', orderable: false, searchable: false},

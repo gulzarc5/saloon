@@ -29,6 +29,10 @@ class ClientOrderResource extends JsonResource
             'closing_time' => $this->closing_time,
             'client_type' => $this->clientType,
             'service_city_id' => $this->service_city_id,
+            'ac' => $this->ac,
+            'parking' => $this->parking,
+            'wifi' => $this->wifi,
+            'music' => $this->music,
         ];
     }
 }

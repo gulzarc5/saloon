@@ -82,7 +82,8 @@ Route::group(['namespace'=>'Api'], function(){
         Route::put('client/change/password/{client_id}','ClientsController@clientChangePassword');
 
         Route::get('client/order/history/{client_id}','ClientsController@orderHistory');
-        Route::get('client/order/status/{order_id}/{status}','ClientsController@orderStatus');
+
+        Route::post('client/order/status','ClientsController@orderStatus');
 
     });
 });

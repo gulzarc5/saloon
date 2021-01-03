@@ -184,6 +184,10 @@ class ClientsController extends Controller
         $client->opening_time = $request->input('opening_time');
         $client->closing_time = $request->input('closing_time');
         $client->description = $request->input('description');
+        $client->ac = $request->input('ac');
+        $client->parking = $request->input('parking');
+        $client->wifi = $request->input('wifi');
+        $client->music = $request->input('music');
         $client->profile_status = 2;
         if($client->save()) {
             if($request->hasfile('profile_image')){
@@ -561,8 +565,24 @@ class ClientsController extends Controller
         return response()->json($response, 200);
     }
 
-    public function orderStatus($order_id,$status)
+    public function orderStatus(Request $request)
     {
+        $validator =  Validator::make($request->all(),[
+            'order_id' => ['required','numeric'],
+            'status' => 'required|in:2,4,5',
+        ]);
+        if ($validator->fails()) {
+            $response = [
+                'status' => false,
+                'message' => 'Required Field Can not be Empty',
+                'error_code' => true,
+                'error_message' => $validator->errors(),
+            ];
+            return response()->json($response, 200);
+        }
+        $order_id = $request->input('order_id');
+        $status = $request->input('status');
+
         $order = Order::find($order_id);
         if ($order) {
             $order->order_status = $status;
@@ -570,6 +590,11 @@ class ClientsController extends Controller
 
             $user_account = UserBankAccount::where('user_id', $order->customer_id)->first();
             if ($status == '5') {
+                $reason = $request->input('reason');
+                $order->vendor_cancel_status = 2;
+                $order->vendor_cancel_reason = $reason;
+                $order->save();
+
                 $refund = new RefundInfo();
                 $refund->order_id = $order->id;
                 if ($user_account) {

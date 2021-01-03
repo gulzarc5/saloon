@@ -84,6 +84,36 @@
                                     <button class="btn btn-sm btn-danger">No</button>
                                 @endif
                             </h5>
+                            @if ($client->clientType == '2')
+                                <h5 class="col-md-4 col-sm-4 col-xs-12"><strong>Air Conditioner : </strong>
+                                    @if ($client->ac == '2')
+                                        <button class="btn btn-sm btn-primary">Yes</button>
+                                    @else
+                                        <button class="btn btn-sm btn-danger">No</button>
+                                    @endif
+                                </h5>
+                                <h5 class="col-md-4 col-sm-4 col-xs-12"><strong>Parking : </strong>
+                                    @if ($client->parking == '2')
+                                        <button class="btn btn-sm btn-primary">Yes</button>
+                                    @else
+                                        <button class="btn btn-sm btn-danger">No</button>
+                                    @endif
+                                </h5>
+                                <h5 class="col-md-4 col-sm-4 col-xs-12"><strong>WIFI : </strong>
+                                    @if ($client->wifi == '2')
+                                        <button class="btn btn-sm btn-primary">Yes</button>
+                                    @else
+                                        <button class="btn btn-sm btn-danger">No</button>
+                                    @endif
+                                </h5>
+                                <h5 class="col-md-4 col-sm-4 col-xs-12"><strong>Music : </strong>
+                                    @if ($client->music == '2')
+                                        <button class="btn btn-sm btn-primary">Yes</button>
+                                    @else
+                                        <button class="btn btn-sm btn-danger">No</button>
+                                    @endif
+                                </h5>
+                            @endif
                         </div>
                         <br/>
 
@@ -154,51 +184,57 @@
                         </div>
                     @endif
 
-                    @if (isset($product->productColors))
-                        <div class="col-md-12">
-                            <hr>
-                            <h3>Product Colors <a class="btn btn-warning" style="float:right" href="">Edit colors</a></h3>
-                            <table class="table table-hover">
-                            <thead>
-                                <tr>
-                                    <th><b>Name</b></th>
-                                    <th><b>Color</b></th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach ($product->productColors as $item)
-                                    <tr>
-                                        <td>{{$item->color->name}}</td>
-                                        <td><div style="background-color:{{$item->color->color}}; height:10px;"></div></td>
-                                    </tr>
-                                @endforeach
-                            </tbody>
-                            </table>
-                        </div>
-                    @endif
-                    @if (!empty($product->size_chart))
-                        <div class="col-md-12">
-                            <div class="product_price">
-                                <h3 style="margin: 0">Size Chart</h3><hr style="margin: 10px 0;border-top: 1px solid #ddd;">
-                                <img src="{{asset('images/products/'.$product->size_chart.'')}}" alt="..." style="height: 400px;"/>
-                            </div>
-                        </div>
-                    @endif
-                    {{-- <div class="col-md-12">
-                        <div class="product_price">
-                            <h3 style="margin: 0">Product Short Description</h3><hr style="margin: 10px 0;border-top: 1px solid #ddd;">
-                                <p>{!!$product->short_description!!}</p>
-                        </div>
-                    </div>
+                    
                     <div class="col-md-12">
-                        <div class="product_price">
-                            <h3 style="margin: 0">Product Description</h3><hr style="margin: 10px 0;border-top: 1px solid #ddd;">
-                                <p>{!!$product->description!!}</p>
-                        </div>
-                    </div> --}}
+                        <hr>
+                        <h3>Documents Uploades </h3>
+                        <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>File Type</th>
+                                <th>Name</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                           @if (!empty($client->address_proof) && !empty($client->address_proof_file))
+                               <tr>
+                                   <td>Address Proof</td>
+                                   <td>{{$client->address_proof}}</td>
+                                   <td><a href="{{asset('images/client/files/'.$client->address_proof_file.'')}}" target="_blank" class="btn btn-sm btn-info">View File</a></td>
+                               </tr>
+                           @endif
+                           @if (!empty($client->photo_proof) && !empty($client->photo_proof_file))
+                               <tr>
+                                   <td>Photo Proof</td>
+                                   <td>{{$client->photo_proof}}</td>
+                                   <td><a href="{{asset('images/client/files/'.$client->photo_proof_file.'')}}" target="_blank" class="btn btn-sm btn-info">View File</a></td>
+                               </tr>
+                           @endif
+                           @if (!empty($client->business_proof) && !empty($client->business_proof_file))
+                               <tr>
+                                   <td>Business Proof</td>
+                                   <td>{{$client->business_proof}}</td>
+                                   <td><a href="{{asset('images/client/files/'.$client->business_proof_file.'')}}" target="_blank" class="btn btn-sm btn-info">View File</a></td>
+                               </tr>
+                           @endif
+                           @if ($client->verify_status == '2')  
+                               <tr>
+                                   <td colspan="3" align="center">
+                                        <button type="button" class="btn btn-primary">Verified</button>
+                                   </td>
+                               </tr>
+                           @endif
+                        </tbody>
+                        </table>
+                    </div>
+ 
 
                 @endif
                 <div class="col-md-12">
+                    @if ($client->verify_status == '1' || $client->verify_status =='3')  
+                        <a href="{{route('admin.client_verify_status_update',['id'=>$client->id,2])}}"class="btn btn-success" onclick="return confirm('Are you sure to verify ??')">Verify</a>
+                    @endif
                     <button class="btn btn-danger" onclick="window.close();">Close Window</button>
                 </div>
             </div>

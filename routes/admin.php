@@ -32,6 +32,9 @@ Route::group(['namespace' => 'Admin'],function(){
 
             Route::get('/services/edit/{client_id}', 'ClientController@clientServicesEdit')->name('admin.client_services_edit');
             Route::put('/services/update/{client_id}', 'ClientController@clientServicesUpdate')->name('admin.client_services_update');
+
+            Route::get('status/update/{id}/{status}', 'ClientController@updateClientStatus')->name('admin.client_status_update');
+            Route::get('verify/status/update/{id}/{status}', 'ClientController@updateClientVerifyStatus')->name('admin.client_verify_status_update');
         });
         // Users
         Route::group(['namespace' => 'User'], function () {
