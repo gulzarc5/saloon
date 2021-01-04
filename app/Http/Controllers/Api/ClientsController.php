@@ -184,10 +184,11 @@ class ClientsController extends Controller
         $client->opening_time = $request->input('opening_time');
         $client->closing_time = $request->input('closing_time');
         $client->description = $request->input('description');
-        $client->ac = $request->input('ac');
-        $client->parking = $request->input('parking');
-        $client->wifi = $request->input('wifi');
-        $client->music = $request->input('music');
+
+        $client->ac = $request->input('ac') ?? 1;
+        $client->parking = $request->input('parking') ?? 1;
+        $client->wifi = $request->input('wifi') ?? 1;
+        $client->music = $request->input('music') ?? 1;
         $client->profile_status = 2;
         if($client->save()) {
             if($request->hasfile('profile_image')){
