@@ -217,29 +217,29 @@ class ClientsController extends Controller
 
             if($request->hasfile('photo_proof_file')){   
                 $photo_proof = $request->file('photo_proof_file');
-                $photo_proof_name = time().date('Y-M-d').'.'.$photo_proof->getClientOriginalExtension();
+                $photo_proof_name = uniqid().time().date('Y-M-d').'.'.$photo_proof->getClientOriginalExtension();
 
                 //Product Original Image
                 $photo_proof->move(public_path('/images/client/files/'), $photo_proof_name);
 
                 $client->photo_proof_file = $photo_proof_name;
-                $client->address_proof = $request->input('address_proof');
+                $client->photo_proof = $request->input('photo_proof');
                 $client->save();
             }
             if($request->hasfile('address_proof_file')){   
                 $address_proof = $request->file('address_proof_file');
-                $address_proof_name = time().date('Y-M-d').'.'.$address_proof->getClientOriginalExtension();
+                $address_proof_name = uniqid().time().date('Y-M-d').'.'.$address_proof->getClientOriginalExtension();
 
                 //Product Original Image
                 $address_proof->move(public_path('/images/client/files/'), $address_proof_name);
 
                 $client->address_proof_file = $address_proof_name;
-                $client->photo_proof = $request->input('photo_proof');
+                $client->address_proof = $request->input('address_proof');
                 $client->save();
             }
             if($request->hasfile('business_proof_file')){   
                 $business_proof = $request->file('business_proof_file');
-                $business_proof_name = time().date('Y-M-d').'.'.$business_proof->getClientOriginalExtension();
+                $business_proof_name = uniqid().time().date('Y-M-d').'.'.$business_proof->getClientOriginalExtension();
 
                 //Product Original Image
                 $business_proof->move(public_path('/images/client/files/'), $business_proof_name);
