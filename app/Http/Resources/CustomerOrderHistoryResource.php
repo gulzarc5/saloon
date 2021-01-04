@@ -26,7 +26,9 @@ class CustomerOrderHistoryResource extends JsonResource
             'order-status' => $this->order_status,
             'service_time' => $this->service_time,
             'refund_request' => $this->refund_request,
-            'created_at' => $this->created,
+            'vendor_cancel_status' => $this->vendor_cancel_status,
+            'vendor_cancel_reason' => $this->vendor_cancel_reason,
+            'created_at' => $this->created_at,
             'vendor_details' => isset($this->client) ? new ClientOrderResource($this->client) : null,
             'service_data' => isset($this->services) ? OrderDetailResource::collection($this->services) : null,
         ];
