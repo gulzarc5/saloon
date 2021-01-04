@@ -41,7 +41,7 @@ class CustomerController extends Controller
 
 
         $customer = SignUpOtp::firstOrCreate(['mobile' => $mobile,'user_type'=>$user_type]);
-        $customer->otp =  rand(11111,99999);
+        $customer->otp =  11111;
         $customer->user_type =  $user_type;
         if($customer->save()) {
             $message = "OTP is $customer->otp . Please Do Not Share With Anyone";
