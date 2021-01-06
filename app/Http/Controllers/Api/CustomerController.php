@@ -527,4 +527,23 @@ class CustomerController extends Controller
 
     }
 
+    public function updateFirebaseToken($id,$token)
+    {
+        $customer = Customer::find($id);
+        if ($customer) {
+            $customer->firsbase_token = $token;
+            $customer->save();
+            $response = [
+                'status' => true,
+                'message' => 'Firebase Token Updated Successfully',
+            ];
+            return response()->json($response, 200);
+        }else{
+            $response = [
+                'status' => false,
+                'message' => 'User Not Found',
+            ];
+            return response()->json($response, 200);
+        }
+    }
 }

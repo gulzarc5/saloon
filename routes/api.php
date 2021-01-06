@@ -36,6 +36,7 @@ Route::group(['namespace'=>'Api'], function(){
     });
     //customer Section
     Route::group(['middleware'=>'auth:customerApi','prefix' =>'customer'], function () {
+
         Route::get('profile/{id}','CustomerController@profileFetch');
         Route::put('profile/update/{id}','CustomerController@profileUpdate');
         Route::put('password/change/{id}','CustomerController@passwordChange');
@@ -43,6 +44,9 @@ Route::group(['namespace'=>'Api'], function(){
         Route::post('payment/verify','OrderController@paymentVerify');
         Route::get('order/history/{user_id}','CustomerController@orderHistory');
         Route::post('order/cancel','CustomerController@orderCancel');
+
+        //For Push Notification
+        Route::get('update/firebase_token/{id}/{token}','CustomerController@updateFirebaseToken');
 
         Route::put('bank/info/add/{customer_id}','CustomerController@bankInfoInsert');
         Route::get('bank/info/list/{customer_id}','CustomerController@bankInfoList');
@@ -67,6 +71,10 @@ Route::group(['namespace'=>'Api'], function(){
     Route::group(['middleware' => 'auth:clientApi'], function () {
         Route::get('client/profile/{id}', 'ClientsController@clientProfile');
         Route::post('client/profile/update', 'ClientsController@clientProfileUpdate');
+
+        //For Push Notification
+        Route::get('client/update/firebase_token/{id}/{token}','ClientsController@updateFirebaseToken');
+
 
         Route::get('client/service/list/{client_id}','JobController@clientServiceList');
         Route::get('client/service/edit/{service_list_id}','JobController@clientServiceEdit');

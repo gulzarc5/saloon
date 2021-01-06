@@ -14,10 +14,12 @@ use Illuminate\Support\Str;
 use File;
 use Image;
 use App\SmsHelper\Sms;
+use App\SmsHelper\PushHelper;
 
 use App\Models\Order;
 use App\Http\Resources\Order\ClientOrderHistoryResource;
 use App\Models\ClientSchedule;
+use App\Models\Customer;
 use App\Models\RefundInfo;
 use App\Models\UserBankAccount;
 
@@ -607,11 +609,44 @@ class ClientsController extends Controller
                     $order->save();
                 }
             }
+            // Send push
+            $user = Customer::find($order->customer_id);
+            if ($user->firsbase_token) {
+                $title = "Your order Confirmed Successfully With Order No : $order->id";
+                if ($status == '4') {                    
+                    $title = "Your order Completed Successfully With Order No : $order->id";
+                } elseif($status == '5') {                    
+                    $title = "Your order is Cancelled With Order No : $order->id";
+                }
+                
+                $push = PushHelper::notification($user->firsbase_token,$title,$user->id,1);
+                // return response()->json($push, 200);
+            }
         }
         $response = [
             'status' => true,
             'message' => 'Order Status Updated Successfully',
         ];
         return response()->json($response, 200);
+    }
+
+    public function updateFirebaseToken($id,$token)
+    {
+        $client = Client::find($id);
+        if ($client) {
+            $client->firsbase_token = $token;
+            $client->save();
+            $response = [
+                'status' => true,
+                'message' => 'Firebase Token Updated Successfully',
+            ];
+            return response()->json($response, 200);
+        }else{
+            $response = [
+                'status' => false,
+                'message' => 'User Not Found',
+            ];
+            return response()->json($response, 200);
+        }
     }
 }

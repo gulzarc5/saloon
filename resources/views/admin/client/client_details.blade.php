@@ -157,8 +157,38 @@
                                     <tr>
                                         <td>{{$item->jobCategory->name}}</td>
                                         <td>{{$item->description}}</td>
-                                        <td>{{$item->mrp}}</td>
-                                        <td>{{$item->price}}</td>
+                                        <td>
+                                            @if($item->is_man == 2)
+                                               <label>MAN : </label>
+                                                {{$item->man_mrp}}
+                                            @endif
+                                            <br>
+                                            @if($item->is_woman == 2)
+                                                <label>WOMAN : </label>
+                                                {{$item->woman_mrp}}
+                                            @endif
+                                            <br>
+                                            @if($item->is_kids == 2)
+                                                <label>KIDS : </label>
+                                                {{$item->kids_mrp}}
+                                            @endif
+                                        </td>
+                                        <td>
+                                            @if($item->is_man == 2)
+                                               <label>MAN : </label>
+                                                {{$item->man_price}}
+                                            @endif
+                                            <br>
+                                            @if($item->is_woman == 2)
+                                                <label>WOMAN : </label>
+                                                {{$item->woman_price}}
+                                            @endif
+                                            <br>
+                                            @if($item->is_kids == 2)
+                                                <label>KIDS : </label>
+                                                {{$item->kids_price}}
+                                            @endif
+                                        </td>
                                         <td>
                                             @if($item->is_man == 2)
                                                <label class="label label-success">MAN</label>
