@@ -620,7 +620,7 @@ class ClientsController extends Controller
                 }
                 
                 $push = PushHelper::notification($user->firsbase_token,$title,$user->id,1);
-                // return response()->json($push, 200);
+                return response()->json($push, 200);
             }
         }
         $response = [

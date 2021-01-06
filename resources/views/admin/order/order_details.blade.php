@@ -236,7 +236,7 @@
                                     <td colspan='2' align='right'>Sub Total : </td>
                                     <td>{{ number_format($order->amount,2,".",'') }}</td>
                                 </tr>
-                                @if ($order->discount > 0)
+                                @if ($order->advance_amount > 0)
                                     <tr>
                                         <td colspan='2' align='right'>Advance Paid : (-) </td>
                                         <td>{{ number_format($order->advance_amount,2,".",'') }}</td>

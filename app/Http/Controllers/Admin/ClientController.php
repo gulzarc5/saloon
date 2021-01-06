@@ -118,6 +118,59 @@ class ClientController extends Controller
         return view('admin.client.client_services',compact('client_services','service_category','client_id'));
     }
 
+    public function clientServicesUpdate(Request $request)
+    {
+        $this->validate($request, [
+            'service_id' => 'required|array|min:1',
+            'description' => 'array',
+            'man' => 'array',
+            'woman' => 'array',
+            'kids' => 'array',
+            'man_mrp' => 'required|array|min:1',
+            'woman_mrp' => 'required|array|min:1',
+            'kids_mrp' => 'required|array|min:1',
+            'man_price' => 'required|array|min:1',
+            'woman_price' => 'required|array|min:1',
+            'kids_price' => 'required|array|min:1',
+        ]);
+
+        $service_id = $request->input('service_id');
+        $description = $request->input('description');
+        $man = $request->input('man');
+        $woman = $request->input('woman');
+        $kids = $request->input('kids');
+        $man_mrp = $request->input('man_mrp');
+        $woman_mrp = $request->input('woman_mrp');
+        $kids_mrp = $request->input('kids_mrp');
+        $man_price = $request->input('man_price');
+        $woman_price = $request->input('woman_price');
+        $kids_price = $request->input('kids_price');
+
+        for ($i=0; $i < count($service_id); $i++) { 
+            $service = Job::find($service_id[$i]);
+            if ($service){
+                $service->description = $description[$i] ?? null;
+                $service->is_man = $man[$service->id] ?? 1;
+                if (isset($man[$service->id]) && $man[$service->id] == '2') {
+                    $service->man_mrp = $man_mrp[$i] ?? 0;
+                    $service->man_price = $man_price[$i] ?? 0;
+                }
+                $service->is_woman = $woman[$service->id] ?? 1;
+                if (isset($woman[$service->id]) && $woman[$service->id] == '2') {
+                    $service->woman_mrp = $woman_mrp[$i] ?? 0;
+                    $service->woman_price = $woman_price[$i] ?? 0;
+                }
+                $service->is_kids = $kids[$service->id] ?? 1;
+                if (isset($kids[$service->id]) && $kids[$service->id] == '2') {
+                    $service->kids_mrp = $kids_mrp[$i] ?? 0;
+                    $service->kids_price = $kids_price[$i] ?? 0;
+                }
+                $service->save();                
+            }
+        }
+        return redirect()->back();
+    }
+
     public function shop(){
         return view('admin.client.shop');
     }
