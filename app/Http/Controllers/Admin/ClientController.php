@@ -12,6 +12,7 @@ use App\Models\JobCategory;
 use App\Models\ServiceCity;
 use File;
 use Image;
+use App\SmsHelper\PushHelper;
 
 class ClientController extends Controller
 {
@@ -211,6 +212,14 @@ class ClientController extends Controller
         $client = Client::findOrFail($id);
         $client->verify_status = $status;
         $client->save();
+        if (!empty($client->firsbase_token)) {
+            $title = "Congratulations! Your profile Verified Successfully";
+            if ($status == '3') {
+                $title = "Sorry! Your profile Rejected Please Contact Customer Care";
+            }
+            $client_type = $client->clientType == '1' ? 2 : 3;
+            PushHelper::notification($client->firsbase_token,$title,$client->id,$client_type);
+        }        
         return redirect()->back();
     }
 

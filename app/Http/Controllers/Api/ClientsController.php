@@ -612,15 +612,14 @@ class ClientsController extends Controller
             // Send push
             $user = Customer::find($order->customer_id);
             if ($user->firsbase_token) {
-                $title = "Your order Confirmed Successfully With Order No : $order->id";
+                $title = "Dear Customer : Your order Confirmed Successfully With Order No : $order->id";
                 if ($status == '4') {                    
-                    $title = "Your order Completed Successfully With Order No : $order->id";
+                    $title = "Dear Customer : Your order Completed Successfully With Order No : $order->id";
                 } elseif($status == '5') {                    
-                    $title = "Your order is Cancelled With Order No : $order->id";
+                    $title = "Dear Customer : Your order is Cancelled With Order No : $order->id";
                 }
                 
-                $push = PushHelper::notification($user->firsbase_token,$title,$user->id,1);
-                return response()->json($push, 200);
+                PushHelper::notification($user->firsbase_token,$title,$user->id,1);
             }
         }
         $response = [
