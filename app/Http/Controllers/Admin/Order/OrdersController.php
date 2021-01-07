@@ -9,6 +9,7 @@ use App\Models\InvoiceSetting;
 use App\Models\Order;
 use App\Models\OrderJobs;
 use App\Models\RefundInfo;
+use App\Models\UserBankAccount;
 use Illuminate\Http\Request;
 
 use App\SmsHelper\PushHelper;
@@ -78,9 +79,10 @@ class OrdersController extends Controller
         $order->order_status =5;
         if($order->save()){
             if ($is_refund == '2') {
+                $user_account = UserBankAccount::where('user_id', $order->customer_id)->first();
                 $refund = new RefundInfo();
                 $refund->order_id = $order->id;
-                $refund->account_id = $bank_account_id;
+                $refund->account_id = $user_account->id;
                 $refund->amount = $order->advance_amount;
                 if ($refund->save()) {
                     $order->refund_request = 2;
