@@ -458,7 +458,7 @@ class ClientsController extends Controller
         }
 
         $client = $client->first();
-        $client->otp = rand(11111,99999);
+        $client->otp = 11111;
         if ($client->save()) {
             $message = "OTP is $client->otp . Please Do Not Share With Anyone";
             // Sms::smsSend($client->mobile,$message);
