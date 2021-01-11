@@ -7,6 +7,7 @@ use App\Models\ClientSchedule;
 use App\Models\Job;
 use App\Models\Order;
 use App\Models\OrderJobs;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Validator;
 use Carbon\Carbon;
