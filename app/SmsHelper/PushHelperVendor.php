@@ -1,7 +1,7 @@
 <?php
 namespace App\SmsHelper;
 
-class PushHelper {
+class PushHelperVendor {
     public static function notification($token, $title,$user_id,$user_type)
     {
         $fcmUrl = 'https://fcm.googleapis.com/fcm/send';
