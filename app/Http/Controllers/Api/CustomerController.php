@@ -18,7 +18,7 @@ use App\Models\Order;
 use App\Http\Resources\CustomerOrderHistoryResource;
 use App\Models\RefundInfo;
 use App\Models\UserBankAccount;
-use App\SmsHelper\PushHelper;
+use App\SmsHelper\PushHelperVendor;
 
 class CustomerController extends Controller
 {
@@ -521,9 +521,9 @@ class CustomerController extends Controller
         $user = Client::find($order->vendor_id);
         if ($user->firsbase_token) {
             $client_type = $user->clientType == '1' ? 2 : 3;                   
-            $title = "Dear Customer : Your order is Cancelled With Order No : $order->id";
+            $title = "Dear Vendor : Your order is Cancelled With Order No : $order->id";
             
-            PushHelper::notification($user->firsbase_token,$title,$user->id,$client_type);
+            PushHelperVendor::notification($user->firsbase_token,$title,$user->id,$client_type);
         }
 
         }

@@ -13,6 +13,7 @@ use App\Models\ServiceCity;
 use File;
 use Image;
 use App\SmsHelper\PushHelper;
+use App\SmsHelper\PushHelperVendor;
 
 class ClientController extends Controller
 {
@@ -218,7 +219,7 @@ class ClientController extends Controller
                 $title = "Sorry! Your profile Rejected Please Contact Customer Care";
             }
             $client_type = $client->clientType == '1' ? 2 : 3;
-            PushHelper::notification($client->firsbase_token,$title,$client->id,$client_type);
+            PushHelperVendor::notification($client->firsbase_token,$title,$client->id,$client_type);
         }        
         return redirect()->back();
     }

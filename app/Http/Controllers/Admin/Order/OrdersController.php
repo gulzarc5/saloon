@@ -13,6 +13,7 @@ use App\Models\UserBankAccount;
 use Illuminate\Http\Request;
 
 use App\SmsHelper\PushHelper;
+use App\SmsHelper\PushHelperVendor;
 
 class OrdersController extends Controller
 {
@@ -140,7 +141,7 @@ class OrdersController extends Controller
         $client = Client::findOrFail($client_id);
         if (!empty($client->firsbase_token)) {           
             $client_type = $client->clientType == '1' ? 2 : 3;
-            PushHelper::notification($client->firsbase_token,$title,$client->id,$client_type);
+            PushHelperVendor::notification($client->firsbase_token,$title,$client->id,$client_type);
         }
     }
 }

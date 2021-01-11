@@ -10,6 +10,7 @@ use App\Models\OrderJobs;
 use Illuminate\Http\Request;
 use Validator;
 use Carbon\Carbon;
+use App\SmsHelper\PushHelperVendor;
 
 use Razorpay\Api\Api;
 
@@ -212,6 +213,12 @@ class OrderController extends Controller
                 'status' => true,
                 'message' => 'Payment Success',
             ];
+            $user = User::find($order->user_id);
+            if ($user->firsbase_token) {
+                $title = "Dear Vendor : A User Placed An Order With Order Id $order->id";
+                PushHelperVendor::notification($user->firsbase_token,$title,$user->id,2);
+            }
+
             return response()->json($response, 200);
         }else{
             $response = [

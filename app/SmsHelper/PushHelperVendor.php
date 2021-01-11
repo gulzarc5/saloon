@@ -22,7 +22,7 @@ class PushHelper {
         ];
         
         $headers = [
-            'Authorization: key=AAAAYG6SOgw:APA91bFXa1IcgbkRwhWo8BiYbrKBoAGvIm8RGKI4xK1_3-0HBEGNxlWY369g7KEbmVAlEOLiacMoZkRJV7APe-HO-VJEgEAZBsGRFfrYJjt1z45b20sJSVQTYtxHfoePYLAvc7sBfe5F',
+            'Authorization: key=AAAARmqEWfc:APA91bHDogxqjaUEfRVBy1k1UbmM8nfEnoenqxoZHBfXxJhz3LqCGT5wFeWwnc2REKCEQdhulqVd7rRdYVAn4r1Dbp52m98wCEui8ZeTr2Xwe3ya2wUTWT0TbkPkzQl0TsyRKVAtsxkS',
             'Content-Type: application/json'
         ];
 
