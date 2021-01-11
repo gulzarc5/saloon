@@ -213,7 +213,7 @@ class OrderController extends Controller
                 'status' => true,
                 'message' => 'Payment Success',
             ];
-            $user = User::find($order->user_id);
+            $user = User::find($order->vendor_id);
             if ($user->firsbase_token) {
                 $title = "Dear Vendor : A User Placed An Order With Order Id $order->id";
                 PushHelperVendor::notification($user->firsbase_token,$title,$user->id,2);
