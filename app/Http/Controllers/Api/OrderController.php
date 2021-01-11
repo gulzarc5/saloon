@@ -3,11 +3,11 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Models\Client;
 use App\Models\ClientSchedule;
 use App\Models\Job;
 use App\Models\Order;
 use App\Models\OrderJobs;
-use App\Models\User;
 use Illuminate\Http\Request;
 use Validator;
 use Carbon\Carbon;
@@ -214,7 +214,7 @@ class OrderController extends Controller
                 'status' => true,
                 'message' => 'Payment Success',
             ];
-            $user = User::find($order->vendor_id);
+            $user = Client::find($order->vendor_id);
             if ($user->firsbase_token) {
                 $title = "Dear Vendor : A User Placed An Order With Order Id $order->id";
                 PushHelperVendor::notification($user->firsbase_token,$title,$user->id,2);
