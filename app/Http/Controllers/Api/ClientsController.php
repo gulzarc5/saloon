@@ -30,7 +30,7 @@ class ClientsController extends Controller
 	        'name'             => ['required', 'string', 'max:255'],
             'mobile'           => ['required','digits:10','numeric','unique:clients'],
             'password'         => ['required', 'string', 'min:8'],
-            'otp'              => 'required|digits:5|numeric',
+            // 'otp'              => 'required|digits:5|numeric',
             'clientType'       => 'required|in:1,2',
             'service_city_id' => 'required',
         ]);
@@ -45,18 +45,18 @@ class ClientsController extends Controller
             return response()->json($response, 200);
         }
 
-        $otp = $request->input('otp');
+        // $otp = $request->input('otp');
         $mobile = $request->input('mobile');
-        $check_otp = SignUpOtp::where('otp', $otp)->where('mobile',$mobile)->where('user_type',2)->count();
-        if ($check_otp == 0) {
-            $response = [
-                'status' => false,
-                'message' => 'Sorry OTP Does Not Matched',
-                'error_code' => false,
-                'error_message' => null,
-            ];
-            return response()->json($response, 200);
-        }
+        // $check_otp = SignUpOtp::where('otp', $otp)->where('mobile',$mobile)->where('user_type',2)->count();
+        // if ($check_otp == 0) {
+        //     $response = [
+        //         'status' => false,
+        //         'message' => 'Sorry OTP Does Not Matched',
+        //         'error_code' => false,
+        //         'error_message' => null,
+        //     ];
+        //     return response()->json($response, 200);
+        // }
 
         $client = new Client;
         $client->name = $request->input('name');
