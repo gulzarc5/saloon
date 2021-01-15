@@ -24,7 +24,7 @@ class RedirectIfAuthenticated
                    $route = 'admin/dashboard';
                    break;
               default:
-                   $route = 'user/login';
+                   $route = 'admin/dashboard';
            }
            return redirect($route);
        }
