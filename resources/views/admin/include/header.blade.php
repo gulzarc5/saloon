@@ -11,10 +11,9 @@
 		<meta name="csrf-token" content="{{ csrf_token() }}">
 		<meta http-equiv="X-UA-Compatible" content="IE=edge">
 		<meta name="viewport" content="width=device-width, initial-scale=1">
-  	<link rel="icon" href="images/favicon.png" type="image/ico" />
-
+    
     <title>Saloon App | Admin Dashboard</title>
-    {{-- <link rel="icon" href="{{ asset('logo/logo.png')}}" type="image/icon type"> --}}
+  	<link rel="icon" href="{{ asset('logo/salon_small.webp')}}" type="image/ico" />
 
 
     <!-- Bootstrap -->
@@ -57,8 +56,7 @@
           <div class="left_col scroll-view">
             <div class="navbar nav_title" style="border: 0;">
               <a href="{{route('admin.deshboard')}}" class="site_title">
-                 App
-                {{-- <img src="{{ asset('logo/logo.png')}}" height="50" style=" width: 90%;"> --}}
+                <img src="{{ asset('logo/logo.png')}}" height="50" style=" width: 90%;">
               </a>
             </div>
 
