@@ -90,6 +90,7 @@
                         <li><a href="{{ route('admin.freelancer_list')}}">Freelancer</a></li>
                         <li><a href="{{ route('admin.shop_list')}}">Shop List</a></li>
                         <li><a href="{{ route('admin.customer_list')}}">Customers</a></li>
+                        <li><a href="{{ route('admin.password_request')}}">Password Request</a></li>
                       </ul>
                   </li>
                   <li>

@@ -15,6 +15,13 @@ Route::group(['namespace' => 'Admin'],function(){
         Route::get('/change/password/form', 'LoginController@changePasswordForm')->name('admin.change_password_form');
         Route::post('/change/password', 'LoginController@changePassword')->name('admin.change_password');
 
+        //Password Request
+        Route::get('/password/request', 'DashboardController@passwordRequest')->name('admin.password_request');
+        Route::get('/password/request/ajax', 'DashboardController@passwordRequestAjax')->name('admin.password_request_ajax');
+
+        Route::get('user/change/password/form/{user_id}/{user_type}/{request_id}', 'DashboardController@changePasswordForm')->name('admin.user_change_password_form');
+        Route::post('user/change/password', 'DashboardController@changePassword')->name('admin.user_change_password');
+
         Route::group(['prefix' =>'client'],function(){
             Route::get('/freelancer/list', 'ClientController@freelancerList')->name('admin.freelancer_list');
             Route::get('/freelancer/list/ajax', 'ClientController@freelancerListAjax')->name('admin.freelancer_list_ajax');

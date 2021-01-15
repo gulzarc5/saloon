@@ -7,8 +7,10 @@ use App\Models\Client;
 use App\Models\Customer;
 use App\Models\JobCategory;
 use App\Models\Order;
+use App\Models\PasswordRequest;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
 
 class DashboardController extends Controller
 {
@@ -78,6 +80,83 @@ class DashboardController extends Controller
     function chartQueryCancel($month){
         $cancel = Order::where('order_status',5) ->whereMonth('created_at', $month)->count();
         return $cancel;
+    }
+
+    public function passwordRequest()
+    {
+        return view('admin.password_request');
+    }
+
+    public function passwordRequestAjax(Request $request){
+        return datatables()->of(PasswordRequest::orderBy('id','desc')->get())
+            ->addIndexColumn()
+            ->addColumn('action', function($row){
+                if (!empty($row->user_type == '1')) {
+                    $btn ='<a href="'.route('admin.customer_edit',['id'=>$row->user_id]).'" class="btn btn-info btn-sm" target="_blank">View</a>
+                    <a href="'.route('admin.user_change_password_form',['user_id'=>$row->user_id,'user_type'=>1,'request_id'=>$row->id]).'" class="btn btn-danger btn-sm" target="_blank">Reset Password</a>';
+                }else{
+                    $btn ='<a href="'.route('admin.client_details',['client_id'=>$row->user_id]).'" class="btn btn-info btn-sm" target="_blank">View</a>
+                    <a href="'.route('admin.user_change_password_form',['user_id'=>$row->user_id,'user_type'=>2,'request_id'=>$row->id]).'" class="btn btn-danger btn-sm" target="_blank">Reset Password</a>';
+                }
+                
+                return $btn;
+            })
+            ->addColumn('name', function($row){
+                if (!empty($row->user_type == '1')) {
+                    return $row->customer->name;
+                }else{
+                    return $row->client->name;
+                }
+            })
+            ->addColumn('mobile', function($row){
+                if (!empty($row->user_type == '1')) {
+                    return $row->customer->mobile;
+                }else{
+                    return $row->client->mobile;
+                }
+            })
+            ->rawColumns(['action','name','mobile'])
+            ->make(true);
+    }
+
+    public function changePasswordForm($user_id,$user_type,$request_id)
+    {
+        if($user_type == '1'){
+            $user = Customer::findOrFail($user_id);
+        }else {
+            $user = Client::findOrFail($user_id);
+        }
+        return view('admin.users.user_change_password',compact('user','user_type','request_id'));
+    }
+
+    public function changePassword(Request $request)
+    {
+        $this->validate($request, [
+            'user_id' => 'required|numeric',
+            'request_id' => 'required|numeric',
+            'user_type' => 'required|numeric|in:1,2,3',
+            'new_password' => 'required|string|min:8|same:confirm_password',
+        ]);
+
+        $user_id = $request->input('user_id');
+        $user_type = $request->input('user_type');
+        $request_id = $request->input('request_id');
+        if ($user_type == '1') {
+            $user = Customer::findOrFail($user_id);
+            $user->password = Hash::make($request->input('new_password'));
+            $user->save();
+        } else {
+            $user = Client::findOrFail($user_id);
+            $user->password = Hash::make($request->input('new_password'));
+            $user->save();
+        }
+
+        $password_request = PasswordRequest::findOrFail($request_id);
+        $password_request->status = 2;
+        $password_request->save();
+
+        return redirect()->back()->with('message','User Password Chqanged Succeddfully');
+        
     }
 
 }

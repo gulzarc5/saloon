@@ -14,6 +14,10 @@ use Illuminate\Support\Facades\Route;
 |
 */
 Route::group(['namespace'=>'Api'], function(){
+
+    //Password Request For Customer , Client
+    Route::post('/password/request/send','PasswordRequestController@passwordRequest');
+
     Route::get('/signup/otp/send/{mobile}/{user_type}', 'CustomerController@signUpOtp');
     Route::get('signUp/otp/verify/{mobile}/{otp}/{user_type}', 'CustomerController@signUpOtpVerify');
     Route::get('service/city/list', 'AppSettingController@serviceCity');
