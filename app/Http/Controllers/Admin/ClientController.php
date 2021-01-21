@@ -26,9 +26,9 @@ class ClientController extends Controller
             ->addColumn('action', function($row){
                 $btn ='<a href="'.route('admin.client_details',['client_id'=>$row->id]).'" class="btn btn-info btn-sm" target="_blank">View</a>';
                 if ($row->status == '1') {
-                    $btn .='<a href="'.route('admin.customer_status_update',['id'=>$row->id,2]).'" class="btn btn-danger btn-sm" >Disable</a>';
+                    $btn .='<a href="'.route('admin.client_status_update',['id'=>$row->id,2]).'" class="btn btn-danger btn-sm" >Disable</a>';
                 } else {
-                    $btn .='<a href="'.route('admin.customer_status_update',['id'=>$row->id,1]).'" class="btn btn-primary btn-sm" >Enable</a>';
+                    $btn .='<a href="'.route('admin.client_status_update',['id'=>$row->id,1]).'" class="btn btn-primary btn-sm" >Enable</a>';
                 }
                 return $btn;
             })
