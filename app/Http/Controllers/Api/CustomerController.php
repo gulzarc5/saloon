@@ -6,7 +6,6 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 
 use App\SmsHelper\Sms;
-use Validator;
 use App\Models\Customer;
 use Illuminate\Support\Facades\Hash;
 use App\Models\SignUpOtp;
@@ -19,16 +18,18 @@ use App\Http\Resources\CustomerOrderHistoryResource;
 use App\Models\RefundInfo;
 use App\Models\UserBankAccount;
 use App\SmsHelper\PushHelperVendor;
+use Illuminate\Support\Facades\Validator;
 
 class CustomerController extends Controller
 {
-    public function signUpOtp($mobile,$user_type){
+    public function signUpOtp($mobile, $user_type)
+    {
         // user_type  1 = Customer, 2 = Client
 
         if ($user_type == '1') {
-            $check_user = Customer::where('mobile',$mobile)->count();
+            $check_user = Customer::where('mobile', $mobile)->count();
         } else {
-            $check_user = Client::where('mobile',$mobile)->count();
+            $check_user = Client::where('mobile', $mobile)->count();
         }
 
         if ($check_user > 0) {
@@ -41,10 +42,10 @@ class CustomerController extends Controller
         }
 
 
-        $customer = SignUpOtp::firstOrCreate(['mobile' => $mobile,'user_type'=>$user_type]);
+        $customer = SignUpOtp::firstOrCreate(['mobile' => $mobile, 'user_type' => $user_type]);
         $customer->otp =  11111;
         $customer->user_type =  $user_type;
-        if($customer->save()) {
+        if ($customer->save()) {
             $message = "OTP is $customer->otp . Please Do Not Share With Anyone";
             // Sms::smsSend($customer->mobile,$message);
             $response = [
@@ -53,7 +54,7 @@ class CustomerController extends Controller
                 'otp' => $customer->otp,
             ];
             return response()->json($response, 200);
-        }else{
+        } else {
             $response = [
                 'status' => true,
                 'message' => 'Sorry Mobile Number Already Registered With Us'
@@ -62,16 +63,17 @@ class CustomerController extends Controller
         }
     }
 
-    public function signUpOtpVerify($mobile,$otp,$user_type){
-        $check = SignUpOtp::where('mobile',$mobile)->where('otp',$otp)->where('user_type',$user_type)->count();
-        if($check > 0){
-            SignUpOtp::where('mobile',$mobile)->where('user_type',$user_type)->delete();
+    public function signUpOtpVerify($mobile, $otp, $user_type)
+    {
+        $check = SignUpOtp::where('mobile', $mobile)->where('otp', $otp)->where('user_type', $user_type)->count();
+        if ($check > 0) {
+            SignUpOtp::where('mobile', $mobile)->where('user_type', $user_type)->delete();
             $response = [
                 'status' => true,
                 'message' => 'OTP Verified Successfully'
             ];
             return response()->json($response, 200);
-        }else {
+        } else {
             $response = [
                 'status' => true,
                 'message' => 'Sorry OTP is Invalid'
@@ -80,16 +82,21 @@ class CustomerController extends Controller
         }
     }
 
-
-    public function customerRegistration(Request $request){
-        $validator =  Validator::make($request->all(),[
-	        'name' => ['required', 'string', 'max:255'],
-            'password' => ['required', 'string', 'min:8', 'same:confirm_password'],
-            'mobile' =>  ['required','digits:10','numeric','unique:customers'],
-            'email' =>  'unique:customers',
-            'gender' =>  'required|in:M,F',
+    public function sendOtp(Request $request)
+    {
+        $validator =  Validator::make($request->all(), [
+            'mobile' =>  ['required', 'digits:10', 'numeric', 'unique:customers,mobile'],
         ]);
-
+        $mobile = $request->input('mobile');
+        $check_user = Customer::where('mobile', $mobile)->count();
+        if ($check_user > 0) {
+            $response = [
+                'status' => false,
+                'message' => 'Sorry User Already Registered With Us',
+                'otp' => null,
+            ];
+            return response()->json($response, 200);
+        }
         if ($validator->fails()) {
             $response = [
                 'status' => false,
@@ -100,31 +107,18 @@ class CustomerController extends Controller
             ];
             return response()->json($response, 200);
         }
-
-        $customer = new Customer();
-        $customer->name = $request->input('name');
-        $customer->mobile = $request->input('mobile');
-        $customer->password = Hash::make($request->input('password'));
-        $customer->email = $request->input('email');
-        $customer->state = $request->input('state');
-        $customer->city = $request->input('city');
-        $customer->address = $request->input('address');
-        $customer->pin = $request->input('pin');
-        $customer->gender = $request->input('gender');
-        $customer->latitude = $request->input('latitude');
-        $customer->longitude = $request->input('longitude');
-        if ($customer->save()) {
+        $random = mt_rand(100000, 999999);
+        $random = 11111;
+        // $otp_code = $this->otp($ot, $request->input('mobile'));
+        $user = Customer::firstOrCreate([
+            'mobile' => $request->input('mobile')
+        ]);
+        if ($user) {
+            $user->otp = $random;
+            $user->save();
             $response = [
                 'status' => true,
-                'message' => 'Customer Registered Successfully',
-                'error_code' => false,
-                'error_message' => null,
-            ];
-            return response()->json($response, 200);
-        }else{
-        	$response = [
-                'status' => false,
-                'message' => 'Something Went Wrong Please Try Again',
+                'message' => 'Otp Sent Successfully',
                 'error_code' => false,
                 'error_message' => null,
             ];
@@ -132,12 +126,14 @@ class CustomerController extends Controller
         }
     }
 
-    public function customerLogin(Request $request){
+    public function customerOtpVerify(Request $request)
+    {
         $validator =  Validator::make($request->all(), [
-            'mobile' => 'required|numeric|digits:10',
-            'password' => 'required|min:8',
+            'mobile' => 'required|digits:10|numeric',
+            'otp' => 'required|numeric|digits:5'
         ]);
-
+        $mobile = $request->input('mobile');
+        $otp = $request->input('otp');
         if ($validator->fails()) {
             $response = [
                 'status' => false,
@@ -147,35 +143,39 @@ class CustomerController extends Controller
             ];
             return response()->json($response, 200);
         }
-
-        $customer = Customer::where('mobile',$request->input('mobile'))->first();
-        if ($customer) {
-            if(Hash::check($request->input('password'), $customer->password)){
+        
+        $customer = Customer::where('mobile', $mobile)->where('otp', $otp);
+        $check = $customer->count();
+        if ($check > 0) {
+            if ($customer) {
+                dd($customer);
+                $customer->mobile = $mobile;
+                $customer->otp = $otp;
+                $customer->is_registered = 1;
                 $customer->api_token = Str::random(60);
                 $customer->save();
                 $response = [
                     'status' => true,
-                    'message' => 'User Successfully Logged In',
-                    'error_code' => false,
-                    'error_message' => null,
-                    'data' => $customer,
+                    'message' => 'Customer Registered Successfully!'
                 ];
                 return response()->json($response, 200);
-            }else {
+            } else {
+                dd($customer);
+                $customer = $customer->first();
+                dd($customer);
+                $customer->mobile = $mobile;
+                $customer->otp = $otp;
+                $customer->api_token = Str::random(60);
+                $customer->save();
                 $response = [
-                    'status' => false,
-                    'message' => 'Sorry !! User Id Or Password Wrong',
-                    'error_code' => false,
-                    'error_message' => null,
+                    'status' => true,
+                    'message' => 'Customer Logged In Successfully!'
                 ];
-                return response()->json($response, 200);
             }
         } else {
             $response = [
-                'status' => false,
-                'message' => 'Sorry !! User Id Or Password Wrong',
-                'error_code' => false,
-                'error_message' => null,
+                'status' => true,
+                'message' => 'Sorry OTP is Invalid'
             ];
             return response()->json($response, 200);
         }
@@ -192,11 +192,11 @@ class CustomerController extends Controller
         return response()->json($response, 200);
     }
 
-    public function profileUpdate(Request $request,$id)
+    public function profileUpdate(Request $request, $id)
     {
         $validator =  Validator::make($request->all(), [
             'name' => 'required',
-            'mobile' => 'required|numeric|digits:10|unique:customers,mobile,'.$id,
+            'mobile' => 'required|numeric|digits:10|unique:customers,mobile,' . $id,
             'state' =>  'required',
             'city' =>  'required',
             'address' => 'required',
@@ -235,8 +235,8 @@ class CustomerController extends Controller
                 'error_message' => null,
             ];
             return response()->json($response, 200);
-        }else{
-        	$response = [
+        } else {
+            $response = [
                 'status' => false,
                 'message' => 'Something Went Wrong Please Try Again',
                 'error_code' => false,
@@ -246,7 +246,7 @@ class CustomerController extends Controller
         }
     }
 
-    public function bankInfoInsert(Request $request,$user_id)
+    public function bankInfoInsert(Request $request, $user_id)
     {
         $validator =  Validator::make($request->all(), [
             'bank_name' => 'required|string',
@@ -283,7 +283,7 @@ class CustomerController extends Controller
 
     public function bankInfoList($user_id)
     {
-        $bankAccountList = UserBankAccount::where('user_id', $user_id)->orderBy('id','desc')->get();
+        $bankAccountList = UserBankAccount::where('user_id', $user_id)->orderBy('id', 'desc')->get();
         $response = [
             'status' => true,
             'message' => 'Bank Account List',
@@ -303,7 +303,7 @@ class CustomerController extends Controller
         return response()->json($response, 200);
     }
 
-    public function bankInfoUpdate(Request $request,$bank_info_id)
+    public function bankInfoUpdate(Request $request, $bank_info_id)
     {
         $validator =  Validator::make($request->all(), [
             'bank_name' => 'required|string',
@@ -339,9 +339,9 @@ class CustomerController extends Controller
         return response()->json($response, 200);
     }
 
-    public function passwordChange(Request $request,$id)
+    public function passwordChange(Request $request, $id)
     {
-        $validator =  Validator::make($request->all(),[
+        $validator =  Validator::make($request->all(), [
             'current_pass' => ['required', 'string', 'min:8'],
             'new_password' => ['required', 'string', 'min:8', 'same:confirm_password'],
         ]);
@@ -356,9 +356,9 @@ class CustomerController extends Controller
             return response()->json($response, 200);
         }
 
-        $user =Customer::find($id);
+        $user = Customer::find($id);
         if ($user) {
-            if(Hash::check($request->input('current_pass'), $user->password)){
+            if (Hash::check($request->input('current_pass'), $user->password)) {
                 $user->password = Hash::make($request->input('confirm_password'));
                 if ($user->save()) {
                     $response = [
@@ -368,7 +368,7 @@ class CustomerController extends Controller
                         'error_message' => null,
                     ];
                     return response()->json($response, 200);
-                }else{
+                } else {
                     $response = [
                         'status' => false,
                         'message' => 'Something Went Wrong Please Try Again',
@@ -377,7 +377,7 @@ class CustomerController extends Controller
                     ];
                     return response()->json($response, 200);
                 }
-            }else{
+            } else {
                 $response = [
                     'status' => false,
                     'message' => 'Please Enter Correct Corrent Password',
@@ -385,7 +385,7 @@ class CustomerController extends Controller
                     'error_message' => null,
                 ];
                 return response()->json($response, 200);
-           }
+            }
         } else {
             $response = [
                 'status' => false,
@@ -399,7 +399,7 @@ class CustomerController extends Controller
 
     public function forgotOtp($mobile)
     {
-        $customer = Customer::where('mobile',$mobile);
+        $customer = Customer::where('mobile', $mobile);
         if ($customer->count() == 0) {
             $response = [
                 'status' => false,
@@ -428,8 +428,9 @@ class CustomerController extends Controller
         }
     }
 
-    public function forgotPasswordChange(Request $request){
-        $validator =  Validator::make($request->all(),[
+    public function forgotPasswordChange(Request $request)
+    {
+        $validator =  Validator::make($request->all(), [
             'mobile' => ['required', 'numeric', 'digits:10'],
             'otp' => ['required', 'numeric', 'digits:5'],
             'password' => ['required', 'string', 'min:8', 'same:confirm_password'],
@@ -446,8 +447,8 @@ class CustomerController extends Controller
         }
         $mobile = $request->input('mobile');
         $otp = $request->input('otp');
-        $customer = Customer::where('mobile',$mobile)->where('otp',$otp);
-        if($customer->count() > 0){
+        $customer = Customer::where('mobile', $mobile)->where('otp', $otp);
+        if ($customer->count() > 0) {
             $customer = $customer->first();
             $customer->password =  Hash::make($request->input('confirm_password'));
             $customer->otp = null;
@@ -457,7 +458,7 @@ class CustomerController extends Controller
                 'message' => 'Password Changed Successfully'
             ];
             return response()->json($response, 200);
-        }else {
+        } else {
             $response = [
                 'status' => false,
                 'message' => 'Sorry OTP is Invalid'
@@ -484,12 +485,12 @@ class CustomerController extends Controller
             'required_if' => 'Please Select Account',
         ];
         //is_refund 2 = yes, 1 = No
-        $validator =  Validator::make($request->all(),[
+        $validator =  Validator::make($request->all(), [
             'order_id' => 'required',
             'is_refund' => 'required',
             'account_id' =>  'required_if:is_refund,2'
-        ],$messages);
-       
+        ], $messages);
+
         if ($validator->fails()) {
             $response = [
                 'status' => false,
@@ -517,15 +518,14 @@ class CustomerController extends Controller
                     $order->save();
                 }
             }
-        // Send push
-        $user = Client::find($order->vendor_id);
-        if ($user->firsbase_token) {
-            $client_type = $user->clientType == '1' ? 2 : 3;                   
-            $title = "Dear Vendor : Your order is Cancelled With Order No : $order->id";
-            
-            PushHelperVendor::notification($user->firsbase_token,$title,$user->id,$client_type);
-        }
+            // Send push
+            $user = Client::find($order->vendor_id);
+            if ($user->firsbase_token) {
+                $client_type = $user->clientType == '1' ? 2 : 3;
+                $title = "Dear Vendor : Your order is Cancelled With Order No : $order->id";
 
+                PushHelperVendor::notification($user->firsbase_token, $title, $user->id, $client_type);
+            }
         }
         $response = [
             'status' => true,
@@ -534,10 +534,9 @@ class CustomerController extends Controller
             'error_message' => null,
         ];
         return response()->json($response, 200);
-
     }
 
-    public function updateFirebaseToken($id,$token)
+    public function updateFirebaseToken($id, $token)
     {
         $customer = Customer::find($id);
         if ($customer) {
@@ -548,7 +547,7 @@ class CustomerController extends Controller
                 'message' => 'Firebase Token Updated Successfully',
             ];
             return response()->json($response, 200);
-        }else{
+        } else {
             $response = [
                 'status' => false,
                 'message' => 'User Not Found',

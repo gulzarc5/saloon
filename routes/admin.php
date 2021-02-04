@@ -61,8 +61,13 @@ Route::group(['namespace' => 'Admin'],function(){
             Route::get('/service/category/status/{id}/{status}', 'ServiceCategoryController@status')->name('admin.service_category.status');
             Route::get('/service/category/edit/{id}', 'ServiceCategoryController@edit')->name('admin.service_category.edit');
             Route::post('/update/service/category', 'ServiceCategoryController@updateServiceCategory')->name('admin.update_service_category');
-        });
 
+            // Sub Category
+            Route::group(['prefix' => 'sub'], function () {
+                Route::resource('category', 'SubCategoryController');
+                Route::get('data', 'SubCategoryController@ajaxData')->name('admin.ajax.subcategory');
+            });
+        });
         // Orders
         Route::group(['namespace' => 'Order','prefix'=>'order'], function () {
             Route::get('/list', 'OrdersController@index')->name('admin.orders');
