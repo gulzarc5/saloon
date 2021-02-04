@@ -113,8 +113,10 @@
                         <li><a href="{{ route('admin.serviceCity')}}">Service City List</a></li>
                         <li><a href="{{ route('admin.app_slider_list')}}">Aapp Sliders</a></li>
                         <li class="sub_menu"><a href="{{route('admin.invoice_form')}}">Invoice Setting</a></li>
+                        <li class="sub_menu"><a href="{{route('admin.admin_commission_list')}}">Admin Commission</a></li>
                       </ul>
                   </li>
+                  <li><a href="{{route('admin.coupon_list')}}"><i class="fa fa-key" aria-hidden="true"></i>Coupon</a></li>
                   <li>
                       <a><i class="fa fa-search-plus" aria-hidden="true"></i> Enquery <span class="fa fa-chevron-down"></span></a>
                       <ul class="nav child_menu">

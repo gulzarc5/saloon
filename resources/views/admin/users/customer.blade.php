@@ -21,6 +21,7 @@
                     <th>Sl. No</th>
                     <th>Name</th>
                     <th>Mobile</th>
+                    <th>Wallet</th>
                     <th>Status</th>
                     <th>Action</th>
                   </tr>
@@ -47,6 +48,7 @@
                 {data: 'DT_RowIndex', name: 'DT_RowIndex'},
                 {data: 'name', name: 'name',searchable: true},
                 {data: 'mobile', name: 'mobile',searchable: true},
+                {data: 'wallet', name: 'wallet',searchable: true},
                 {data: 'status', name: 'status', render:function(data, type, row){
                   if (row.status == '1') {
                     return "<button class='btn btn-info'>Enable</a>"

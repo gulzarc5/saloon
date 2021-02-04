@@ -15,6 +15,17 @@ Route::group(['namespace' => 'Admin'],function(){
         Route::get('/change/password/form', 'LoginController@changePasswordForm')->name('admin.change_password_form');
         Route::post('/change/password', 'LoginController@changePassword')->name('admin.change_password');
 
+        Route::group(['prefix' =>'coupon'],function(){
+            Route::get('list','CouponController@couponList')->name('admin.coupon_list');
+            Route::get('edit/{coupon_id}','CouponController@couponEdit')->name('admin.coupon_edit');
+            Route::put('update/{coupon_id}','CouponController@couponUpdate')->name('admin.coupon_update');
+        });
+        Route::group(['prefix' =>'admin/commission'],function(){
+            Route::get('list','AdminCommissionController@commissionList')->name('admin.admin_commission_list');
+            Route::get('edit/{commission_id}','AdminCommissionController@commissionEdit')->name('admin.admin_commission_edit');
+            Route::put('update/{commission_id}','AdminCommissionController@commissionUpdate')->name('admin.admin_commission_update');
+        });
+
         //Password Request
         Route::get('/password/request', 'DashboardController@passwordRequest')->name('admin.password_request');
         Route::get('/password/request/ajax', 'DashboardController@passwordRequestAjax')->name('admin.password_request_ajax');
@@ -50,6 +61,8 @@ Route::group(['namespace' => 'Admin'],function(){
             Route::get('/customer/edit/{id}', 'UsersController@customerEdit')->name('admin.customer_edit');
             Route::put('/customer/update/{id}', 'UsersController@customerUpdate')->name('admin.customer_update');
             Route::get('/customer/status/update/{id}/{status}', 'UsersController@updateCustomerStatus')->name('admin.customer_status_update');
+
+            Route::get('/wallet/history/{user_id}', 'UsersController@walletHistory')->name('admin.customer_wallet_history');
         });
 
         // Service Category

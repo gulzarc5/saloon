@@ -1,0 +1,68 @@
+@extends('admin.template.admin_master')
+
+@section('content')
+
+<div class="right_col" role="main">
+    <div class="x_panel">
+        <div class="x_title">
+          <h2>Coupon List</h2>
+          <div class="clearfix"></div>
+        </div>
+        @if (Session::has('message'))
+            <div class="alert alert-success" >{{ Session::get('message') }}</div>
+        @endif
+        @if (Session::has('error'))
+            <div class="alert alert-danger">{{ Session::get('error') }}</div>
+        @endif
+        <div class="x_content">
+            <table id="customers" class="table table-striped table-bordered dt-responsive nowrap" cellspacing="0" width="100%">
+                <thead>
+                  <tr>
+                    <th>Sl. No</th>
+                    <th>Name</th>
+                    <th>Type</th>
+                    <th>Cashback</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>       
+                  @forelse ($coupons as $item)
+                      <tr>
+                        <td>{{ $loop->iteration }}</td>
+                        <td>{{ $item->name }}</td>
+                        <td>
+                          @if ($item->type == '1')
+                            <button type="button" class="btn btn-xs btn-primary">New User</button>
+                          @else
+                            <button type="button" class="btn btn-xs btn-success">Old User</button>                              
+                          @endif
+                        </td>
+                        <td>{{ $item->amount }}</td>
+                        <td>
+                          @if ($item->status == '1')
+                            <button type="button" class="btn btn-xs btn-info">Enabled</button>
+                          @else
+                            <button type="button" class="btn btn-xs btn-danger">Disabled</button>                              
+                          @endif
+                        </td>
+                        <td>
+                          @if ($item->status == '1')
+                            <a href="#" class="btn btn-xs btn-danger">Disable</a>
+                          @else
+                            <a href="#" class="btn btn-xs btn-info">Enable</a>                              
+                          @endif
+                            <a href="{{ route('admin.coupon_edit',['coupon_id' => $item->id]) }}" class="btn btn-xs btn-warning">Edit</a>                              
+                        </td>
+                      </tr>
+                  @empty
+                      <tr>
+                        <td colspan="6" align="center">No Coupons Found</td>
+                      </tr>
+                  @endforelse                
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+ @endsection

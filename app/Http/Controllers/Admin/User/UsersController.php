@@ -8,6 +8,8 @@ use Yajra\DataTables\DataTables;
 use App\Models\Customer;
 use App\Models\State;
 use App\Models\City;
+use App\Models\Wallet;
+use App\Models\WalletHistory;
 
 class UsersController extends Controller
 {
@@ -19,7 +21,8 @@ class UsersController extends Controller
         return datatables()->of(Customer::orderBy('id','desc')->get())
             ->addIndexColumn()
             ->addColumn('action', function($row){
-                $btn ='<a href="'.route('admin.customer_edit',['id'=>$row->id]).'" class="btn btn-info btn-sm" target="_blank">View</a>';
+                $btn ='<a href="'.route('admin.customer_edit',['id'=>$row->id]).'" class="btn btn-info btn-sm" target="_blank">View</a>
+                <a href="'.route('admin.customer_wallet_history',['user_id'=>$row->id]).'" class="btn btn-success btn-sm" target="_blank">Wallet history</a>';
                 if ($row->status == '1') {
                     $btn .='<a href="'.route('admin.customer_status_update',['id'=>$row->id,2]).'" class="btn btn-danger btn-sm" >Disable</a>';
                 } else {
@@ -27,7 +30,11 @@ class UsersController extends Controller
                 }
                 return $btn;
             })
-            ->rawColumns(['action'])
+            ->addColumn('wallet', function($row){
+                $btn = $row->wallet->amount ?? 0;
+                return $btn;
+            })
+            ->rawColumns(['action','wallet'])
             ->make(true);
     }
 
@@ -67,5 +74,13 @@ class UsersController extends Controller
         $state->status = $status;
         $state->save();
         return redirect()->back();
+    }
+
+    public function walletHistory($user_id)
+    {
+        $wallet = Wallet::where('user_id', $user_id)->first();
+
+        $wallet_history = WalletHistory::where('wallet_id',$wallet->id)->latest()->limit(50)->get();
+        return view('admin.users.wallet_history',compact('wallet_history'));
     }
 }
