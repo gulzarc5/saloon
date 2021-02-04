@@ -92,10 +92,12 @@
                       </ul>
                   </li>
                   <li>
-                        <a><i class="fa fa-laptop" aria-hidden="true"></i> Service Category <span class="fa fa-chevron-down"></span></a>
+                        <a><i class="fa fa-laptop" aria-hidden="true"></i> Category <span class="fa fa-chevron-down"></span></a>
                         <ul class="nav child_menu">
-                            <li><a href="{{ route('admin.add.service_category')}}">Add Service Category</a></li>
-                            <li><a href="{{ route('admin.service_category')}}">Service Category List</a></li>
+                            <li><a href="{{ route('admin.add.service_category')}}">Add Category</a></li>
+                            <li><a href="{{ route('admin.service_category')}}">Category List</a></li>
+                            <li><a href="{{ route('category.create')}}">Add Sub Category List</a></li>
+                            <li><a href="{{ route('category.index')}}">Sub Category List</a></li>
                         </ul>
                   </li>
                   <li>

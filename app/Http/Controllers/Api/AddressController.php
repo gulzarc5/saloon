@@ -11,7 +11,7 @@ class AddressController extends Controller
 {
     public function addAddress(Request $request)
     {
-        $validator =  Validator::make($request->all(),[
+        $validator =  Validator::make($request->all(), [
             'name' => 'required',
             'mobile' => 'required|numeric|digits:10',
             'state' => 'required',
@@ -53,7 +53,7 @@ class AddressController extends Controller
 
     public function addressList($customer_id)
     {
-        $address =  Address::where('user_id',$customer_id)->get();
+        $address =  Address::where('user_id', $customer_id)->get();
         $response = [
             'status' => true,
             'message' => 'Address List',
@@ -73,9 +73,9 @@ class AddressController extends Controller
         return response()->json($response, 200);
     }
 
-    public function addressUpdate(Request $request,$address_id)
+    public function addressUpdate(Request $request, $address_id)
     {
-        $validator = Validator::make($request->all(),[
+        $validator = Validator::make($request->all(), [
             'name' => 'required',
             'mobile' => 'required|numeric|digits:10',
             'state' => 'required',

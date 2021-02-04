@@ -8,14 +8,14 @@ use App\Models\JobCategory;
 use Illuminate\Http\Request;
 use App\Models\ServiceCity;
 use App\Models\Slider;
-use DB;
 use App\Http\Resources\ClientResource;
+use Illuminate\Support\Facades\DB;
 
 class AppSettingController extends Controller
 {
     public function serviceCity()
     {
-        $serviceCity = ServiceCity::select('id','name')->where('status',1)->get();
+        $serviceCity = ServiceCity::select('id', 'name')->where('status', 1)->get();
         $response = [
             'status' => true,
             'message' => 'Service City List',
@@ -27,11 +27,11 @@ class AppSettingController extends Controller
     public function AppLoadApi()
     {
         $Sliders = Slider::get();
-        $category_list = JobCategory::where('status',1)->get();
-        $top_saloon = Client::where('profile_status',2)->where('job_status',2)->where('status',1)->where('clientType',2)->withCount(['review as average_rating' => function($query) {
+        $category_list = JobCategory::with('subCategory')->where('status', 1)->get();
+        $top_saloon = Client::where('profile_status', 2)->where('job_status', 2)->where('status', 1)->where('clientType', 2)->withCount(['review as average_rating' => function ($query) {
             $query->select(DB::raw('coalesce(avg(rating),0)'));
         }])->orderByDesc('average_rating')->limit(9)->get();
-        $top_free_launcer = Client::where('profile_status',2)->where('job_status',2)->where('status',1)->where('clientType',1)->withCount(['review as average_rating' => function($query) {
+        $top_free_launcer = Client::where('profile_status', 2)->where('job_status', 2)->where('status', 1)->where('clientType', 1)->withCount(['review as average_rating' => function ($query) {
             $query->select(DB::raw('coalesce(avg(rating),0)'));
         }])->orderByDesc('average_rating')->limit(10)->get();
         $response = [
@@ -49,7 +49,7 @@ class AppSettingController extends Controller
 
     public function serviceList()
     {
-        $category_list = JobCategory::where('status',1)->get();
+        $category_list = JobCategory::where('status', 1)->get();
         $response = [
             'status' => true,
             'message' => 'Service Category List',
