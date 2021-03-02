@@ -4,7 +4,7 @@ namespace App\Http\Resources;
 
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class ClientJobResource extends JsonResource
+class JobPricingResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
@@ -16,9 +16,7 @@ class ClientJobResource extends JsonResource
     {
         return [
             'id' => $this->id,
-            'cat_level_1' => new JobPricingResource($this->jobPricing),
-            'status' => $this->status,
-            'description' => $this->description
+            'cat_level_1' => $this->cat_level_1
         ];
     }
 }

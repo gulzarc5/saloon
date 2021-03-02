@@ -9,10 +9,9 @@ use App\Models\Job;
 use App\Models\Order;
 use App\Models\OrderJobs;
 use Illuminate\Http\Request;
-use Validator;
 use Carbon\Carbon;
 use App\SmsHelper\PushHelperVendor;
-
+use Illuminate\Support\Facades\Validator;
 use Razorpay\Api\Api;
 
 class OrderController extends Controller
@@ -20,14 +19,14 @@ class OrderController extends Controller
     public function orderPlace(Request $request)
     {
         // service type 1 = man, 2 = woman, 3= kids
-        $validator =  Validator::make($request->all(),[
-            'user_id' =>'required',
-            'service_id' =>'required|array|min:1',
-            'service_id.*' =>'required',
-            'service_for' =>'required|array|min:1',
-            'service_for.*' =>'required',
-            'service_time' =>'required|date_format:Y-m-d H:i:s',
-            'address_id'=>'required',
+        $validator =  Validator::make($request->all(), [
+            'user_id' => 'required',
+            'service_id' => 'required|array|min:1',
+            'service_id.*' => 'required',
+            'service_for' => 'required|array|min:1',
+            'service_for.*' => 'required',
+            'service_time' => 'required|date_format:Y-m-d H:i:s',
+            'address_id' => 'required',
             'vendor_id' => 'required'
         ]);
 
@@ -45,15 +44,16 @@ class OrderController extends Controller
         $vendor_id = $request->input('vendor_id');
         $service_date = $request->input('service_time');
         //check service is available or not
-        for ($i=0; $i < count($service_id); $i++) { 
+        for ($i = 0; $i < count($service_id); $i++) {
             if (isset($service_id[$i]) && !empty($service_id[$i]) && isset($service_for[$i]) && !empty($service_for[$i])) {
-                $checkService = Job::where('id',$service_id[$i])->where('status',1);
-                if($service_for[$i] == '1'){
-                    $checkService->where('is_man',2);
-                }elseif ($service_for[$i] == '2') {
-                    $checkService->where('is_woman',2);
-                }elseif ($service_for[$i] == '3') {
-                    $checkService->where('is_kids',2);
+                $checkService = Job::where('id', $service_id[$i])->where('status', 1);
+                if ($service_for[$i] == '1') {
+                    $checkService->where('is_man', 2);
+                } elseif ($service_for[$i] == '2') {
+                    $checkService->where('is_woman', 2);
+                }
+                elseif ($service_for[$i] == '3') {
+                    $checkService->where('is_kids', 2);
                 }
                 if ($checkService->count() == 0) {
                     $response = [
@@ -72,7 +72,7 @@ class OrderController extends Controller
 
         $service_date_check = Carbon::parse($service_date)->toDateString();
         if (!empty($service_date_check)) {
-            $checkSchedule = ClientSchedule::where('user_id',$vendor_id)->where('date',$service_date_check)->count();
+            $checkSchedule = ClientSchedule::where('user_id', $vendor_id)->where('date', $service_date_check)->count();
             if ($checkSchedule > 0) {
                 $response = [
                     'status' => false,
@@ -85,7 +85,7 @@ class OrderController extends Controller
         }
 
         ////////////// Validation End////////////////////
-        
+
 
         $total_amount = 0;
         //Order Creation
@@ -95,31 +95,33 @@ class OrderController extends Controller
         $order->service_time = $request->input('service_time');
         $order->vendor_id = $vendor_id;
         if ($order->save()) {
-            for ($i=0; $i < count($service_id); $i++) { 
+            for ($i = 0; $i < count($service_id); $i++) {
                 if (isset($service_id[$i]) && !empty($service_id[$i]) && isset($service_for[$i]) && !empty($service_for[$i])) {
-                    $checkService = Job::where('id',$service_id[$i])->where('status',1);
-                    if($service_for[$i] == '1'){
-                        $checkService->where('is_man',2);
-                    }elseif ($service_for[$i] == '2') {
-                        $checkService->where('is_woman',2);
-                    }elseif ($service_for[$i] == '3') {
-                        $checkService->where('is_kids',2);
+                    $checkService = Job::where('id', $service_id[$i])->where('status', 1);
+                    if ($service_for[$i] == '1') {
+                        $checkService->where('is_man', 2);
+                    } elseif ($service_for[$i] == '2') {
+                        $checkService->where('is_woman', 2);
+                    }
+                    elseif ($service_for[$i] == '3') {
+                        $checkService->where('is_kids', 2);
                     }
                     if ($checkService->count() > 0) {
                         $job_fetch = $checkService->first();
                         $order_job = new OrderJobs();
-                        $order_job->order_id = $order->id;                        
+                        $order_job->order_id = $order->id;
                         $order_job->job_id = $service_id[$i];
                         $order_job->service_for = $service_for[$i];
-                        if($service_for[$i] == '1'){
+                        if ($service_for[$i] == '1') {
                             $order_job->amount = $job_fetch->man_price;
-                            $total_amount+=$job_fetch->man_price;
-                        }elseif ($service_for[$i] == '2') {
+                            $total_amount += $job_fetch->man_price;
+                        } elseif ($service_for[$i] == '2') {
                             $order_job->amount = $job_fetch->woman_price;
-                            $total_amount+=$job_fetch->woman_price;
-                        }elseif ($service_for[$i] == '3') {
+                            $total_amount += $job_fetch->woman_price;
+                        }
+                        elseif ($service_for[$i] == '3') {
                             $order_job->amount = $job_fetch->kids_price;
-                            $total_amount+=$job_fetch->kids_price;
+                            $total_amount += $job_fetch->kids_price;
                         }
                         $order_job->save();
                     }
@@ -129,46 +131,45 @@ class OrderController extends Controller
             $order->amount = $total_amount;
             $advance_amount = 0;
             if ($total_amount > 0) {
-                $advance_amount = (($total_amount*20)/100);
+                $advance_amount = (($total_amount * 20) / 100);
             }
             $order->advance_amount = $advance_amount;
 
             $api = new Api(config('services.razorpay.id'), config('services.razorpay.key'));
-                $orders = $api->order->create(array(
-                    'receipt' =>$order->id,
-                    'amount' => $advance_amount*100,
-                    'currency' => 'INR',
-                    )
-                );
+            $orders = $api->order->create(array(
+                'receipt' => $order->id,
+                'amount' => $advance_amount * 100,
+                'currency' => 'INR',
+            ));
 
-                $order->payment_request_id = $orders['id'];
-                $order->save();
+            $order->payment_request_id = $orders['id'];
+            $order->save();
 
-                $payment_data = [
-                    'key_id' => config('services.razorpay.id'),
-                    'amount' => $advance_amount*100,
-                    'order_id' => $orders['id'],
-                    'name' => $order->customer->name,
-                    'email' => $order->customer->email,
-                    'mobile' => $order->customer->mobile,
-                ];
+            $payment_data = [
+                'key_id' => config('services.razorpay.id'),
+                'amount' => $advance_amount * 100,
+                'order_id' => $orders['id'],
+                'name' => $order->customer->name,
+                'email' => $order->customer->email,
+                'mobile' => $order->customer->mobile,
+            ];
 
-                $response = [
-                    'status' => true,
-                    'message' => 'Order Place',
-                    'error_code' => false,
-                    'error_message' => null,
-                    'data' => [
-                        'order_id' => $order->id,
-                        'payment_status' => 1,
-                        'amount' => $total_amount,
-                        'advance_amount' => $advance_amount,
-                        'payment_data' => $payment_data,
-                    ],
-                ];
+            $response = [
+                'status' => true,
+                'message' => 'Order Place',
+                'error_code' => false,
+                'error_message' => null,
+                'data' => [
+                    'order_id' => $order->id,
+                    'payment_status' => 1,
+                    'amount' => $total_amount,
+                    'advance_amount' => $advance_amount,
+                    'payment_data' => $payment_data,
+                ],
+            ];
 
-               return response()->json($response, 200);
-        }else{
+            return response()->json($response, 200);
+        } else {
             $response = [
                 'status' => false,
                 'message' => 'Something Went Wrong Please Try Again',
@@ -180,8 +181,9 @@ class OrderController extends Controller
     }
 
 
-    public function paymentVerify(Request $request){
-        $validator =  Validator::make($request->all(),[
+    public function paymentVerify(Request $request)
+    {
+        $validator =  Validator::make($request->all(), [
             'user_id' => 'required',
             'razorpay_order_id' => 'required', // 1 = normal, 2 = Express
             'razorpay_payment_id' => 'required', // 1 = cod, 2 = online
@@ -217,11 +219,11 @@ class OrderController extends Controller
             $user = Client::find($order->vendor_id);
             if ($user->firsbase_token) {
                 $title = "Dear Vendor : A User Placed An Order With Order Id $order->id";
-                PushHelperVendor::notification($user->firsbase_token,$title,$user->id,2);
+                PushHelperVendor::notification($user->firsbase_token, $title, $user->id, 2);
             }
 
             return response()->json($response, 200);
-        }else{
+        } else {
             $response = [
                 'status' => false,
                 'message' => 'Payment Failed',
@@ -230,7 +232,7 @@ class OrderController extends Controller
         }
     }
 
-    private function signatureVerify($order_id,$payment_id,$signature)
+    private function signatureVerify($order_id, $payment_id, $signature)
     {
         try {
             $api = new Api(config('services.razorpay.id'), config('services.razorpay.key'));

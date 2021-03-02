@@ -19,4 +19,5 @@ class JobCategory extends Model
     {
         return $this->hasMany('App\Models\SubCategory', 'category_id')->where('status', 1);
     }
+   
 }

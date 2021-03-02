@@ -20,4 +20,6 @@ class SubCategory extends Model
     {
         return $this->belongsTo('App\Models\JobCategory', 'category_id', 'id');
     }
+
+    
 }

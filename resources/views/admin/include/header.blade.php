@@ -98,6 +98,8 @@
                             <li><a href="{{ route('admin.service_category')}}">Category List</a></li>
                             <li><a href="{{ route('category.create')}}">Add Sub Category List</a></li>
                             <li><a href="{{ route('category.index')}}">Sub Category List</a></li>
+                            <li><a href="{{ route('level.create')}}">Add Third Level Category</a></li>
+                            <li><a href="{{ route('level.index')}}">Third Level Category List</a></li>
                         </ul>
                   </li>
                   <li>

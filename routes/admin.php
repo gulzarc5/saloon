@@ -80,6 +80,12 @@ Route::group(['namespace' => 'Admin'],function(){
                 Route::resource('category', 'SubCategoryController');
                 Route::get('data', 'SubCategoryController@ajaxData')->name('admin.ajax.subcategory');
             });
+            // Third Level Category 
+            Route::group(['prefix' => 'third'], function () {
+                Route::resource('third/level', 'ThirdLevelCategoryController');
+                Route::post('sub/category', 'ThirdLevelCategoryController@fetchSubCategory')->name('fetch_sub_category');
+                Route::get('third/category', 'ThirdLevelCategoryController@fetchThirdCategory')->name('admin.ajax.thirdcategory');
+            });
         });
         // Orders
         Route::group(['namespace' => 'Order','prefix'=>'order'], function () {
@@ -108,14 +114,16 @@ Route::group(['namespace' => 'Admin'],function(){
             Route::put('/state/update/{id}', 'ConfigurationController@updateState')->name('admin.update_state');
             Route::get('/state/update/status/{id}/{status}', 'ConfigurationController@updateStatusState')->name('admin.update_status_state');
 
-            Route::get('/city', 'ConfigurationController@city')->name('admin.city');
-            Route::get('/city/list/ajax', 'ConfigurationController@cityListAjax')->name('admin.city_list_ajax');
-            Route::get('/city/add', 'ConfigurationController@addCity')->name('admin.add_city');
-            Route::post('/city/insert', 'ConfigurationController@insertCity')->name('admin.insert_city');
-            Route::get('/city/edit/{id}', 'ConfigurationController@editCity')->name('admin.edit_city');
-            Route::put('/city/update/{id}', 'ConfigurationController@updateCity')->name('admin.update_city');
-            Route::get('/city/update/status/{id}/{status}', 'ConfigurationController@updateStatusCity')->name('admin.update_status_city');
-            Route::get('/city/list/byState/{state_id}', 'ConfigurationController@cityListByState')->name('admin.city_list_by_state');
+            Route::group(['prefix' => 'city'], function () {
+                Route::get('', 'ConfigurationController@city')->name('admin.city');
+                Route::get('list/ajax', 'ConfigurationController@cityListAjax')->name('admin.city_list_ajax');
+                Route::get('add', 'ConfigurationController@addCity')->name('admin.add_city');
+                Route::post('insert', 'ConfigurationController@insertCity')->name('admin.insert_city');
+                Route::get('edit/{id}', 'ConfigurationController@editCity')->name('admin.edit_city');
+                Route::put('update/{id}', 'ConfigurationController@updateCity')->name('admin.update_city');
+                Route::get('update/status/{id}/{status}', 'ConfigurationController@updateStatusCity')->name('admin.update_status_city');
+                Route::get('list/byState/{state_id}', 'ConfigurationController@cityListByState')->name('admin.city_list_by_state');
+            });
 
 
             Route::group(['prefix' =>'service'],function(){

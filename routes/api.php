@@ -15,23 +15,12 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::group(['namespace' => 'Api'], function () {
-
-    //Password Request For Customer , Client
-    Route::post('/password/request/send', 'PasswordRequestController@passwordRequest');
     // Send otp API by Saddam
     Route::post('send/otp', 'CustomerController@sendOtp');
     Route::post('otp/verify', 'CustomerController@customerOtpVerify');
-    // Route::get('signup/otp/send/{mobile}/{user_type}', 'CustomerController@signUpOtp');
-    // Route::get('signUp/otp/verify/{mobile}/{otp}/{user_type}', 'CustomerController@signUpOtpVerify');
-    // Route::get('service/city/list', 'AppSettingController@serviceCity');
-    // Route::get('app/loade/api', 'AppSettingController@AppLoadApi');
-    // Route::get('service/list/category', 'AppSettingController@serviceList');
-
-    // Customer
-    Route::post('customer/registration', 'CustomerController@customerRegistration');
-    Route::post('customer/login', 'CustomerController@customerLogin');
-    Route::get('/customer/forgot/otp/send/{mobile}', 'CustomerController@forgotOtp');
-    Route::post('customer/forgot/password/change', 'CustomerController@forgotPasswordChange');
+    Route::get('service/city/list', 'AppSettingController@serviceCity');
+    Route::get('app/loade/api', 'AppSettingController@AppLoadApi');
+    Route::get('service/list/category', 'AppSettingController@serviceList');
 
     Route::get('/client/forgot/otp/send/{mobile}', 'ClientsController@forgotOtp');
     Route::post('client/forgot/password/change', 'ClientsController@forgotPasswordChange');
@@ -41,11 +30,17 @@ Route::group(['namespace' => 'Api'], function () {
         Route::get('details/{service_id}', 'ServiceController@serviceDetails');
         Route::get('search/{search_key}/{page}', 'ServiceController@serviceSearch');
     });
-    //customer Section
-    Route::group(['middleware' => 'auth:customerApi', 'prefix' => 'customer'], function () {
 
-        Route::get('profile/{id}', 'CustomerController@profileFetch');
-        Route::put('profile/update/{id}', 'CustomerController@profileUpdate');
+    //Customer Section
+    Route::group(['middleware' => 'auth:customerApi', 'prefix' => 'customer'], function () {
+        Route::group(['prefix' => 'registration'], function () {
+            Route::post('update/details', 'CustomerController@updateDetailsRegistration');
+            Route::post('address', 'CustomerController@updateAddressRegistration');
+        });
+        Route::group(['prefix' => 'profile'], function () {
+            Route::get('/', 'CustomerController@profileFetch');
+            Route::post('update', 'CustomerController@profileUpdate');
+        });
         Route::put('password/change/{id}', 'CustomerController@passwordChange');
         Route::post('order/place', 'OrderController@orderPlace');
         Route::post('payment/verify', 'OrderController@paymentVerify');
@@ -55,13 +50,17 @@ Route::group(['namespace' => 'Api'], function () {
         //For Push Notification
         Route::get('update/firebase_token/{id}/{token}', 'CustomerController@updateFirebaseToken');
 
-        Route::put('bank/info/add/{customer_id}', 'CustomerController@bankInfoInsert');
-        Route::get('bank/info/list/{customer_id}', 'CustomerController@bankInfoList');
-        Route::get('bank/info/fetch/{bank_info_id}', 'CustomerController@bankInfoFetch');
-        Route::put('bank/info/update/{bank_info_id}', 'CustomerController@bankInfoUpdate');
+        Route::group(['prefix' => 'bank'], function () {
+            Route::group(['prefix' => 'info'], function () {
+                Route::post('add', 'CustomerController@bankInfoInsert');
+                Route::get('list', 'CustomerController@bankInfoList');
+                Route::get('fetch/{bank_info_id}', 'CustomerController@bankInfoFetch');
+                Route::put('update/{bank_info_id}', 'CustomerController@bankInfoUpdate');
+            });
+        });
 
         Route::group(['prefix' => 'address'], function () {
-            Route::get('list/{customer_id}', 'AddressController@addressList');
+            Route::get('list', 'AddressController@addressList');
             Route::post('add', 'AddressController@addAddress');
             Route::get('fetch/{id}', 'AddressController@addressFetch');
             Route::put('update/{id}', 'AddressController@addressUpdate');
@@ -75,13 +74,12 @@ Route::group(['namespace' => 'Api'], function () {
     // Client Regitration
     Route::post('client/registration', 'ClientsController@clientRegistration');
     Route::post('client/login', 'ClientsController@clientLogin');
-    Route::group(['middleware' => 'auth:clientApi'], function () {
+    Route::group(['middleware' => ['auth:clientApi']], function () {
         Route::get('client/profile/{id}', 'ClientsController@clientProfile');
         Route::post('client/profile/update', 'ClientsController@clientProfileUpdate');
 
         //For Push Notification
         Route::get('client/update/firebase_token/{id}/{token}', 'ClientsController@updateFirebaseToken');
-
 
         Route::get('client/service/list/{client_id}', 'JobController@clientServiceList');
         Route::get('client/service/edit/{service_list_id}', 'JobController@clientServiceEdit');

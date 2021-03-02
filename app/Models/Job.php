@@ -10,7 +10,7 @@ class Job extends Model
     protected $table = 'jobs';
     protected $primaryKey = 'id';
     protected $fillable = [
-        'user_id','job_category','description','main_image','mrp','price','status','is_man','is_woman','is_kids','man_mrp','man_price','woman_mrp','woman_price','kids_mrp','kids_price'
+        'user_id','job_category','description','main_image','mrp','price','status',
     ];
 
     public function jobCategory()
@@ -22,5 +22,15 @@ class Job extends Model
     public function clientData()
     {
         return $this->belongsTo('App\Models\Client','user_id','id');
+    }
+
+    public function jobPricing()
+    {
+        return $this->hasMany('App\Models\JobPricing');
+    }
+
+    public function minPrice(){
+        return $this->hasMany('App\Models\JobPricing', 'job_id', 'id')
+        ->where('job_pricing.price', $this->jobPricing->min('price'));
     }
 }

@@ -25,15 +25,19 @@ use App\Models\UserBankAccount;
 
 class ClientsController extends Controller
 {
-    public function clientRegistration(Request $request){
-        $validator =  Validator::make($request->all(),[
-	        'name'             => ['required', 'string', 'max:255'],
-            'mobile'           => ['required','digits:10','numeric','unique:clients'],
+    public function clientRegistration(Request $request)
+    {
+        $validator =  Validator::make($request->all(), [
+            'name'             => ['required', 'string', 'max:255'],
+            'mobile'           => ['required', 'digits:10', 'numeric', 'unique:clients'],
             'password'         => ['required', 'string', 'min:8'],
             // 'otp'              => 'required|digits:5|numeric',
             'clientType'       => 'required|in:1,2',
             'service_city_id' => 'required',
+            'latitude' => 'required',
+            'longitude' =>  'required'
         ]);
+
         if ($validator->fails()) {
             $response = [
                 'status' => false,
@@ -64,6 +68,8 @@ class ClientsController extends Controller
         $client->password = Hash::make($request->input('password'));
         $client->clientType = $request->input('clientType');
         $client->service_city_id = $request->input('service_city_id');
+        $client->latitude = $request->input('latitude');
+        $client->longitude = $request->input('longitude');
         if ($client->save()) {
             $response = [
                 'status' => true,
@@ -72,8 +78,8 @@ class ClientsController extends Controller
                 'error_message' => null,
             ];
             return response()->json($response, 200);
-        }else{
-        	$response = [
+        } else {
+            $response = [
                 'status' => false,
                 'message' => 'Something Went Wrong Please Try Again',
                 'error_code' => false,
@@ -83,9 +89,10 @@ class ClientsController extends Controller
         }
     }
 
-    public function clientLogin(Request $request){
-        $validator =  Validator::make($request->all(),[
-            'mobile'           => ['required','digits:10','numeric'],
+    public function clientLogin(Request $request)
+    {
+        $validator =  Validator::make($request->all(), [
+            'mobile'           => ['required', 'digits:10', 'numeric'],
             'password'         => ['required', 'string', 'min:8'],
         ]);
         if ($validator->fails()) {
@@ -98,9 +105,9 @@ class ClientsController extends Controller
             ];
             return response()->json($response, 200);
         }
-        $client = Client::where('mobile',$request->input('mobile'))->first();
+        $client = Client::where('mobile', $request->input('mobile'))->first();
         if ($client) {
-            if(Hash::check($request->input('password'), $client->password)){
+            if (Hash::check($request->input('password'), $client->password)) {
                 $client->api_token = Str::random(60);
                 $client->save();
                 $response = [
@@ -111,7 +118,7 @@ class ClientsController extends Controller
                     'data' => new ClientResource($client),
                 ];
                 return response()->json($response, 200);
-            }else {
+            } else {
                 $response = [
                     'status' => false,
                     'message' => 'Sorry !! Client Id Or Password Wrong',
@@ -131,7 +138,8 @@ class ClientsController extends Controller
         }
     }
 
-    public function clientProfile($id){
+    public function clientProfile($id)
+    {
         $client = Client::find($id);
         $response = [
             'status' => true,
@@ -144,10 +152,10 @@ class ClientsController extends Controller
     public function clientProfileUpdate(Request $request)
     {
         $client_id = $request->input('client_id');
-        $validator =  Validator::make($request->all(),[
+        $validator =  Validator::make($request->all(), [
             'client_id' => 'required',
             'name' => 'required',
-            'mobile' =>  'required|unique:clients,id,'.$client_id,
+            'mobile' =>  'required|unique:clients,id,' . $client_id,
             'profile_image' => 'image|mimes:jpeg,png,jpg,gif|max:2048',
             'address_proof_file' => 'image|mimes:jpeg,png,jpg,gif,pdf|max:2048',
             'photo_proof_file' => 'image|mimes:jpeg,png,jpg,gif,pdf|max:2048',
@@ -192,35 +200,35 @@ class ClientsController extends Controller
         $client->wifi = $request->input('wifi') ?? 1;
         $client->music = $request->input('music') ?? 1;
         $client->profile_status = 2;
-        if($client->save()) {
-            if($request->hasfile('profile_image')){
-                $path = public_path().'/images/client/thumb/';
+        if ($client->save()) {
+            if ($request->hasfile('profile_image')) {
+                $path = public_path() . '/images/client/thumb/';
                 File::exists($path) or File::makeDirectory($path, 0777, true, true);
-                $path_thumb = public_path().'/images/client/';
+                $path_thumb = public_path() . '/images/client/';
                 File::exists($path_thumb) or File::makeDirectory($path_thumb, 0777, true, true);
 
-   
+
                 $image = $request->file('profile_image');
-                $image_name = time().date('Y-M-d').'.'.$image->getClientOriginalExtension();
+                $image_name = time() . date('Y-M-d') . '.' . $image->getClientOriginalExtension();
 
                 //Product Original Image
-                $destination = public_path().'/images/client/';
+                $destination = public_path() . '/images/client/';
                 $img = Image::make($image->getRealPath());
-                $img->save($destination.'/'.$image_name);
+                $img->save($destination . '/' . $image_name);
 
                 //Product Thumbnail
-                $destination = public_path().'/images/client/thumb';
+                $destination = public_path() . '/images/client/thumb';
                 $img = Image::make($image->getRealPath());
                 $img->resize(600, 600, function ($constraint) {
                     $constraint->aspectRatio();
-                })->save($destination.'/'.$image_name);
+                })->save($destination . '/' . $image_name);
                 $client->image = $image_name;
                 $client->save();
             }
 
-            if($request->hasfile('photo_proof_file')){   
+            if ($request->hasfile('photo_proof_file')) {
                 $photo_proof = $request->file('photo_proof_file');
-                $photo_proof_name = uniqid().time().date('Y-M-d').'.'.$photo_proof->getClientOriginalExtension();
+                $photo_proof_name = uniqid() . time() . date('Y-M-d') . '.' . $photo_proof->getClientOriginalExtension();
 
                 //Product Original Image
                 $photo_proof->move(public_path('/images/client/files/'), $photo_proof_name);
@@ -229,9 +237,9 @@ class ClientsController extends Controller
                 $client->photo_proof = $request->input('photo_proof');
                 $client->save();
             }
-            if($request->hasfile('address_proof_file')){   
+            if ($request->hasfile('address_proof_file')) {
                 $address_proof = $request->file('address_proof_file');
-                $address_proof_name = uniqid().time().date('Y-M-d').'.'.$address_proof->getClientOriginalExtension();
+                $address_proof_name = uniqid() . time() . date('Y-M-d') . '.' . $address_proof->getClientOriginalExtension();
 
                 //Product Original Image
                 $address_proof->move(public_path('/images/client/files/'), $address_proof_name);
@@ -240,9 +248,9 @@ class ClientsController extends Controller
                 $client->address_proof = $request->input('address_proof');
                 $client->save();
             }
-            if($request->hasfile('business_proof_file')){   
+            if ($request->hasfile('business_proof_file')) {
                 $business_proof = $request->file('business_proof_file');
-                $business_proof_name = uniqid().time().date('Y-M-d').'.'.$business_proof->getClientOriginalExtension();
+                $business_proof_name = uniqid() . time() . date('Y-M-d') . '.' . $business_proof->getClientOriginalExtension();
 
                 //Product Original Image
                 $business_proof->move(public_path('/images/client/files/'), $business_proof_name);
@@ -268,13 +276,12 @@ class ClientsController extends Controller
             ];
             return response()->json($response, 200);
         }
-
     }
 
     public function galleryImageAdd(Request $request)
     {
         $client_id = $request->input('client_id');
-        $image_count = ClientImage::where('client_id',$client_id)->count();
+        $image_count = ClientImage::where('client_id', $client_id)->count();
         $image_max = (12 - $image_count);
         if ($image_max == 0) {
             $messages = [
@@ -282,16 +289,16 @@ class ClientsController extends Controller
             ];
         } else {
             $messages = [
-                'max' => 'More '.$image_max.' :attribute Can Be Allowed To Upload.',
+                'max' => 'More ' . $image_max . ' :attribute Can Be Allowed To Upload.',
             ];
         }
 
 
-        $validator =  Validator::make($request->all(),[
-            'images' => 'required|max:'.$image_max,
+        $validator =  Validator::make($request->all(), [
+            'images' => 'required|max:' . $image_max,
             'images.*' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
             'client_id' => 'required'
-        ],$messages);
+        ], $messages);
 
         if ($validator->fails()) {
             $response = [
@@ -304,27 +311,27 @@ class ClientsController extends Controller
             return response()->json($response, 200);
         }
 
-        if($request->hasfile('images')){
-            $path = public_path().'/images/client/thumb/';
+        if ($request->hasfile('images')) {
+            $path = public_path() . '/images/client/thumb/';
             File::exists($path) or File::makeDirectory($path, 0777, true, true);
-            $path_thumb = public_path().'/images/client/';
+            $path_thumb = public_path() . '/images/client/';
             File::exists($path_thumb) or File::makeDirectory($path_thumb, 0777, true, true);
 
-            for ($i=0; $i < count($request->file('images')); $i++) {
+            for ($i = 0; $i < count($request->file('images')); $i++) {
                 $image = $request->file('images')[$i];
-                $image_name = $i.time().date('Y-M-d').'.'.$image->getClientOriginalExtension();
+                $image_name = $i . time() . date('Y-M-d') . '.' . $image->getClientOriginalExtension();
 
                 //Product Original Image
-                $destination = public_path().'/images/client/';
+                $destination = public_path() . '/images/client/';
                 $img = Image::make($image->getRealPath());
-                $img->save($destination.'/'.$image_name);
+                $img->save($destination . '/' . $image_name);
 
                 //Product Thumbnail
-                $destination = public_path().'/images/client/thumb';
+                $destination = public_path() . '/images/client/thumb';
                 $img = Image::make($image->getRealPath());
                 $img->resize(600, 600, function ($constraint) {
                     $constraint->aspectRatio();
-                })->save($destination.'/'.$image_name);
+                })->save($destination . '/' . $image_name);
 
                 $client_images = new ClientImage();
                 $client_images->image = $image_name;
@@ -341,12 +348,12 @@ class ClientsController extends Controller
         return response()->json($response, 200);
     }
 
-    public function galleryImageDelete($client_id,$image_id)
+    public function galleryImageDelete($client_id, $image_id)
     {
         $images = ClientImage::find($image_id);
         $image_name = $images->image;
 
-        $profile_picture_check = Client::where(['id'=>$client_id,'image'=>$image_name])->count();
+        $profile_picture_check = Client::where(['id' => $client_id, 'image' => $image_name])->count();
         if ($profile_picture_check > 0) {
             $response = [
                 'status' => false,
@@ -355,14 +362,14 @@ class ClientsController extends Controller
             return response()->json($response, 200);
         }
 
-        $path = public_path().'/images/client/'.$image_name;
-        $thumb_path = public_path().'/images/client/thumb/'.$image_name;
+        $path = public_path() . '/images/client/' . $image_name;
+        $thumb_path = public_path() . '/images/client/thumb/' . $image_name;
 
-        if ( File::exists($path)) {
+        if (File::exists($path)) {
             File::delete($path);
         }
 
-        if ( File::exists($thumb_path)) {
+        if (File::exists($thumb_path)) {
             File::delete($thumb_path);
         }
 
@@ -376,7 +383,7 @@ class ClientsController extends Controller
 
     public function galleryImageSetThumb($client_id, $image_id)
     {
-        $image = ClientImage::where('id',$image_id)->first();
+        $image = ClientImage::where('id', $image_id)->first();
         $client = Client::find($client_id);
         $client->image = $image->image;
         $client->save();
@@ -387,9 +394,9 @@ class ClientsController extends Controller
         return response()->json($response, 200);
     }
 
-    public function clientChangePassword(Request $request,$client_id)
+    public function clientChangePassword(Request $request, $client_id)
     {
-        $validator =  Validator::make($request->all(),[
+        $validator =  Validator::make($request->all(), [
             'current_password' => 'required|string|min:8',
             'new_password' => 'required|string|min:8',
         ]);
@@ -406,7 +413,7 @@ class ClientsController extends Controller
         $client = Client::find($client_id);
 
         if ($client) {
-            if(Hash::check($request->input('current_password'), $client->password)){
+            if (Hash::check($request->input('current_password'), $client->password)) {
                 $client->password = Hash::make($request->input('new_password'));
                 if ($client->save()) {
                     $response = [
@@ -416,7 +423,7 @@ class ClientsController extends Controller
                         'error_message' => null,
                     ];
                     return response()->json($response, 200);
-                }else{
+                } else {
                     $response = [
                         'status' => false,
                         'message' => 'Something Went Wrong Please Try Again',
@@ -425,7 +432,7 @@ class ClientsController extends Controller
                     ];
                     return response()->json($response, 200);
                 }
-            }else{
+            } else {
                 $response = [
                     'status' => false,
                     'message' => 'Please Enter Correct Corrent Password',
@@ -433,7 +440,7 @@ class ClientsController extends Controller
                     'error_message' => null,
                 ];
                 return response()->json($response, 200);
-           }
+            }
         } else {
             $response = [
                 'status' => false,
@@ -443,12 +450,11 @@ class ClientsController extends Controller
             ];
             return response()->json($response, 200);
         }
-
     }
 
     public function forgotOtp($mobile)
     {
-        $client = Client::where('mobile',$mobile);
+        $client = Client::where('mobile', $mobile);
         if ($client->count() == 0) {
             $response = [
                 'status' => false,
@@ -477,8 +483,9 @@ class ClientsController extends Controller
         }
     }
 
-    public function forgotPasswordChange(Request $request){
-        $validator =  Validator::make($request->all(),[
+    public function forgotPasswordChange(Request $request)
+    {
+        $validator =  Validator::make($request->all(), [
             'mobile' => ['required', 'numeric', 'digits:10'],
             'otp' => ['required', 'numeric', 'digits:5'],
             'password' => ['required', 'string', 'min:8', 'same:confirm_password'],
@@ -495,8 +502,8 @@ class ClientsController extends Controller
         }
         $mobile = $request->input('mobile');
         $otp = $request->input('otp');
-        $client = Client::where('mobile',$mobile)->where('otp',$otp);
-        if($client->count() > 0){
+        $client = Client::where('mobile', $mobile)->where('otp', $otp);
+        if ($client->count() > 0) {
             $client = $client->first();
             $client->password =  Hash::make($request->input('confirm_password'));
             $client->otp = null;
@@ -506,7 +513,7 @@ class ClientsController extends Controller
                 'message' => 'Password Changed Successfully'
             ];
             return response()->json($response, 200);
-        }else {
+        } else {
             $response = [
                 'status' => false,
                 'message' => 'Sorry OTP is Invalid'
@@ -517,7 +524,7 @@ class ClientsController extends Controller
 
     public function orderHistory($client_id)
     {
-        $order = Order::where('vendor_id', $client_id)->where('payment_status',2)->orderBy('id', 'desc')->limit(50)->get();
+        $order = Order::where('vendor_id', $client_id)->where('payment_status', 2)->orderBy('id', 'desc')->limit(50)->get();
         $response = [
             'status' => true,
             'message' => 'Order history',
@@ -529,8 +536,8 @@ class ClientsController extends Controller
 
     public function clientScheduleUpdate(Request $request)
     {
-        $validator =  Validator::make($request->all(),[
-            'date' => ['required','date_format:Y-m-d'],
+        $validator =  Validator::make($request->all(), [
+            'date' => ['required', 'date_format:Y-m-d'],
             'status' => 'required|in:1,2',
             'client_id' => 'required|numeric',
         ]);
@@ -547,14 +554,14 @@ class ClientsController extends Controller
         $client_id = $request->input('client_id');
         $status = $request->input('status');
         if ($status == '1') {
-            $job = ClientSchedule::firstOrNew(['date'=>$date,'user_id'=>$client_id]);
+            $job = ClientSchedule::firstOrNew(['date' => $date, 'user_id' => $client_id]);
             if ($job) {
                 $job->user_id = $client_id;
                 $job->date = $date;
                 $job->save();
             }
         } else {
-            $job = ClientSchedule::firstOrNew(['date'=>$date,'user_id'=>$client_id]);
+            $job = ClientSchedule::firstOrNew(['date' => $date, 'user_id' => $client_id]);
             if ($job) {
                 $job->delete();
             }
@@ -570,8 +577,8 @@ class ClientsController extends Controller
 
     public function orderStatus(Request $request)
     {
-        $validator =  Validator::make($request->all(),[
-            'order_id' => ['required','numeric'],
+        $validator =  Validator::make($request->all(), [
+            'order_id' => ['required', 'numeric'],
             'status' => 'required|in:2,4,5',
         ]);
         if ($validator->fails()) {
@@ -613,13 +620,13 @@ class ClientsController extends Controller
             $user = Customer::find($order->customer_id);
             if ($user->firsbase_token) {
                 $title = "Dear Customer : Your order Confirmed Successfully With Order No : $order->id";
-                if ($status == '4') {                    
+                if ($status == '4') {
                     $title = "Dear Customer : Your order Completed Successfully With Order No : $order->id";
-                } elseif($status == '5') {                    
+                } elseif ($status == '5') {
                     $title = "Dear Customer : Your order is Cancelled With Order No : $order->id";
                 }
-                
-                PushHelper::notification($user->firsbase_token,$title,$user->id,1);
+
+                PushHelper::notification($user->firsbase_token, $title, $user->id, 1);
             }
         }
         $response = [
@@ -629,7 +636,7 @@ class ClientsController extends Controller
         return response()->json($response, 200);
     }
 
-    public function updateFirebaseToken($id,$token)
+    public function updateFirebaseToken($id, $token)
     {
         $client = Client::find($id);
         if ($client) {
@@ -640,7 +647,7 @@ class ClientsController extends Controller
                 'message' => 'Firebase Token Updated Successfully',
             ];
             return response()->json($response, 200);
-        }else{
+        } else {
             $response = [
                 'status' => false,
                 'message' => 'User Not Found',

@@ -10,10 +10,9 @@ use App\Models\ClientImage;
 use App\Models\Job;
 use App\Models\JobCategory;
 use App\Models\ServiceCity;
-use File;
-use Image;
 use App\SmsHelper\PushHelper;
 use App\SmsHelper\PushHelperVendor;
+use Illuminate\Support\Facades\File;
 
 class ClientController extends Controller
 {

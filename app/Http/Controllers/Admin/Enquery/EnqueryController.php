@@ -7,11 +7,13 @@ use Illuminate\Http\Request;
 
 class EnqueryController extends Controller
 {
-    public function feedback(){
+    public function feedback()
+    {
         return view('admin.enquery.feedback');
     }
 
-    public function enquery(){
+    public function enquery()
+    {
         return view('admin.enquery.enquery');
     }
 }

@@ -5,7 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\Address;
 use Illuminate\Http\Request;
-use Validator;
+use Illuminate\Support\Facades\Validator;
 
 class AddressController extends Controller
 {
@@ -19,6 +19,7 @@ class AddressController extends Controller
             'pin' => 'required',
             'address' => 'required',
         ]);
+
         if ($validator->fails()) {
             $response = [
                 'status' => false,
@@ -30,7 +31,7 @@ class AddressController extends Controller
         }
 
         $address = new Address();
-        $address->user_id = $request->input('user_id');
+        $address->user_id = $request->user()->id;
         $address->name = $request->input('name');
         $address->email = $request->input('email');
         $address->mobile = $request->input('mobile');
@@ -38,7 +39,6 @@ class AddressController extends Controller
         $address->city = $request->input('city');
         $address->pin = $request->input('pin');
         $address->address = $request->input('address');
-        $address->email = $request->input('email');
         $address->latitude = $request->input('latitude');
         $address->longitude = $request->input('longitude');
         $address->save();
@@ -51,9 +51,9 @@ class AddressController extends Controller
         return response()->json($response, 200);
     }
 
-    public function addressList($customer_id)
+    public function addressList(Request $request)
     {
-        $address =  Address::where('user_id', $customer_id)->get();
+        $address =  Address::where('user_id', $request->user()->id)->get();
         $response = [
             'status' => true,
             'message' => 'Address List',
@@ -108,7 +108,7 @@ class AddressController extends Controller
         $address->save();
         $response = [
             'status' => true,
-            'message' => 'Address Added Successfully',
+            'message' => 'Address Updated Successfully!',
             'error_code' => false,
             'error_message' => null,
         ];
