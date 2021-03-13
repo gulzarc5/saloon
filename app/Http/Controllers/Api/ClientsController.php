@@ -224,6 +224,11 @@ class ClientsController extends Controller
                 })->save($destination . '/' . $image_name);
                 $client->image = $image_name;
                 $client->save();
+
+                $client_images = new ClientImage();
+                $client_images->image = $image_name;
+                $client_images->client_id = $client->id;
+                $client_images->save();
             }
 
             if ($request->hasfile('photo_proof_file')) {
@@ -303,7 +308,7 @@ class ClientsController extends Controller
         if ($validator->fails()) {
             $response = [
                 'status' => false,
-                'message' => 'Required Field Can not be Empty',
+                'message' => 'Validation Error',
                 'error_code' => true,
                 'error_message' => $validator->errors(),
 
@@ -467,7 +472,7 @@ class ClientsController extends Controller
         $client->otp = 11111;
         if ($client->save()) {
             $message = "OTP is $client->otp . Please Do Not Share With Anyone";
-            // Sms::smsSend($client->mobile,$message);
+            Sms::smsSend($client->mobile,$message);
             $response = [
                 'status' => true,
                 'message' => 'OTP Sent Successfully To Registered Mobile Number',

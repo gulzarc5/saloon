@@ -71,7 +71,7 @@
                                         </div>
                                     </div>
                                     
-                                    <div class="form-row mb-10">
+                                    {{-- <div class="form-row mb-10">
                                         <div class="col-md-4 col-sm-12 col-xs-12 mb-3">
                                             <div class="form-inline">
                                                 <br>
@@ -92,7 +92,7 @@
                                                 @endif
                                             </div>
                                         </div>
-                                    </div>
+                                    </div> --}}
                                 </div>
                                 <div class="form-group">    
                                     @if (isset($sub_category) && !empty($sub_category))	            	

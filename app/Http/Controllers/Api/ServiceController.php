@@ -11,6 +11,7 @@ use Illuminate\Http\Request;
 use Validator;
 use App\Http\Resources\ClientResource;
 use App\Models\Client;
+use Illuminate\Support\Facades\DB;
 
 class ServiceController extends Controller
 {
@@ -19,13 +20,17 @@ class ServiceController extends Controller
         $validator =  Validator::make($request->all(),[
             'service_city' => 'required',
             'category_id' => 'required',
+            'type' => 'required|in:1,2,3', //1 = main Category, 2 = Sub Category, 3 = third Category
             'page' => 'required|in:1,2',
+            'latitude' => 'required',
+            'longitude' => 'required',
+            'client_type' => 'required:in:1,2', // 1 = freelauncer , 2 = Salon
         ]);
 
         if ($validator->fails()) {
             $response = [
                 'status' => false,
-                'message' => 'Required data Can not Be Empty',
+                'message' => 'Validation Error',
                 'error_code' => true,
                 'error_message' => $validator->errors(),
             ];
@@ -33,14 +38,35 @@ class ServiceController extends Controller
         }
         $service_city = $request->input('service_city');
         $category_id = $request->input('category_id');
+        $type = $request->input('type');
+        $latitude = $request->input('latitude');
+        $longitude = $request->input('longitude');
         $client_type = $request->input('client_type');
-        $service_for = $request->input('service_for');
+        // OPTIONAL FIELDS //
+        $price_from = $request->input('price_from');
+        $price_to = $request->input('price_to');
+        $ac = $request->input('ac'); // 2 = yes
+        $parking = $request->input('parking'); // 2 = yes
+        $wifi = $request->input('wifi'); // 2 = yes
+        $music = $request->input('music'); // 2 = yes
         $page = $request->input('page');
+        $sort_by = $request->input('sort_by'); // 1 = distance low to high, 2 = distance high to low, 3 = price low to high, 4 = price high to low
+
+        $sqlDistance = DB::raw('( 111.045 * acos( cos( radians(' . $latitude . ') ) 
+       * cos( radians( clients.latitude ) ) 
+       * cos( radians( clients.longitude ) 
+       - radians(' . $longitude  . ') ) 
+       + sin( radians(' . $latitude  . ') ) 
+       * sin( radians( clients.latitude ) ) ) )');
 
         $jobs = Job::select('jobs.*')->where('jobs.status',1)
-        ->join('clients','clients.id','=','jobs.user_id');
-        if (!empty($category_id)) {
+        ->join('clients','clients.id','=','jobs.user_id')->selectRaw("{$sqlDistance} AS distance");
+        if ($type == '1') {
             $jobs->where('jobs.job_category',$category_id);
+        }elseif ($type == '2') {
+            $jobs->where('jobs.sub_category',$category_id);
+        }else{
+            $jobs->where('jobs.last_category',$category_id);
         }
         if (!empty($service_city)) {
             $jobs->where('clients.service_city_id',$service_city);
@@ -48,14 +74,20 @@ class ServiceController extends Controller
         if (!empty($client_type)) {
             $jobs->where('clients.clientType',$client_type);
         }
-        if (!empty($service_for)) {
-            if ($service_for == '1') {
-                $jobs->where('jobs.is_man',2);
-            }elseif ($service_for == '2') {
-                $jobs->where('jobs.is_woman',2);
-            }elseif ($service_for == '3') {
-                $jobs->where('jobs.is_kids',2);
-            }
+        if (!empty($price_from) && !empty($price_to)) {
+            $jobs->whereBetween('jobs.price', [$price_from, $price_to]);
+        }
+        if (!empty($ac) && $ac == '2') {
+            $jobs->where('clients.ac', 2);
+        }
+        if (!empty($parking) && $parking == '2') {
+            $jobs->where('clients.parking', 2);
+        }
+        if (!empty($wifi) && $wifi == '2') {
+            $jobs->where('clients.wifi', 2);
+        }
+        if (!empty($music) && $music == '2') {
+            $jobs->where('clients.music', 2);
         }
         $jobs->where('clients.status',1)
         ->where('clients.profile_status',2)
@@ -76,8 +108,22 @@ class ServiceController extends Controller
             ];
             return response()->json($response, 200);
         }
+        if (!empty($sort_by)) {
+            if ($sort_by == '1') {
+                $jobs_query->orderBy('distance','asc');
+            } else  if ($sort_by == '2'){
+                $jobs_query->orderBy('distance','desc');
+            }else  if ($sort_by == '3'){
+                $jobs_query->orderBy('price','asc');
+            }else  if ($sort_by == '4'){
+                $jobs_query->orderBy('price','desc');
+            }
+            
+        }else{
+            $jobs_query->orderBy('distance','asc');
+        }
 
-        $job_data = $jobs->skip($limit)->take(12)->get();
+        $job_data = $jobs_query->skip($limit)->take(12)->get();
         $response = [
             'status' => true,
             'message' => 'Service List',

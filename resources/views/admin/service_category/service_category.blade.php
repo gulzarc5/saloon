@@ -23,7 +23,7 @@
                             {{ Form::open(['method' => 'post','route'=>'admin.store_service_category', 'enctype'=>'multipart/form-data']) }}
                                 <div class="well" style="overflow: auto">
                                     <div class="form-row mb-10">
-                                        <div class="col-md-4 col-sm-12 col-xs-12 mb-3">
+                                        <div class="col-md-6 col-sm-12 col-xs-12 mb-3">
                                             <label for="name">Name</label>
                                             <input type="text" class="form-control" name="name" value="{{old('name')}}"  placeholder="Enter The Product Name">
                                             @if($errors->has('name'))
@@ -32,7 +32,7 @@
                                                 </span>
                                             @enderror
                                         </div>                     
-                                        <div class="col-md-4 col-sm-12 col-xs-12 mb-3">
+                                        <div class="col-md-6 col-sm-12 col-xs-12 mb-3">
                                             <label for="image">Image</label>
                                             <input type="file" name="image" id="image" class="form-control">
                                             @if($errors->has('image'))
@@ -41,7 +41,7 @@
                                                 </span>
                                             @enderror
                                         </div>                     
-                                        <div class="col-md-4 col-sm-12 col-xs-12 mb-3">
+                                        {{-- <div class="col-md-4 col-sm-12 col-xs-12 mb-3">
                                             <div class="form-inline">
                                                 <input type="checkbox" class="form-control" id="man" name="man" value="1" checked>
                                                 <label for="man"> Man</label>
@@ -50,7 +50,7 @@
                                                 <input type="checkbox" class="form-control" id="kids" name="kids" value="1" checked>
                                                 <label for="kids"> Kids</label>
                                             </div>
-                                        </div>
+                                        </div> --}}
                                     </div>
                                 </div>
                                 <div class="form-group">    	            	

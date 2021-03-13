@@ -10,12 +10,20 @@ class Job extends Model
     protected $table = 'jobs';
     protected $primaryKey = 'id';
     protected $fillable = [
-        'user_id','job_category','description','main_image','mrp','price','status',
+        'user_id','job_category','sub_category','last_category','description','main_image','mrp','price','status',
     ];
 
     public function jobCategory()
     {
         return $this->belongsTo('App\Models\JobCategory','job_category','id');
+    }
+    public function subCategory()
+    {
+        return $this->belongsTo('App\Models\SubCategory','sub_category','id');
+    }
+    public function lastCategory()
+    {
+        return $this->belongsTo('App\Models\ThirdLevelCategory','last_category','id');
     }
 
 

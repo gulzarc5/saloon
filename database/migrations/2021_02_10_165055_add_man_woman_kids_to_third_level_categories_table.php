@@ -15,9 +15,6 @@ class AddManWomanKidsToThirdLevelCategoriesTable extends Migration
     {
         Schema::table('third_level_categories', function (Blueprint $table) {
             $table->string('image')->after('third_level_category_name')->nullable();
-            $table->integer('man')->after('image')->default(2)->comment('1=Yes, 2=No');
-            $table->integer('woman')->after('image')->default(2)->comment('1=Yes, 2=No');
-            $table->integer('kids')->after('image')->default(2)->comment('1=Yes, 2=No');
         });
     }
 

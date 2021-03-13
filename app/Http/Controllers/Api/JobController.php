@@ -17,57 +17,54 @@ class JobController extends Controller
     public function clientServiceAdd(Request $request)
     {
         $validator =  Validator::make($request->all(), [
-            'cat_level_1' => 'required|array',
-            'cat_level_1.*' => 'numeric'
+            'client_id' => 'required|numeric',
+            'main_category' => 'required|array',
+            'mrp' => 'array|min:1',
+            'price' => 'array|min:1',
+            'main_category.*' => 'required',
+            'mrp.*' => 'required',
+            'price.*' => 'required',
         ]);
 
         if ($validator->fails()) {
             $response = [
                 'status' => false,
-                'message' => 'Required data Can not Be Empty',
+                'message' => 'Validation Error',
                 'error_code' => true,
                 'error_message' => $validator->errors(),
             ];
             return response()->json($response, 200);
         }
 
-        $client_id = Auth::guard('clientApi')->user()->id;
+        $client_id = $request->input('client_id');
         $description = $request->input('description');
-        $cat_level_1 = $request->input('cat_level_1');
-        $cat_level_2 = $request->input('cat_level_2');
-        $cat_level_3 = $request->input('cat_level_3');
+        $main_category = $request->input('main_category');
+        $sub_category = $request->input('sub_category');
+        $last_category = $request->input('last_category');
         $mrp = $request->input('mrp');
         $price = $request->input('price');
 
-        $job = new Job();
-        $job->user_id = $client_id;
-        $job->description = $description;
-        $job->save();
-
-        if ($request->has('cat_level_1')) {
-            $length = count($cat_level_1);
-            for ($i = 0; $i < $length; $i++) {
-                $validator =  Validator::make($request->all(), [
-                    'cat_level_2' => 'required|array',
-                    'cat_level_2.*' => 'numeric'
-                ]);
-                if ($validator->fails()) {
-                    $response = [
-                        'status' => false,
-                        'message' => 'Required data Can not Be Empty',
-                        'error_code' => true,
-                        'error_message' => $validator->errors(),
-                    ];
-                    return response()->json($response, 200);
+        if ($request->has('main_category')) {            
+            for ($i = 0; $i < count($main_category); $i++) {
+                $check = Job::where('user_id',$client_id)->where('job_category',$main_category[$i]);
+                if (isset( $sub_category[$i] ) && !empty( $sub_category[$i] )) {
+                    $check->where('sub_category',$sub_category[$i]);
                 }
-                $job_pricing = new JobPricing();
-                $job_pricing->job_id = $job->id;
-                $job_pricing->cat_level_1 = $cat_level_1[$i] ?? 0;
-                $job_pricing->cat_level_2 = $cat_level_2[$i] ?? 0;
-                $job_pricing->cat_level_3 = $cat_level_3[$i] ?? 0;
-                $job_pricing->mrp = $mrp[$i] ?? 0;
-                $job_pricing->price = $price[$i] ?? 0;
-                $job_pricing->save();
+                if (isset( $sub_category[$i] ) && !empty( $sub_category[$i] )) {
+                    $check->where('sub_category',$sub_category[$i]);
+                }
+                if ($check->count() == 0) {
+                    # code...
+                    $job = new Job();
+                    $job->user_id = $client_id;
+                    $job->description = $description;
+                    $job->job_category = $main_category[$i] ?? null;
+                    $job->sub_category = $sub_category[$i] ?? null;
+                    $job->last_category = $last_category[$i] ?? null;
+                    $job->mrp = $mrp[$i] ?? null;
+                    $job->price = $price[$i] ?? null;
+                    $job->save();
+                }
             }
             $client = Client::find($client_id);
             $client->job_status = 2;
@@ -108,52 +105,40 @@ class JobController extends Controller
     public function clientServiceUpdate(Request $request, $service_list_id)
     {
         $validator =  Validator::make($request->all(), [
-            'is_man' => 'required|in:1,2',
-            'man_mrp' => 'required',
-            'man_price' => 'required',
-            'is_women' => 'required|in:1,2',
-            'woman_mrp' => 'required',
-            'woman_price' => 'required',
-            'is_kids' => 'required|in:1,2',
-            'kids_mrp' => 'required',
-            'kids_price' => 'required',
+            'mrp' => 'required',
+            'price' => 'required',
+            'main_category_id' => 'required',
         ]);
 
         if ($validator->fails()) {
             $response = [
                 'status' => false,
-                'message' => 'Required data Can not Be Empty',
+                'message' => 'Validation Error',
                 'error_code' => true,
                 'error_message' => $validator->errors(),
 
             ];
             return response()->json($response, 200);
         }
-        $man_mrp    = $request->input('man_mrp');
-        $man_price = $request->input('man_price');
-        $is_man = $request->input('is_man');
+        $mrp = $request->input('mrp');
+        $price = $request->input('price');
 
-        $woman_mrp    = $request->input('woman_mrp');
-        $woman_price = $request->input('woman_price');
-        $is_woman = $request->input('is_women');
-
-        $kids_mrp    = $request->input('kids_mrp');
-        $kids_price = $request->input('kids_price');
-        $is_kids = $request->input('is_kids');
+        $main_category_id    = $request->input('main_category_id');
+        $sub_category_id    = $request->input('sub_category_id');
+        $last_category_id = $request->input('last_category_id');
         $description = $request->input('description');
 
         $service = Job::find($service_list_id);
-        $service->is_man = $is_man;
-        $service->man_mrp = $man_mrp;
-        $service->man_price = $man_price;
-        $service->woman_mrp = $woman_mrp;
-        $service->is_woman = $is_woman;
-        $service->woman_price = $woman_price;
-        $service->is_kids = $is_kids;
-        $service->kids_mrp = $kids_mrp;
-        $service->kids_price = $kids_price;
-        $service->description = $description;
-        $service->save();
+        if ($service) {
+            $service->job_category = $main_category_id;
+            $service->sub_category = $sub_category_id;
+            $service->last_category = $last_category_id;
+            $service->mrp = $mrp;
+            $service->price = $price;
+            $service->description = $description;
+            $service->save();
+        }
+       
         $response = [
             'status' => true,
             'message' => 'Service Updated successfully',

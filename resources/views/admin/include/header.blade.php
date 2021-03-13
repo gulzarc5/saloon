@@ -121,6 +121,7 @@
                       </ul>
                   </li>
                   <li><a href="{{route('admin.coupon_list')}}"><i class="fa fa-key" aria-hidden="true"></i>Coupon</a></li>
+                  <li><a href="{{route('admin.offer_list')}}"><i class="fa fa-key" aria-hidden="true"></i>Offer</a></li>
                   <li>
                       <a><i class="fa fa-search-plus" aria-hidden="true"></i> Enquery <span class="fa fa-chevron-down"></span></a>
                       <ul class="nav child_menu">

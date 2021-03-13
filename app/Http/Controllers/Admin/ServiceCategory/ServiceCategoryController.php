@@ -88,10 +88,8 @@ class ServiceCategoryController extends Controller
         ]);
         $id     = $request->input('id');
         $name   = $request->input('name');
-        $man    = $request->input('man');
-        $woman  = $request->input('woman');
-        $kids   = $request->input('kids');
 
+        $service_category = JobCategory::find($id);
         if ($request->hasfile('image')) {
             $this->validate($request, [
                 'image' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
@@ -108,42 +106,18 @@ class ServiceCategoryController extends Controller
                 ->save($thumb_path);
 
             // Check wheather image is in DB
-            $service_category = JobCategory::find($id);
+           
             if ($service_category->image) {
                 //Delete
                 $image_path = "admin/service_category/thumb/" . $service_category->image;
                 if (File::exists($image_path)) {
                     File::delete($image_path);
                 }
-                //Update
-                $service_category->image = $image_name;
-                $service_category->updated_at = Carbon::now();
-                if ($service_category->save()) {
-                    return redirect()->back()->with('message', 'Service Category Updated Successfully!');
-                } else {
-                    return redirect()->back()->with('error', 'Something Went Wrong Please Try Again');
-                }
-            } else {
-                //Update
-                $service_category->image = $image_name;
-                $service_category->updated_at = Carbon::now();
-                if ($service_category->save()) {
-                    return redirect()->back()->with('message', 'Service Category Updated Successfully!');
-                } else {
-                    return redirect()->back()->with('error', 'Something Went Wrong Please Try Again');
-                }
+                //Update               
             }
+            $service_category->image = $image_name;
         }
-        $service_category = JobCategory::find($id);
         $service_category->name = $name;
-
-        $man == null  ? $service_category->man = '2' : '1';
-        $woman == null  ? $service_category->woman = '2' : '1';
-        $kids == null  ? $service_category->kids = '2' : '1';
-
-        $man == 2  ? $service_category->man = '1' : '2';
-        $woman == 2  ? $service_category->woman = '1' : '2';
-        $kids == 2  ? $service_category->kids = '1' : '2';
 
         if ($service_category->save()) {
             return redirect()->back()->with('message', 'Service Category Successfully Added');
@@ -165,9 +139,6 @@ class ServiceCategoryController extends Controller
         ]);
 
         $name   = $request->input('name');
-        $man    = $request->input('man');
-        $woman  = $request->input('woman');
-        $kids   = $request->input('kids');
         if ($request->hasfile('image')) {
             $image = $request->file('image');
             $destination = base_path() . '/public/admin/service_category/';
@@ -183,14 +154,6 @@ class ServiceCategoryController extends Controller
         $service_category = new JobCategory;
         $service_category->name = $name;
         $service_category->image = $image_name;
-
-        $man == null ? $service_category->man = '2' : '1';
-        $woman == null ? $service_category->woman = '2' : '1';
-        $kids == null ? $service_category->kids = '2' : '1';
-
-        $man == 2  ? $service_category->man = '1' : '2';
-        $woman == 2  ? $service_category->woman = '1' : '2';
-        $kids == 2  ? $service_category->kids = '1' : '2';
         if ($service_category->save()) {
             return redirect()->back()->with('message', 'Service Category Successfully Added');
         } else {

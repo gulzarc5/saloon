@@ -66,9 +66,10 @@
                                         <table class="table table-striped jambo_table bulk_action">
                                             <thead>
                                                 <tr style="font-size: 10.5px;">
-                                                    <th>Service Name</th>
+                                                    <th>Main Category</th>
+                                                    <th>Sub Category</th>
+                                                    <th>Last Category</th>
                                                     <th>Description</th>
-                                                    <th style="min-width:88px">Service Available</th>
                                                     <th >M.R.P.</th>
                                                     <th>Price</th>
                                                     <th>Status</th>
@@ -83,29 +84,22 @@
                                                             {{isset($service->jobCategory->name) ? $service->jobCategory->name : ''}}
                                                         </td>
                                                         <td>
+                                                            {{$service->subCategory->name ?? ''}}
+                                                        </td>
+                                                        <td>
+                                                            {{$service->lastCategory->third_level_category_name ?? ''}}
+                                                        </td>
+                                                        <td>
                                                             <textarea name="description[]"  rows="1">{{$service->description}}</textarea>
                                                         </td>
+                                                        
                                                         <td>
                                                             <div class="form-inline">
-                                                                <input type="checkbox" class="form-control" id="man" name="man[{{$service->id}}]" value="2" {{$service->is_man == '2' ? 'checked' : ''}}>
-                                                                <label for="man"> Man</label><br>
-                                                                <input type="checkbox" class="form-control" id="woman" name="woman[{{$service->id}}]" value="2" {{$service->is_woman == '2' ? 'checked' : ''}}>
-                                                                <label for="woman"> Woman</label><br>
-                                                                <input type="checkbox" class="form-control" id="kids" name="kids[{{$service->id}}]" value="2" {{$service->is_kids == '2' ? 'checked' : ''}}>
-                                                                <label for="kids"> Kids</label>
-                                                            </div>
-                                                        </td>
-                                                        <td>
-                                                            <div class="form-inline">
-                                                                <input type="number" class="form-control" name="man_mrp[]" value="{{$service->man_mrp}}" style="width: 70px;"><br>
-                                                                <input type="number" class="form-control" name="woman_mrp[]" value="{{$service->woman_mrp}}" style="width: 70px;"><br>
-                                                                <input type="number" class="form-control" name="kids_mrp[]" value="{{$service->kids_mrp}}" style="width: 70px;">
+                                                                <input type="number" class="form-control" name="mrp[]" value="{{$service->mrp}}" style="width: 70px;"><br>
                                                             </div>
                                                         </td>
                                                         <td> <div class="form-inline">
-                                                            <input type="number" class="form-control" name="man_price[]" value="{{$service->man_price}}" style="width: 70px;"><br>
-                                                            <input type="number" class="form-control" name="woman_price[]" value="{{$service->woman_price}}" style="width: 70px;"><br>
-                                                            <input type="number" class="form-control" name="kids_price[]" value="{{$service->kids_price}}" style="width: 70px;">
+                                                            <input type="number" class="form-control" name="price[]" value="{{$service->price}}" style="width: 70px;"><br>
                                                             </div>
                                                         </td>
                                                        

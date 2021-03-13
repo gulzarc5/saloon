@@ -20,6 +20,18 @@ Route::group(['namespace' => 'Admin'],function(){
             Route::get('edit/{coupon_id}','CouponController@couponEdit')->name('admin.coupon_edit');
             Route::put('update/{coupon_id}','CouponController@couponUpdate')->name('admin.coupon_update');
         });
+
+        Route::group(['prefix' =>'offer'],function(){
+            Route::get('edit/form/{offer_id}','OfferController@editForm')->name('admin.offer_edit_form');
+            Route::get('edit/salons/{offer_id}','OfferController@editSalon')->name('admin.offer_edit_salon');
+            Route::get('add/salons/{offer_id}','OfferController@addSalon')->name('admin.offer_add_salon');
+
+            Route::get('salon/data/fetch/{mobile}','OfferController@salonDataFetch');
+            Route::post('insert/salon','OfferController@insertOfferSalon')->name('admin.insert_offer_salon');
+            Route::get('list','OfferController@offerList')->name('admin.offer_list');
+            Route::get('edit/{coupon_id}','OfferController@couponEdit')->name('admin.coupon_edit');
+            Route::put('update/{coupon_id}','OfferController@couponUpdate')->name('admin.coupon_update');
+        });
         Route::group(['prefix' =>'admin/commission'],function(){
             Route::get('list','AdminCommissionController@commissionList')->name('admin.admin_commission_list');
             Route::get('edit/{commission_id}','AdminCommissionController@commissionEdit')->name('admin.admin_commission_edit');
@@ -84,6 +96,7 @@ Route::group(['namespace' => 'Admin'],function(){
             Route::group(['prefix' => 'third'], function () {
                 Route::resource('third/level', 'ThirdLevelCategoryController');
                 Route::post('sub/category', 'ThirdLevelCategoryController@fetchSubCategory')->name('fetch_sub_category');
+                Route::post('ajax/category', 'ThirdLevelCategoryController@fetchThirdCategoryAjax')->name('admin.fetch_third_category_ajax');
                 Route::get('third/category', 'ThirdLevelCategoryController@fetchThirdCategory')->name('admin.ajax.thirdcategory');
             });
         });

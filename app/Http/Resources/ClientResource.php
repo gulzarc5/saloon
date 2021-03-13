@@ -51,6 +51,7 @@ class ClientResource extends JsonResource
             'music' => $this->music,
             'image_upload_left_count' =>  (12 - $this->images->count()),            
             'avarage_rating' => isset($this->review) ? $this->review->avg('rating') : 0,
+            'distance' => $this->distance ?? 0,
             'reviews' => isset($this->review) ? ReviewResource::collection($this->review) : [],
             'client_schedules' => isset($this->clientSchedules) ? $this->clientSchedules : [],
             'images' => isset($this->images) ? $this->images : [],

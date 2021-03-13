@@ -48,9 +48,7 @@ class SubCategoryController extends Controller
         ]);
         $category   = $request->input('category');
         $name   = $request->input('name');
-        $man    = $request->input('man');
-        $woman  = $request->input('woman');
-        $kids   = $request->input('kids');
+        
         if ($request->hasfile('image')) {
             $image = $request->file('image');
             $destination = base_path() . '/public/admin/service_category/sub_category';
@@ -68,14 +66,6 @@ class SubCategoryController extends Controller
         $sub_category->category_id = $category;
         $sub_category->name = $name;
         $sub_category->image = $image_name;
-
-        $man == null ? $sub_category->man = '2' : '1';
-        $woman == null ? $sub_category->woman = '2' : '1';
-        $kids == null ? $sub_category->kids = '2' : '1';
-
-        $man == 2  ? $sub_category->man = '1' : '2';
-        $woman == 2  ? $sub_category->woman = '1' : '2';
-        $kids == 2  ? $sub_category->kids = '1' : '2';
 
         if ($sub_category->save()) {
             if ($this->checkCategory($category)) {
@@ -133,9 +123,9 @@ class SubCategoryController extends Controller
         ]);
         $category = $request->input('category');
         $name   = $request->input('name');
-        $man    = $request->input('man');
-        $woman  = $request->input('woman');
-        $kids   = $request->input('kids');
+        $sub_category = SubCategory::findOrFail($id);
+        $sub_category->category_id = $category;
+        $sub_category->name = $name;
 
         if ($request->hasfile('image')) {
             $this->validate($request, [
@@ -160,32 +150,9 @@ class SubCategoryController extends Controller
                 if (File::exists($image_path)) {
                     File::delete($image_path);
                 }
-                //Update
-                $sub_category->image = $image_name;
-                $sub_category->updated_at = Carbon::now();
-                if ($sub_category->save()) {
-                    return redirect()->back()->with('message', 'Service Category Updated Successfully!');
-                } else {
-                    return redirect()->back()->with('error', 'Something Went Wrong Please Try Again');
-                }
-            } else {
-                //Update
-                $sub_category->image = $image_name;
-                $sub_category->updated_at = Carbon::now();
-                if ($sub_category->save()) {
-                    return redirect()->back()->with('message', 'Sub Category Updated Successfully!');
-                } else {
-                    return redirect()->back()->with('error', 'Something Went Wrong Please Try Again');
-                }
             }
-        }
-
-        $sub_category = SubCategory::findOrFail($id);
-        $sub_category->category_id = $category;
-        $sub_category->name = $name;
-        $sub_category->man = ($man == null) ? 2 : 1;
-        $sub_category->woman = ($woman == null) ? 2 : 1;
-        $sub_category->kids = ($kids == null) ? 2 : 1;
+            $sub_category->image = $image_name;
+        }      
 
         if ($sub_category->save()) {
             return redirect()->back()->with('message', 'Sub Category Successfully Added');

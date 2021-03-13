@@ -32,7 +32,7 @@ class CustomerController extends Controller
         if ($validator->fails()) {
             $response = [
                 'status' => false,
-                'message' => 'Required Field Can not be Empty',
+                'message' => 'Validation error',
                 'error_code' => true,
                 'error_message' => $validator->errors(),
 
@@ -46,6 +46,8 @@ class CustomerController extends Controller
             'mobile' => $request->input('mobile')
         ]);
         if ($user) {
+            $message = "OTP is $random . Please do not share with anyone";
+            Sms::smsSend($mobile,$message);
             $user->otp = $random;
             $user->save();
             $response = [
@@ -64,33 +66,52 @@ class CustomerController extends Controller
             'mobile' => 'required|digits:10|numeric',
             'otp' => 'required|numeric|digits:5'
         ]);
-        $mobile = $request->input('mobile');
-        $otp = $request->input('otp');
         if ($validator->fails()) {
             $response = [
                 'status' => false,
-                'message' => 'Required Field Can not be Empty',
+                'message' => 'Validation Error',
+                'data' => null,
                 'error_code' => true,
                 'error_message' => $validator->errors(),
             ];
             return response()->json($response, 200);
         }
+        $mobile = $request->input('mobile');
+        $otp = $request->input('otp');
 
         $customer = Customer::where('mobile', $mobile)->where('otp', $otp);
         $check = $customer->count();
         if ($check > 0) {
-            $customer_check = $customer->where('is_registered', 2)->count();
-            if ($customer_check > 0) {
-                $response = $this->otpVerifyData($mobile, $otp, 2);
-                return response()->json($response, 200);
-            } else {
-                $response = $this->otpVerifyData($mobile, $otp, 1);
-                return response()->json($response, 200);
-            }
-        } else {
+            $customer_data = $customer->first();
+            $customer_data->api_token = Str::random(60);
+            $customer_data->save();
+
+            $customer_check = $customer->where('is_registered', 1);
+            if ($customer_check->count() > 0) {
+                Wallet::firstOrCreate([
+                    'user_id' => $customer_data->id
+                ]);
+                $customer = $customer->first();
+                $customer->is_registered = 2;
+                $customer->save();
+            } 
+
             $response = [
                 'status' => true,
-                'message' => 'Sorry OTP is Invalid'
+                'message' => 'Success',
+                'data' => $customer_data,
+                'error_code' => false,
+                'error_message' => null,
+            ];            
+            return response()->json($response, 200);
+            
+        } else {
+            $response = [
+                'status' => false,
+                'message' => 'Sorry OTP is Invalid',
+                'data' => null,
+                'error_code' => false,
+                'error_message' => null,
             ];
             return response()->json($response, 200);
         }
@@ -99,14 +120,12 @@ class CustomerController extends Controller
     public function updateDetailsRegistration(Request $request)
     {
         $validator =  Validator::make($request->all(), [
+            'user_id' => 'required',
             'name' => 'required|string',
             'gender' => 'required',
+            'lat' => 'required',
+            'long' => 'required'
         ]);
-        $name = $request->input('name');
-        $gender = $request->input('gender');
-        $lat = $request->input('lat');
-        $long = $request->input('long');
-
         if ($validator->fails()) {
             $response = [
                 'status' => false,
@@ -116,7 +135,13 @@ class CustomerController extends Controller
             ];
             return response()->json($response, 200);
         }
-        $customer = $request->user();
+        $user_id = $request->input('user_id');
+        $name = $request->input('name');
+        $gender = $request->input('gender');
+        $lat = $request->input('lat');
+        $long = $request->input('long');
+
+        $customer = Customer::find($user_id);
         $customer->name = $name;
         $customer->gender = $gender;
         $customer->latitude = $lat;
@@ -132,7 +157,24 @@ class CustomerController extends Controller
 
     public function updateAddressRegistration(Request $request)
     {
-        $customer = $request->user();
+        $validator =  Validator::make($request->all(), [
+            'user_id' => 'required',
+            'state' => 'required|string',
+            'city' => 'required',
+            'address' => 'required',
+            'pin' => 'required'
+        ]);
+        if ($validator->fails()) {
+            $response = [
+                'status' => false,
+                'message' => 'Required Field Can not be Empty',
+                'error_code' => true,
+                'error_message' => $validator->errors(),
+            ];
+            return response()->json($response, 200);
+        }
+        $user_id = $request->input('user_id');
+        $customer = Customer::find($user_id);
         $customer->state = $request->input('state');
         $customer->city = $request->input('city');
         $customer->address = $request->input('address');
@@ -140,15 +182,15 @@ class CustomerController extends Controller
 
         // Shipping Address Save
         $address = new Address();
-        $address->user_id = $request->user()->id;
-        $address->name = $request->user()->name;
-        $address->mobile = $request->user()->mobile;
+        $address->user_id = $request->input('user_id');
+        $address->name = $customer->name;
+        $address->mobile = $customer->mobile;
         $address->state = $request->input('state');
         $address->city = $request->input('city');
         $address->pin = $request->input('pin');
         $address->address = $request->input('address');
-        $address->latitude = $request->user()->latitude;
-        $address->longitude = $request->user()->longitude;
+        $address->latitude = $customer->latitude;
+        $address->longitude = $customer->longitude;
 
         if ($customer->save() && $address->save()) {
             $response = [
@@ -158,10 +200,9 @@ class CustomerController extends Controller
             return response()->json($response, 200);
         }
     }
-    public function profileFetch(Request $request)
+    public function profileFetch($user_id)
     {
-
-        $customer = $request->user();
+        $customer = Customer::find($user_id);
         $response = [
             'status' => true,
             'message' => 'Customer Profile',
@@ -173,6 +214,7 @@ class CustomerController extends Controller
     public function profileUpdate(Request $request)
     {
         $validator =  Validator::make($request->all(), [
+            'user_id' => 'required',
             'name' => 'required',
             'state' =>  'required',
             'city' =>  'required',
@@ -192,17 +234,13 @@ class CustomerController extends Controller
             return response()->json($response, 200);
         }
 
-        $customer = $request->user();
+        $customer = Customer::find($request->input('user_id'));
         $customer->name = $request->input('name');
-        $customer->mobile = $request->input('mobile');
-        $customer->email = $request->input('email');
         $customer->state = $request->input('state');
         $customer->city = $request->input('city');
         $customer->address = $request->input('address');
         $customer->pin = $request->input('pin');
         $customer->gender = $request->input('gender');
-        $customer->latitude = $request->input('lat');
-        $customer->longitude = $request->input('long');
         $customer->dob = $request->input('dob');
         if ($customer->save()) {
             $response = [

@@ -47,10 +47,7 @@ class ThirdLevelCategoryController extends Controller
             'name' => 'required',
             'image' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048'
         ]);
-        $man    = $request->input('man');
-        $woman  = $request->input('woman');
-        $kids   = $request->input('kids');
-
+       
         $third = new ThirdLevelCategory();
         $third->top_category_id = $request->input('category');
         $third->sub_category_id = $request->input('sub_category');
@@ -68,13 +65,6 @@ class ThirdLevelCategoryController extends Controller
                 ->save($thumb_path);
         }
         $third->image = $image_name;
-        $man == null ? $third->man = '2' : '1';
-        $woman == null ? $third->woman = '2' : '1';
-        $kids == null ? $third->kids = '2' : '1';
-
-        $man == 2  ? $third->man = '1' : '2';
-        $woman == 2  ? $third->woman = '1' : '2';
-        $kids == 2  ? $third->kids = '1' : '2';
 
         if ($third->save()) {
             // if ($this->checkCategory($category)) {
@@ -134,15 +124,23 @@ class ThirdLevelCategoryController extends Controller
     {
         $category_id = $request->input('category_id');
         $sub_categories = SubCategory::whereStatus(1)->where('category_id', $category_id)->latest()->get();
-        $html = '<select name="sub_category" id="sub_category" class="form-control">
-        <option value="" selected disabled>--Select Sub Category--</option>
-        </select>';
+        $html = '<option value="" selected disabled>--Select Sub Category--</option>';
         if (isset($sub_categories) && !empty($sub_categories) && count($sub_categories) > 0) {
             foreach ($sub_categories as  $value) {
-                $html = '<select name="sub_category" id="sub_category" class="form-control">
-                <option value="" selected disabled>--Select Sub Category--</option>
-                <option value="' . $value->id . '">' . $value->name . '</option>
-                </select>';
+                $html .= '<option value="' . $value->id . '">' . $value->name . '</option>';
+            }
+        }
+        return response()->json($html, 200);
+    }
+    public function fetchThirdCategoryAjax(Request $request)
+    {
+        $category_id = $request->input('category_id');
+        $sub_categories = ThirdLevelCategory::whereStatus(1)->where('sub_category_id', $category_id)->latest()->get();
+        $html = '<option value="" selected disabled>--Select Third Category--</option>';
+        if (isset($sub_categories) && !empty($sub_categories) && count($sub_categories) > 0) {
+            foreach ($sub_categories as  $value) {
+                $html .= '
+                <option value="' . $value->id . '">' . $value->third_level_category_name . '</option>';
             }
         }
         return response()->json($html, 200);

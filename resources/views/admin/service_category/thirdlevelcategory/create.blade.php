@@ -67,7 +67,7 @@
                                 </div>
                             </div>
                             
-                            <div class="form-row mb-10">
+                            {{-- <div class="form-row mb-10">
                                 <div class="col-md-4 col-sm-12 col-xs-12 mb-3">
                                     <div class="form-inline">
                                         <br>
@@ -79,7 +79,7 @@
                                             <label for="kids"> Kids</label>
                                     </div>
                                 </div>
-                            </div>
+                            </div> --}}
                         </div>
                         <div class="form-group">    
                             {{ Form::submit('Submit', array('class'=>'btn btn-success pull-right')) }}  

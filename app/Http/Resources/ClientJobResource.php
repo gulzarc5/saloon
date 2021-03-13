@@ -16,9 +16,16 @@ class ClientJobResource extends JsonResource
     {
         return [
             'id' => $this->id,
-            'cat_level_1' => new JobPricingResource($this->jobPricing),
+            'main_category_id' => $this->job_category,
+            'main_category' => $this->jobCategory->name ?? null,
+            'sub_category_id' => $this->sub_category,
+            'sub_category' => $this->subCategory->name ?? null,
+            'last_category_id' => $this->last_category,
+            'last_category' => $this->lastCategory->third_level_category_name ?? null,
+            'description' => $this->description,
+            'mrp' => $this->mrp,
+            'price' => $this->price,
             'status' => $this->status,
-            'description' => $this->description
         ];
     }
 }

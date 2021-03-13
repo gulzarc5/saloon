@@ -21,7 +21,7 @@
                     <th>Sl. No</th>
                     <th>Name</th>
                     <th>Photo</th>
-                    <th>Category</th>
+                    {{-- <th>Category</th> --}}
                     <th>Action</th>
                   </tr>
                 </thead>
@@ -44,7 +44,7 @@
                 { "render": function(data, type, full, meta) {return i++;}},
                 {data: 'name', name: 'name',searchable: true},      
                 {data: 'photo', name: 'photo',searchable: true},      
-                {data: 'category', name: 'category',searchable: true},      
+                // {data: 'category', name: 'category',searchable: true},      
                 {data: 'action', name: 'action',searchable: true},      
             ]
         });

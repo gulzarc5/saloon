@@ -8,7 +8,7 @@ class ThirdLevelCategory extends Model
 {
     protected $table = 'third_level_categories';
     protected $fillable = [
-        'top_category_id','sub_category_id', 'third_level_category_name', 'image', 'kids', 'woman', 'man', 'status' 
+        'top_category_id','sub_category_id', 'third_level_category_name', 'image','status' 
     ];
 
     /**

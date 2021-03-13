@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class JobCategory extends Model
 {
     protected $table = 'job_categories';
-    protected $fillable = ['name', 'image', 'status', 'man', 'woman', 'kids'];
+    protected $fillable = ['name', 'image', 'status'];
     protected $primaryKey = 'id';
 
     public function subCategory()

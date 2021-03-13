@@ -144,62 +144,25 @@
                             <table class="table table-hover">
                             <thead>
                                 <tr>
-                                    <th>Service Name</th>
+                                    <th>Main Category</th>
+                                    <th>Sub Category</th>
+                                    <th>Last Category</th>
                                     <th>Description</th>
                                     <th>M.R.P.</th>
                                     <th>Price</th>
-                                    <th>Service Available</th>
                                     <th>Status</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 @foreach ($client->jobs as $item)
                                     <tr>
-                                        <td>{{$item->jobCategory->name}}</td>
+                                        <td>{{$item->jobCategory->name ?? null}}</td>
+                                        <td>{{$item->subCategory->name ?? null}}</td>
+                                        <td>{{$item->lastCategory->third_level_category_name ?? null}}</td>
                                         <td>{{$item->description}}</td>
-                                        <td>
-                                            @if($item->is_man == 2)
-                                               <label>MAN : </label>
-                                                {{$item->man_mrp}}
-                                            @endif
-                                            <br>
-                                            @if($item->is_woman == 2)
-                                                <label>WOMAN : </label>
-                                                {{$item->woman_mrp}}
-                                            @endif
-                                            <br>
-                                            @if($item->is_kids == 2)
-                                                <label>KIDS : </label>
-                                                {{$item->kids_mrp}}
-                                            @endif
-                                        </td>
-                                        <td>
-                                            @if($item->is_man == 2)
-                                               <label>MAN : </label>
-                                                {{$item->man_price}}
-                                            @endif
-                                            <br>
-                                            @if($item->is_woman == 2)
-                                                <label>WOMAN : </label>
-                                                {{$item->woman_price}}
-                                            @endif
-                                            <br>
-                                            @if($item->is_kids == 2)
-                                                <label>KIDS : </label>
-                                                {{$item->kids_price}}
-                                            @endif
-                                        </td>
-                                        <td>
-                                            @if($item->is_man == 2)
-                                               <label class="label label-success">MAN</label>
-                                            @endif
-                                            @if($item->is_woman == 2)
-                                                <label class="label label-success">WOMAN</label>
-                                            @endif
-                                            @if($item->is_kids == 2)
-                                                <label class="label label-success">KIDS</label>
-                                            @endif
-                                        </td>
+                                        <td>{{$item->mrp}}</td>
+                                        <td>{{$item->price}}</td>
+                                       
                                         <td>
                                             @if($item->status == 1)
                                                <label class="label label-success">Enabled</label>

@@ -19,8 +19,10 @@ Route::group(['namespace' => 'Api'], function () {
     Route::post('send/otp', 'CustomerController@sendOtp');
     Route::post('otp/verify', 'CustomerController@customerOtpVerify');
     Route::get('service/city/list', 'AppSettingController@serviceCity');
-    Route::get('app/loade/api', 'AppSettingController@AppLoadApi');
+    Route::post('app/loade/api', 'AppSettingController@AppLoadApi');
     Route::get('service/list/category', 'AppSettingController@serviceList');
+    Route::get('sub/category/{main_category_id}', 'AppSettingController@subCategoryList');
+    Route::get('third/category/{sub_category_id}', 'AppSettingController@thirdCategoryList');
 
     Route::get('/client/forgot/otp/send/{mobile}', 'ClientsController@forgotOtp');
     Route::post('client/forgot/password/change', 'ClientsController@forgotPasswordChange');
@@ -38,7 +40,7 @@ Route::group(['namespace' => 'Api'], function () {
             Route::post('address', 'CustomerController@updateAddressRegistration');
         });
         Route::group(['prefix' => 'profile'], function () {
-            Route::get('/', 'CustomerController@profileFetch');
+            Route::get('/{id}', 'CustomerController@profileFetch');
             Route::post('update', 'CustomerController@profileUpdate');
         });
         Route::put('password/change/{id}', 'CustomerController@passwordChange');

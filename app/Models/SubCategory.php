@@ -21,5 +21,10 @@ class SubCategory extends Model
         return $this->belongsTo('App\Models\JobCategory', 'category_id', 'id');
     }
 
+    public function thirdCategoryWithStatus()
+    {
+        return $this->hasMany('App\Models\ThirdLevelCategory', 'sub_category_id')->where('status', 1);
+    }
+
     
 }

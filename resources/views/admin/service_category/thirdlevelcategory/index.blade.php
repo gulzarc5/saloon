@@ -22,7 +22,7 @@
                     <th>Sub Category</th>
                     <th>Name</th>
                     <th>Photo</th>
-                    <th>Category</th>
+                    {{-- <th>Category</th> --}}
                     <th>Action</th>
                   </tr>
                 </thead>
@@ -47,7 +47,7 @@
                 {data: 'sub_category', name: 'sub_category',searchable: true},      
                 {data: 'third_level_category_name', name: 'third_level_category_name',searchable: true},      
                 {data: 'photo', name: 'photo',searchable: true},      
-                {data: 'category', name: 'category',searchable: true},      
+                // {data: 'category', name: 'category',searchable: true},      
                 {data: 'action', name: 'action',searchable: true},      
             ]
         });
