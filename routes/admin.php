@@ -22,15 +22,20 @@ Route::group(['namespace' => 'Admin'],function(){
         });
 
         Route::group(['prefix' =>'offer'],function(){
-            Route::get('edit/form/{offer_id}','OfferController@editForm')->name('admin.offer_edit_form');
+            Route::get('list','OfferController@offerList')->name('admin.offer_list');
+            Route::get('add/form/','OfferController@addOfferForm')->name('admin.offer_add_form');
+            Route::post('insert','OfferController@insertOffer')->name('admin.offer_insert');
+            
+            Route::get('edit/form/{offer_id}','OfferController@editOfferForm')->name('admin.offer_edit_form');
+            Route::post('update','OfferController@updateOffer')->name('admin.offer_update');
+
+
             Route::get('edit/salons/{offer_id}','OfferController@editSalon')->name('admin.offer_edit_salon');
             Route::get('add/salons/{offer_id}','OfferController@addSalon')->name('admin.offer_add_salon');
-
             Route::get('salon/data/fetch/{mobile}','OfferController@salonDataFetch');
             Route::post('insert/salon','OfferController@insertOfferSalon')->name('admin.insert_offer_salon');
-            Route::get('list','OfferController@offerList')->name('admin.offer_list');
-            Route::get('edit/{coupon_id}','OfferController@couponEdit')->name('admin.coupon_edit');
-            Route::put('update/{coupon_id}','OfferController@couponUpdate')->name('admin.coupon_update');
+            Route::get('salon/remove/{offer_salon_id}','OfferController@removeOfferSalon')->name('admin.remove_offer_salon');
+            // Route::put('update/{coupon_id}','OfferController@couponUpdate')->name('admin.coupon_update');
         });
         Route::group(['prefix' =>'admin/commission'],function(){
             Route::get('list','AdminCommissionController@commissionList')->name('admin.admin_commission_list');

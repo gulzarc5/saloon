@@ -6,7 +6,7 @@
     <div class="x_panel">
         <div class="x_title">
           <h2>Offer Salon List</h2>      
-         
+          <a style="float:right" href="{{ route('admin.offer_add_salon',['offer_id' => $offer_id]) }}" class="btn btn-xs btn-warning">Add New</a>
           <div class="clearfix"></div>
         </div>
         @if (Session::has('message'))
@@ -29,11 +29,10 @@
                   @forelse ($offer_salon as $item)
                       <tr>
                         <td>{{ $loop->iteration }}</td>
-                        <td>{{ $item->name }}</td>
-                        <td>{{ $item->name }}</td>
-                        <td>{{ $item->name }}</td>
+                        <td>{{ $item->salon->name ?? null }}</td>
+                        <td>{{ $item->salon->mobile ?? null }}</td>
                         <td>
-                            <a href="{{ route('admin.offer_add_salon',['offer_id' => $item->id]) }}" class="btn btn-xs btn-warning"><i class="fa fa-trash"></i></a>                                     
+                            <a href="{{ route('admin.remove_offer_salon',['offer_salon_id' => $item->id]) }}" class="btn btn-xs btn-warning"><i class="fa fa-trash"></i></a>                                     
                         </td>
                       </tr>
                   @empty

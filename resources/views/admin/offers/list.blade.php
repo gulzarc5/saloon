@@ -6,7 +6,7 @@
     <div class="x_panel">
         <div class="x_title">
           <h2>Offer List</h2>      
-         
+          <a style="float:right" href="{{ route('admin.offer_add_form') }}" class="btn btn-xs btn-warning">Add New</a>
           <div class="clearfix"></div>
         </div>
         @if (Session::has('message'))
@@ -32,10 +32,12 @@
                       <tr>
                         <td>{{ $loop->iteration }}</td>
                         <td>{{ $item->name }}</td>
-                        <td>{{ $item->name }}</td>
-                        <td>{{ $item->name }}</td>
+                        <td>{{ $item->category->name ?? null }}</td>
+                        <td>{{ $item->subCategory->name ?? null }}</td>
                         <td>
-                          @if ($item->status == '1')
+                          @if ($item->total_user <= $item->offer_received_user)
+                            <button type="button" class="btn btn-xs btn-danger">Expired</button>
+                          @elseif ($item->status == '1')
                             <button type="button" class="btn btn-xs btn-info">Enabled</button>
                           @else
                             <button type="button" class="btn btn-xs btn-danger">Disabled</button>                              

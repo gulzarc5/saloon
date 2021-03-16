@@ -10,7 +10,7 @@
             <div class="x_panel">
 
                 <div class="x_title">
-                    <h2>Edit Offer</h2>
+                    <h2>Add New Offer</h2>
                     <div class="clearfix"></div>
                 </div>
 
@@ -24,11 +24,11 @@
 
                 <div>
                     <div class="x_content">
-                        {{Form::open(['method' => 'post','route'=>'admin.offer_update', 'enctype'=>'multipart/form-data'])}}                       
-                        <input type="hidden" name="offer_id" value="{{$offer->id}}">
+                        {{Form::open(['method' => 'post','route'=>'admin.offer_insert' , 'enctype'=>'multipart/form-data'])}}
+
                         <div class="form-group">
                             {{ Form::label('name', 'Offer Name')}}
-                            <input type="text" name="name" value="{{ $offer->name }}" class="form-control" required>
+                            <input type="text" name="name" class="form-control" required>
                         </div>
                         <div class="form-group">
                             {{ Form::label('category', 'Category')}}
@@ -36,7 +36,7 @@
                                 <option value="">Select Category</option>
                                 @if (isset($category) && !empty($category))
                                     @foreach ($category as $item)
-                                        <option value="{{$item->id}}" {{ $offer->category_id == $item->id ? 'selected' :""}}>{{$item->name}}</option>
+                                        <option value="{{$item->id}}">{{$item->name}}</option>
                                     @endforeach
                                 @endif
                             </select>
@@ -45,66 +45,42 @@
                             {{ Form::label('sub_category', 'Sub Category')}}
                             <select name="sub_category" class="form-control" id="sub_category" >
                                 <option value="">Select Sub Category</option>
-                                @if ($offer->sub_category_id)
-                                    <option value="{{$offer->sub_category_id}}" selected>{{$offer->subCategory->name ?? null}}</option>
-                                @endif
                             </select>
                         </div>
                         <div class="form-group" >
                             {{ Form::label('third_category', 'Third Category')}}
                             <select name="third_category" id="third_category" class="form-control">
                                 <option value="">Select Third Category</option>
-                                @if ($offer->third_category_id)
-                                    <option value="{{$offer->third_category_id}}" selected>{{$offer->ThirdCategory->third_level_category_name ?? null}}</option>
-                                @endif
                             </select>
                         </div>
                         <div class="form-group" >
                             {{ Form::label('range_type', 'Range Type')}}
                             <select name="range_type" id="range_type" class="form-control" required>
-                                <option value="1" {{ $offer->range_type == 1 ? 'selected' :""}}>Limited Period</option>
-                                <option value="2" {{ $offer->range_type == 2 ? 'selected' :""}}>Date Range</option>
+                                <option value="1">Limited Period</option>
+                                <option value="2">Date Range</option>
                             </select>
                         </div>
-                        <div class="form-group" id="from_date_div" style="{{$offer->range_type == 1 ? 'display:none' : ''}}">
+                        <div class="form-group" id="from_date_div" style="display:none">
                             {{ Form::label('from_date', 'From Date')}}
-                            <input type="date" value="{{$offer->from_date}}" name="from_date" id="from_date" class="form-control" >
+                            <input type="date" name="from_date" id="from_date" class="form-control" >
                         </div>
-                        <div class="form-group" id="to_date_div" style="{{$offer->range_type == 1 ? 'display:none' : ''}}">
+                        <div class="form-group" id="to_date_div" style="display:none">
                             {{ Form::label('to_date', 'To Date')}}
-                            <input type="date" name="to_date" value="{{$offer->to_date}}" id="to_date" class="form-control" >
+                            <input type="date" name="to_date" id="to_date" class="form-control" >
                         </div>
                         <div class="form-group">
                             {{ Form::label('image', 'Image')}}
-                            <input type="file" name="image" id="image" class="form-control">
+                            <input type="file" name="image" id="image" class="form-control" required>
                         </div>
                         <div class="form-group" >
                             {{ Form::label('total_user', 'How Many User')}}
-                            <input type="number" value="{{$offer->total_user}}" name="total_user"  class="form-control" required>
+                            <input type="number" name="total_user"  class="form-control" required>
                         </div>
-
-                        {{-- <div class="form-group" >
-                            {{ Form::label('salon_mobile', 'Salon Mobile')}}
-                            <div class="inline">
-                                <input type="number" name="salon_mobile"  class="form-control">
-                                <button class="btn btn-success"><i class="fa fa-plus"></i></button>
-                            </div>
-                            <span id="salon_mobile_err"></span>
-                        </div>
-
-                        <div class="form-group" >
-                            {{ Form::label('salon_mobile', 'Salon Mobile')}}
-                            <div class="inline">
-                                <input type="number" name="salon_mobile"  class="form-control">
-                                <button class="btn btn-danger"><i class="fa fa-trash"></i></button>
-                            </div>
-                            <span id="salon_mobile_err"></span>
-                        </div> --}}
                         <div id="salon_div"></div>
 
                         <div class="form-group" >
                             {{ Form::label('description', 'Description')}}
-                            <textarea name="description"  class="form-control">{{$offer->description}}</textarea>
+                            <textarea name="description"  class="form-control"></textarea>
                         </div>
                         
 
@@ -124,13 +100,7 @@
 </div>
 @endsection
 @section('script')
-<script src="{{ asset('admin/ckeditor4/ckeditor.js')}}"></script>
-
     <script>
-        CKEDITOR.replace( 'description', {
-            height: 200,
-        });
-
         $(function(){
             $(document).on('change',"#category", function(){
                 let category_id = $(this).val();
@@ -173,7 +143,6 @@
                     $("#to_date_div").show();
                     $("#from_date").attr("required", "true");
                     $("#to_date").attr("required", "true");
-
                 }else{
                     $("#from_date_div").hide();
                     $("#to_date_div").hide();

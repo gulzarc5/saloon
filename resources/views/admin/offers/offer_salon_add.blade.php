@@ -11,6 +11,7 @@
 
                 <div class="x_title">
                     <h2>Add New Offer Salon</h2>
+                    <a style="float:right" href="{{ route('admin.offer_edit_salon',['offer_id' => $offer_id]) }}" class="btn btn-xs btn-warning">Back</a>
                     <div class="clearfix"></div>
                 </div>
 
@@ -40,7 +41,7 @@
                         <div id="salon_info"></div>
 
                         <div class="form-group">
-                            {{ Form::submit('Submit', array('class'=>'btn btn-success')) }}
+                            {{ Form::submit('Submit', array('class'=>'btn btn-success', 'id'=>'submit_btn')) }}
                         </div>
                         {{ Form::close() }}
 
@@ -57,6 +58,7 @@
 @section('script')
     <script>
         $(function(){
+            $("#submit_btn").hide();
             $(document).on('blur',"#salon_mobile", function(){
                 var mobile = $(this).val();
                 $.ajaxSetup({
@@ -78,7 +80,9 @@
                             <input type="text" value="${data.mobile}" disabled class="form-control">
                         </div>`;
                         $("#salon_info").html(html);
+                        $("#submit_btn").show();
                         }else{
+                            $("#submit_btn").hide();
                             $("#salon_info").html(`<div style="text-align: center;color: red;font-size: 19px;">No Salon Found</div>`);
                         }
                     }
