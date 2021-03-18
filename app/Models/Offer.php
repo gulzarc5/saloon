@@ -23,4 +23,9 @@ class Offer extends Model
     {
         return $this->belongsTo('App\Models\ThirdLevelCategory','third_category_id','id');
     }
+
+    public function salons()
+    {
+        return $this->hasMany('App\Models\OfferSalon','offer_id','id');
+    }
 }

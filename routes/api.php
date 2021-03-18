@@ -33,6 +33,10 @@ Route::group(['namespace' => 'Api'], function () {
         Route::get('search/{search_key}/{page}', 'ServiceController@serviceSearch');
     });
 
+    Route::group(['prefix' => 'offer'],function(){
+        Route::get('list','OfferController@index');
+    });
+
     //Customer Section
     Route::group(['middleware' => 'auth:customerApi', 'prefix' => 'customer'], function () {
         Route::group(['prefix' => 'registration'], function () {

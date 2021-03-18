@@ -17,6 +17,8 @@ class CreateOrderJobTable extends Migration
             $table->bigIncrements('id');
             $table->bigInteger('order_id');
             $table->bigInteger('job_id');
+            $table->bigInteger('amount',10,2)->default(0);
+            $table->bigInteger('quantity')->default(1);
             $table->timestamps();
         });
     }

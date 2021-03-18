@@ -21,19 +21,22 @@ class OrderController extends Controller
         // service type 1 = man, 2 = woman, 3= kids
         $validator =  Validator::make($request->all(), [
             'user_id' => 'required',
-            'service_id' => 'required|array|min:1',
-            'service_id.*' => 'required',
-            'service_for' => 'required|array|min:1',
-            'service_for.*' => 'required',
-            'service_time' => 'required|date_format:Y-m-d H:i:s',
-            'address_id' => 'required',
-            'vendor_id' => 'required'
+            'vendor_id' => 'required',
+            'offer_id' => 'nullable|numeric',
+            'offer_job_id' => 'nullable|numeric',
+            'coupon_id' => 'nullable|numeric',
+            'is_wallet' => 'nullable|numeric|in:1,2', // 1 = wallet use, 2 = No
+            'job_id' => 'required|array|min:1',
+            'job_id.*' => 'required',
+            'quantity' => 'required|array|min:1',
+            'quantity.*' => 'required',
+            'address_id' => 'nullable|numeric',
         ]);
 
         if ($validator->fails()) {
             $response = [
                 'status' => false,
-                'message' => 'Required data Can not Be Empty',
+                'message' => 'Validation Error',
                 'error_code' => true,
                 'error_message' => $validator->errors(),
             ];
