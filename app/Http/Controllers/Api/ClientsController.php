@@ -527,12 +527,16 @@ class ClientsController extends Controller
         }
     }
 
-    public function orderHistory($client_id)
+    public function orderHistory(Request $request)
     {
-        $order = Order::where('vendor_id', $client_id)->where('payment_status', 2)->orderBy('id', 'desc')->limit(50)->get();
+        $order = Order::where('vendor_id', $request->user()->id)->where('payment_status', 2)->orderBy('id', 'desc')->paginate(12);
         $response = [
             'status' => true,
             'message' => 'Order history',
+            'total_page' => $order->lastPage(),
+            'current_page' =>$order->currentPage(),
+            'total_data' =>$order->total(),
+            'has_more_page' =>$order->hasMorePages(),
             'data' => ClientOrderHistoryResource::collection($order),
         ];
 
@@ -585,6 +589,7 @@ class ClientsController extends Controller
         $validator =  Validator::make($request->all(), [
             'order_id' => ['required', 'numeric'],
             'status' => 'required|in:2,4,5',
+            'reason' => 'required_if:status,5'
         ]);
         if ($validator->fails()) {
             $response = [
@@ -597,30 +602,16 @@ class ClientsController extends Controller
         }
         $order_id = $request->input('order_id');
         $status = $request->input('status');
-
+        $reason = $request->input('reason');
         $order = Order::find($order_id);
         if ($order) {
-            $order->order_status = $status;
-            $order->save();
-
-            $user_account = UserBankAccount::where('user_id', $order->customer_id)->first();
-            if ($status == '5') {
-                $reason = $request->input('reason');
+            if ($status == 5) {
                 $order->vendor_cancel_status = 2;
                 $order->vendor_cancel_reason = $reason;
-                $order->save();
-
-                $refund = new RefundInfo();
-                $refund->order_id = $order->id;
-                if ($user_account) {
-                    $refund->account_id = $user_account->id;
-                }
-                $refund->amount = $order->advance_amount;
-                if ($refund->save()) {
-                    $order->refund_request = 2;
-                    $order->save();
-                }
-            }
+            } else {
+                $order->order_status = $status;
+            }            
+            $order->save();
             // Send push
             $user = Customer::find($order->customer_id);
             if ($user->firsbase_token) {
@@ -628,9 +619,8 @@ class ClientsController extends Controller
                 if ($status == '4') {
                     $title = "Dear Customer : Your order Completed Successfully With Order No : $order->id";
                 } elseif ($status == '5') {
-                    $title = "Dear Customer : Your order is Cancelled With Order No : $order->id";
+                    $title = "Dear Customer : Your order is Cancelled By Vendor Do You Want to change vendor ??";
                 }
-
                 PushHelper::notification($user->firsbase_token, $title, $user->id, 1);
             }
         }

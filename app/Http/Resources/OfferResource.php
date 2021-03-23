@@ -26,6 +26,7 @@ class OfferResource extends JsonResource
             'from_date' => $this->from_date,
             'to_date' => $this->to_date,
             'total_user' => $this->total_user,
+            'price' => $this->price,
             'offer_received_user' => $this->offer_received_user,
             'description' => $this->description,
             'image' => $this->image,

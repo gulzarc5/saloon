@@ -17,6 +17,7 @@ use App\Models\Address;
 use App\Models\RefundInfo;
 use App\Models\UserBankAccount;
 use App\Models\Wallet;
+use App\Services\WalletAmountService;
 use App\SmsHelper\PushHelperVendor;
 use Illuminate\Support\Facades\Validator;
 
@@ -129,7 +130,7 @@ class CustomerController extends Controller
         if ($validator->fails()) {
             $response = [
                 'status' => false,
-                'message' => 'Required Field Can not be Empty',
+                'message' => 'Validation Error',
                 'error_code' => true,
                 'error_message' => $validator->errors(),
             ];
@@ -167,7 +168,7 @@ class CustomerController extends Controller
         if ($validator->fails()) {
             $response = [
                 'status' => false,
-                'message' => 'Required Field Can not be Empty',
+                'message' => 'Validation Error',
                 'error_code' => true,
                 'error_message' => $validator->errors(),
             ];
@@ -227,7 +228,7 @@ class CustomerController extends Controller
         if ($validator->fails()) {
             $response = [
                 'status' => false,
-                'message' => 'Required Field Can not be Empty',
+                'message' => 'Validation Error',
                 'error_code' => true,
                 'error_message' => $validator->errors(),
             ];
@@ -273,7 +274,7 @@ class CustomerController extends Controller
         if ($validator->fails()) {
             $response = [
                 'status' => false,
-                'message' => 'Required Field Can not be Empty',
+                'message' => 'Validation Error',
                 'error_code' => true,
                 'error_message' => $validator->errors(),
             ];
@@ -330,7 +331,7 @@ class CustomerController extends Controller
         if ($validator->fails()) {
             $response = [
                 'status' => false,
-                'message' => 'Required Field Can not be Empty',
+                'message' => 'Validation Error',
                 'error_code' => true,
                 'error_message' => $validator->errors(),
             ];
@@ -354,12 +355,17 @@ class CustomerController extends Controller
         return response()->json($response, 200);
     }
 
-    public function orderHistory($user_id)
+    public function orderHistory(Request $request)
     {
-        $order = Order::where('customer_id', $user_id)->orderBy('id', 'desc')->limit(50)->get();
+        $user_id = $request->user()->id;
+        $order = Order::where('customer_id', $user_id)->orderBy('id', 'desc')->paginate(10);
         $response = [
             'status' => true,
             'message' => 'Order history',
+            'total_page' => $order->lastPage(),
+            'current_page' =>$order->currentPage(),
+            'total_data' =>$order->total(),
+            'has_more_page' =>$order->hasMorePages(),
             'data' => CustomerOrderHistoryResource::collection($order),
         ];
 
@@ -368,20 +374,16 @@ class CustomerController extends Controller
 
     public function orderCancel(Request $request)
     {
-        $messages = [
-            'required_if' => 'Please Select Account',
-        ];
         //is_refund 2 = yes, 1 = No
         $validator =  Validator::make($request->all(), [
             'order_id' => 'required',
-            'is_refund' => 'required',
-            'account_id' =>  'required_if:is_refund,2'
-        ], $messages);
+            'is_refund' => 'required|in:1,2',
+        ]);
 
         if ($validator->fails()) {
             $response = [
                 'status' => false,
-                'message' => 'Required Field Can not be Empty',
+                'message' => 'Validation Error',
                 'error_code' => true,
                 'error_message' => $validator->errors(),
             ];
@@ -389,28 +391,21 @@ class CustomerController extends Controller
         }
         $order_id = $request->input('order_id');
         $is_refund = $request->input('is_refund');
-        $account_id = $request->input('account_id');
 
         $order = Order::find($order_id);
         if ($order) {
             $order->order_status = 5;
             $order->save();
-            if ($is_refund == 2) {
-                $refund = new RefundInfo();
-                $refund->order_id = $order->id;
-                $refund->account_id = $account_id;
-                $refund->amount = $order->advance_amount;
-                if ($refund->save()) {
-                    $order->refund_request = 2;
-                    $order->save();
-                }
+            if (($order->payment_status == 2) && ($order->advance_amount > 0) && ($is_refund=='2')) {
+                WalletAmountService::walletCredit($order->customer_id,$order->advance_amount,"Order Cancel Amount Credited To Wallet");
+            }elseif (($order->wallet_pay > 0) && ($is_refund=='2')) {
+                WalletAmountService::walletCredit($order->customer_id,$order->wallet_pay,"Order Cancel Amount Credited To Wallet");
             }
             // Send push
             $user = Client::find($order->vendor_id);
             if ($user->firsbase_token) {
                 $client_type = $user->clientType == '1' ? 2 : 3;
                 $title = "Dear Vendor : Your order is Cancelled With Order No : $order->id";
-
                 PushHelperVendor::notification($user->firsbase_token, $title, $user->id, $client_type);
             }
         }

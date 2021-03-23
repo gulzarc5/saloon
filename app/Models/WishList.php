@@ -12,8 +12,8 @@ class WishList extends Model
         'user_id', 'vandor_id'
     ];
 
-    public function product()
+    public function client()
     {
-        return $this->belongsTo('App\Models\Product','product_id',$this->primaryKey);
+        return $this->belongsTo('App\Models\Client','vandor_id',$this->primaryKey);
     }
 }

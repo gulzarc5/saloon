@@ -1,10 +1,11 @@
 <?php
 
-namespace App\Http\Resources;
+namespace App\Http\Resources\Customer;
 
+use App\Http\Resources\ClientResource;
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class CategoryResource extends JsonResource
+class WishListResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
@@ -16,8 +17,8 @@ class CategoryResource extends JsonResource
     {
         return [
             'id' => $this->id,
-            'name' => $this->name,
-            'image' => $this->image
+            'vendor_details' => $this->client,
+            'vendor_details' => isset($this->client) ? new ClientResource($this->client) : null,
         ];
     }
 }

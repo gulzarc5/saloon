@@ -136,41 +136,56 @@ class ServiceController extends Controller
 
     }
 
-    public function serviceSearch($search_key,$page)
+    public function serviceSearch(Request $request)
     {
-        $client = Client::where('status',1)->where('profile_status',2)->where('job_status',2)
-        ->where('clients.verify_status',2);
-            if (!empty($search_key)) {
-                $client->where('clients.name','like', '%'.$search_key.'%');
-            }
-            $client->count();
+        $validator =  Validator::make($request->all(),[
+            'search_key' => 'required',
+            'latitude' => 'required',
+            'longitude' => 'required',
+        ]);
 
-            $client_query = clone $client;
-            $total_client = $client->count('id');
-            $total_page = intval(ceil($total_client / 12 ));
-            $limit = ($page*12)-12;
-
-            if ($total_client == 0) {
-                $response = [
-                    'status' => false,
-                    'message' => 'Sorry No Data Found',
-                    'search_key' => $search_key,
-                    'data' => [],
-                ];
-                return response()->json($response, 200);
-            }
-
-            $client_data = $client->skip($limit)->take(12)->get();
+        if ($validator->fails()) {
             $response = [
-                'status' => true,
-                'message' => 'Data List',
-                'tatal_page' => $total_page,
-                'current_page' => $page,
-                'total_item' => $total_client,
-                'search_key' => $search_key,
-                'data' => ClientResource::collection($client_data),
+                'status' => false,
+                'message' => 'Validation Error',
+                'error_code' => true,
+                'error_message' => $validator->errors(),
             ];
             return response()->json($response, 200);
+        }
+        $search_key = $request->input('search_key');
+        $latitude = $request->input('latitude');
+        $longitude = $request->input('longitude');
+
+        $sqlDistance = DB::raw('( 111.045 * acos( cos( radians(' . $latitude . ') ) 
+       * cos( radians( clients.latitude ) ) 
+       * cos( radians( clients.longitude ) 
+       - radians(' . $longitude  . ') ) 
+       + sin( radians(' . $latitude  . ') ) 
+       * sin( radians( clients.latitude ) ) ) )');
+
+        $client = Client::select('clients.*')->where('clients.status',1)
+        ->where('clients.profile_status',2)
+        ->where('clients.job_status',2)
+        ->where('clients.verify_status',2)
+        ->selectRaw("{$sqlDistance} AS distance");
+        if (!empty($search_key)) {
+            $client->where('clients.name','like', '%'.$search_key.'%');
+        }
+        $client->orderBy('distance','asc');
+        $client = $client->paginate(12);
+
+        $response = [
+            'status' => true,
+            'message' => 'Data List',
+            'total_page' => $client->lastPage(),
+            'current_page' =>$client->currentPage(),
+            'total_data' =>$client->total(),
+            'has_more_page' =>$client->hasMorePages(),
+            'search_key' => $search_key,
+            'data' => ClientResource::collection($client),
+        ];
+        return response()->json($response, 200);
     }
 
     public function serviceDetails($service_id){

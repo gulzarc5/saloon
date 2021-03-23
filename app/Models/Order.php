@@ -8,7 +8,7 @@ class Order extends Model
 {
     protected $table = 'orders';
     protected $fillable = [
-        'customer_id','vendor_id','customer_address_id','amount','advance_amount','payment_id','payment_request_id','payment_status','order_status','service_time','refund_request','vendor_cancel_status',
+        'customer_id','vendor_id','customer_address_id','amount','advance_amount','payment_id','payment_request_id','payment_status','payment_method','order_status','service_time','refund_request','vendor_cancel_status',
     ];
 
     public function customer()

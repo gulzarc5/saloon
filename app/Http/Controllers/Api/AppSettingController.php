@@ -29,8 +29,8 @@ class AppSettingController extends Controller
 
     public function AppLoadApi(Request $request)
     {
-        $latitude       =       "28.418715";
-        $longitude      =       "77.0478997";
+        $latitude  =   "28.418715";
+        $longitude =   "77.0478997";
 
         $latitude = $request->get('latitude');
         $longitude =  $request->get('longitude');

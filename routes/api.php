@@ -30,28 +30,45 @@ Route::group(['namespace' => 'Api'], function () {
     Route::group(['prefix' => 'service'], function () {
         Route::post('list', 'ServiceController@serviceList');
         Route::get('details/{service_id}', 'ServiceController@serviceDetails');
-        Route::get('search/{search_key}/{page}', 'ServiceController@serviceSearch');
+        Route::post('search', 'ServiceController@serviceSearch');
     });
 
     Route::group(['prefix' => 'offer'],function(){
         Route::get('list','OfferController@index');
+        Route::post('check','OfferController@offerCheck')->middleware('auth:customerApi');
+        Route::post('coupon/check','OfferController@couponCheck')->middleware('auth:customerApi');
     });
 
-    //Customer Section
+
+
+
+    //////////////////////////////////////////Customer Section
     Route::group(['middleware' => 'auth:customerApi', 'prefix' => 'customer'], function () {
+
         Route::group(['prefix' => 'registration'], function () {
             Route::post('update/details', 'CustomerController@updateDetailsRegistration');
             Route::post('address', 'CustomerController@updateAddressRegistration');
         });
+
         Route::group(['prefix' => 'profile'], function () {
             Route::get('/{id}', 'CustomerController@profileFetch');
             Route::post('update', 'CustomerController@profileUpdate');
         });
+
+        Route::group(['prefix' => 'order'],function () {
+            Route::post('place', 'OrderController@orderPlace');
+            Route::get('history', 'CustomerController@orderHistory');
+            Route::post('cancel', 'CustomerController@orderCancel');
+        });
+
+        Route::group(['prefix' =>'wish'],function(){
+            Route::get('list/add/{client_id}','WishListController@add');
+            Route::get('list/getData','WishListController@list');
+            Route::get('list/remove/{wish_list_id}','WishListController@remove');
+        });
+
         Route::put('password/change/{id}', 'CustomerController@passwordChange');
-        Route::post('order/place', 'OrderController@orderPlace');
         Route::post('payment/verify', 'OrderController@paymentVerify');
-        Route::get('order/history/{user_id}', 'CustomerController@orderHistory');
-        Route::post('order/cancel', 'CustomerController@orderCancel');
 
         //For Push Notification
         Route::get('update/firebase_token/{id}/{token}', 'CustomerController@updateFirebaseToken');
@@ -75,34 +92,41 @@ Route::group(['namespace' => 'Api'], function () {
         Route::group(['prefix' => 'service/review'], function () {
             Route::post('insert', 'ServiceController@insertReview');
         });
+
+        Route::group(['prefix' => 'wallet'],function () {
+            Route::get('amount/check','CustomerWalletController@walletFetch');
+        });
     });
 
     // Client Regitration
     Route::post('client/registration', 'ClientsController@clientRegistration');
     Route::post('client/login', 'ClientsController@clientLogin');
-    Route::group(['middleware' => ['auth:clientApi']], function () {
-        Route::get('client/profile/{id}', 'ClientsController@clientProfile');
-        Route::post('client/profile/update', 'ClientsController@clientProfileUpdate');
+    Route::group(['middleware' => ['auth:clientApi'],'prefix'=>'client'], function () {
+        Route::get('profile/{id}', 'ClientsController@clientProfile');
+        Route::post('profile/update', 'ClientsController@clientProfileUpdate');
 
         //For Push Notification
-        Route::get('client/update/firebase_token/{id}/{token}', 'ClientsController@updateFirebaseToken');
+        Route::get('update/firebase_token/{id}/{token}', 'ClientsController@updateFirebaseToken');
 
-        Route::get('client/service/list/{client_id}', 'JobController@clientServiceList');
-        Route::get('client/service/edit/{service_list_id}', 'JobController@clientServiceEdit');
-        Route::put('client/service/update/{service_list_id}', 'JobController@clientServiceUpdate');
-        Route::post('client/service/add', 'JobController@clientServiceAdd');
-        Route::get('client/service/status/update/{service_id}/{status}', 'JobController@clientServiceStatusUpdate');
-        Route::post('client/schedule/update', 'ClientsController@clientScheduleUpdate');
+        Route::get('service/list/{client_id}', 'JobController@clientServiceList');
+        Route::get('service/edit/{service_list_id}', 'JobController@clientServiceEdit');
+        Route::put('service/update/{service_list_id}', 'JobController@clientServiceUpdate');
+        Route::post('service/add', 'JobController@clientServiceAdd');
+        Route::get('service/status/update/{service_id}/{status}', 'JobController@clientServiceStatusUpdate');
+        Route::post('schedule/update', 'ClientsController@clientScheduleUpdate');
 
-        Route::post('client/gallery/image/add', 'ClientsController@galleryImageAdd');
-        Route::get('client/gallery/image/delete/{client_id}/{image_id}', 'ClientsController@galleryImageDelete');
-        Route::get('client/gallery/image/set/thumb/{client_id}/{image_id}', 'ClientsController@galleryImageSetThumb');
+        Route::post('gallery/image/add', 'ClientsController@galleryImageAdd');
+        Route::get('gallery/image/delete/{client_id}/{image_id}', 'ClientsController@galleryImageDelete');
+        Route::get('gallery/image/set/thumb/{client_id}/{image_id}', 'ClientsController@galleryImageSetThumb');
 
-        Route::put('client/change/password/{client_id}', 'ClientsController@clientChangePassword');
+        Route::put('change/password/{client_id}', 'ClientsController@clientChangePassword');
 
-        Route::get('client/order/history/{client_id}', 'ClientsController@orderHistory');
+        Route::group(['prefix' => 'order'],function(){
+            Route::get('history', 'ClientsController@orderHistory');
+            Route::post('status', 'ClientsController@orderStatus');
+            Route::get('vendor/cancel/accept/reject', 'ClientsController@orderVendorCancelAcceptReject');
+        });
 
-        Route::post('client/order/status', 'ClientsController@orderStatus');
     });
 });
 

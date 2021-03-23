@@ -18,8 +18,12 @@ class ClientOrderHistoryResource extends JsonResource
     {
         return [
             'id' => $this->id,
-            'total_amount' => $this->amount,
+            'discount' => $this->discount,
+            'wallet_pay' => $this->wallet_pay,
+            'online_pay' => $this->online_pay,
+            'amount' => $this->amount,
             'advance_amount' => $this->advance_amount,
+            'payment_method' => $this->payment_method,
             'payment_id' => $this->payment_id,
             'payment_request_id' => $this->payment_request_id,
             'payment_status' => $this->payment_status,

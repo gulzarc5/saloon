@@ -8,6 +8,13 @@ use App\Models\ClientSchedule;
 use App\Models\Job;
 use App\Models\Order;
 use App\Models\OrderJobs;
+use App\Models\UserOfferCouponHistory;
+use App\Models\Wallet;
+use App\Models\WalletHistory;
+use App\Services\AdminCommissionService;
+use App\Services\CouponCheckService;
+use App\Services\OfferCheckService;
+use App\Services\WalletAmountService;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
 use App\SmsHelper\PushHelperVendor;
@@ -20,8 +27,7 @@ class OrderController extends Controller
     {
         // service type 1 = man, 2 = woman, 3= kids
         $validator =  Validator::make($request->all(), [
-            'user_id' => 'required',
-            'vendor_id' => 'required',
+            'vendor_id' => 'required|numeric',
             'offer_id' => 'nullable|numeric',
             'offer_job_id' => 'nullable|numeric',
             'coupon_id' => 'nullable|numeric',
@@ -31,6 +37,7 @@ class OrderController extends Controller
             'quantity' => 'required|array|min:1',
             'quantity.*' => 'required',
             'address_id' => 'nullable|numeric',
+            'service_time' => 'required',
         ]);
 
         if ($validator->fails()) {
@@ -42,22 +49,21 @@ class OrderController extends Controller
             ];
             return response()->json($response, 200);
         }
-        $service_id = $request->input('service_id');
-        $service_for = $request->input('service_for');
+        $user_id = $request->user()->id;
         $vendor_id = $request->input('vendor_id');
-        $service_date = $request->input('service_time');
+        $offer_id = $request->input('offer_id');
+        $offer_job_id = $request->input('offer_job_id');
+        $coupon_id = $request->input('coupon_id');
+        $is_wallet = $request->input('is_wallet'); // 1 = yes else no
+        $job_id = $request->input('job_id'); // Array Of Job Id
+        $quantity = $request->input('quantity'); // Array Of Quantity
+        $address_id = $request->input('address_id');
+        $service_time = $request->input('service_time');
+
         //check service is available or not
-        for ($i = 0; $i < count($service_id); $i++) {
-            if (isset($service_id[$i]) && !empty($service_id[$i]) && isset($service_for[$i]) && !empty($service_for[$i])) {
-                $checkService = Job::where('id', $service_id[$i])->where('status', 1);
-                if ($service_for[$i] == '1') {
-                    $checkService->where('is_man', 2);
-                } elseif ($service_for[$i] == '2') {
-                    $checkService->where('is_woman', 2);
-                }
-                elseif ($service_for[$i] == '3') {
-                    $checkService->where('is_kids', 2);
-                }
+        for ($i = 0; $i < count($job_id); $i++) {
+            if (isset($job_id[$i]) && !empty($job_id[$i])) {
+                $checkService = Job::where('id', $job_id[$i])->where('user_id',$vendor_id)->where('status', 1);
                 if ($checkService->count() == 0) {
                     $response = [
                         'status' => false,
@@ -71,9 +77,8 @@ class OrderController extends Controller
         }
 
         //check Vendor is available or not in scheduled date
-        // $checkSchedule = 
 
-        $service_date_check = Carbon::parse($service_date)->toDateString();
+        $service_date_check = Carbon::parse(Carbon::now())->toDateString();
         if (!empty($service_date_check)) {
             $checkSchedule = ClientSchedule::where('user_id', $vendor_id)->where('date', $service_date_check)->count();
             if ($checkSchedule > 0) {
@@ -86,91 +91,139 @@ class OrderController extends Controller
                 return response()->json($response, 200);
             }
         }
-
+    
+        //check Offer Id Available or Not
+        $offer = null;
+        if ($offer_id && $job_id) {
+            $offer_check = OfferCheckService::checkOffer($offer_id,$offer_job_id,$vendor_id,$user_id);
+            if ($offer_check['status'] == true) {
+                $offer = $offer_check['data']['data'];
+            }        
+        }
+        // coupon check
+        $coupon = null;
+        if (!$offer && $coupon_id) {
+            $coupon_check = CouponCheckService::checkCoupon($coupon_id,$user_id);
+            if ($coupon_check['status'] == true) {
+                $coupon = $coupon_check['data']['data'];
+            }  
+        }
         ////////////// Validation End////////////////////
 
 
         $total_amount = 0;
         //Order Creation
         $order = new Order();
-        $order->customer_id = $request->input('user_id');
-        $order->customer_address_id = $request->input('address_id');
-        $order->service_time = $request->input('service_time');
+        $order->customer_id = $user_id;
         $order->vendor_id = $vendor_id;
+        if ($address_id) {
+            $order->customer_address_id = $address_id;
+        }
+        $order->service_time = $request->input('service_time');
         if ($order->save()) {
-            for ($i = 0; $i < count($service_id); $i++) {
-                if (isset($service_id[$i]) && !empty($service_id[$i]) && isset($service_for[$i]) && !empty($service_for[$i])) {
-                    $checkService = Job::where('id', $service_id[$i])->where('status', 1);
-                    if ($service_for[$i] == '1') {
-                        $checkService->where('is_man', 2);
-                    } elseif ($service_for[$i] == '2') {
-                        $checkService->where('is_woman', 2);
-                    }
-                    elseif ($service_for[$i] == '3') {
-                        $checkService->where('is_kids', 2);
-                    }
-                    if ($checkService->count() > 0) {
-                        $job_fetch = $checkService->first();
+            
+            for ($i = 0; $i < count($job_id); $i++) {
+                if (isset($job_id[$i]) && !empty($job_id[$i]) && isset($quantity[$i]) && !empty($quantity[$i])) {
+                    $service = Job::where('id', $job_id[$i])->where('user_id',$vendor_id)->where('status', 1)->first();
+                    if ($service) {
                         $order_job = new OrderJobs();
                         $order_job->order_id = $order->id;
-                        $order_job->job_id = $service_id[$i];
-                        $order_job->service_for = $service_for[$i];
-                        if ($service_for[$i] == '1') {
-                            $order_job->amount = $job_fetch->man_price;
-                            $total_amount += $job_fetch->man_price;
-                        } elseif ($service_for[$i] == '2') {
-                            $order_job->amount = $job_fetch->woman_price;
-                            $total_amount += $job_fetch->woman_price;
+                        $order_job->job_id = $job_id[$i];
+                        $order_job->quantity = $quantity[$i] ?? 1;
+                        $order_job->mrp = $service->mrp;
+                        if ($offer && $offer_job_id == $job_id[$i]) {
+                            $order->discount = ($service->price - $offer->price);
+                            $this->offerHistory($offer->id,$user_id,$order->id);
                         }
-                        elseif ($service_for[$i] == '3') {
-                            $order_job->amount = $job_fetch->kids_price;
-                            $total_amount += $job_fetch->kids_price;
-                        }
+                        $order_job->amount = $service->price*$quantity[$i];                        
                         $order_job->save();
+                        $total_amount += $order_job->amount;
                     }
                 }
             }
 
             $order->amount = $total_amount;
             $advance_amount = 0;
-            if ($total_amount > 0) {
-                $advance_amount = (($total_amount * 20) / 100);
+            $total_amount = $total_amount - $order->discount;
+            if ($total_amount == 1) {
+                $order->advance_amount = $total_amount;
+            }elseif ($total_amount > 0) {
+                $admin_commission = AdminCommissionService::commissionFetch($total_amount);
+                if ($admin_commission) {
+                    $order->advance_amount = (($total_amount * $admin_commission->charge_amount) / 100);
+                }
             }
-            $order->advance_amount = $advance_amount;
-
-            $api = new Api(config('services.razorpay.id'), config('services.razorpay.key'));
-            $orders = $api->order->create(array(
-                'receipt' => $order->id,
-                'amount' => $advance_amount * 100,
-                'currency' => 'INR',
-            ));
-
-            $order->payment_request_id = $orders['id'];
             $order->save();
 
-            $payment_data = [
-                'key_id' => config('services.razorpay.id'),
-                'amount' => $advance_amount * 100,
-                'order_id' => $orders['id'],
-                'name' => $order->customer->name,
-                'email' => $order->customer->email,
-                'mobile' => $order->customer->mobile,
-            ];
+            //Check Wallet Pay Or No
+            if ($is_wallet == 1) {
+                $wallet = WalletAmountService::walletFetch($user_id);
+                if ($wallet['status'] && ($order->advance_amount >= 1)) {
+                    $wallet_amount = $wallet['data']->amount;
+                    if ($wallet_amount > 0) {
+                        if ($wallet_amount >= $order->advance_amount) {
+                            $order->wallet_pay = $order->advance_amount;
+                            $order->payment_method = 2;
+                            $order->payment_status = 2;
+                        }else{
+                            $order->wallet_pay = $wallet['data']->amount;
+                        }
+                        $order->save();
+                        $this->walletAmountDebit($order->wallet_pay,$wallet['data']->id);
+                    }
+                }
+            }
+            
+            if ($order->wallet_pay == $order->advance_amount) {
+                $response = [
+                    'status' => true,
+                    'message' => 'Order Place',
+                    'error_code' => false,
+                    'error_message' => null,
+                    'data' => [
+                        'order_id' => $order->id,
+                        'payment_status' => 2, // 1 = pay online 2 = paid by wallet
+                        'amount' => $order->amount,
+                        'advance_amount' => $order->advance_amount,
+                        'payment_data' => null,
+                    ],
+                ];
+            } else {
+                $api = new Api(config('services.razorpay.id'), config('services.razorpay.key'));
+                $orders = $api->order->create(array(
+                    'receipt' => $order->id,
+                    'amount' => $order->advance_amount * 100,
+                    'currency' => 'INR',
+                ));
 
-            $response = [
-                'status' => true,
-                'message' => 'Order Place',
-                'error_code' => false,
-                'error_message' => null,
-                'data' => [
-                    'order_id' => $order->id,
-                    'payment_status' => 1,
-                    'amount' => $total_amount,
-                    'advance_amount' => $advance_amount,
-                    'payment_data' => $payment_data,
-                ],
-            ];
-
+                $order->payment_request_id = $orders['id'];
+                $order->online_pay = ($order->advance_amount - $order->wallet_pay);
+                $order->save();
+                $payment_data = [
+                    'key_id' => config('services.razorpay.id'),
+                    'amount' => ($order->advance_amount - $order->wallet_pay) * 100,
+                    'order_id' => $orders['id'],
+                    'name' => $order->customer->name,
+                    'email' => $order->customer->email ?? null,
+                    'mobile' => $order->customer->mobile,
+                ];
+    
+                $response = [
+                    'status' => true,
+                    'message' => 'Order Place',
+                    'error_code' => false,
+                    'error_message' => null,
+                    'data' => [
+                        'order_id' => $order->id,
+                        'payment_status' => 1,
+                        'amount' => $order->amount,
+                        'advance_amount' => $order->advance_amount,
+                        'payment_data' => $payment_data,
+                    ],
+                ];
+    
+            }  
+            
             return response()->json($response, 200);
         } else {
             $response = [
@@ -183,6 +236,15 @@ class OrderController extends Controller
         }
     }
 
+    private function offerHistory($offer_id,$customer_id,$order_id){
+        $offer_history = new UserOfferCouponHistory();
+        $offer_history->customer_id = $customer_id;
+        $offer_history->offer_id = $offer_id;
+        $offer_history->order_id = $order_id;
+        $offer_history->offer_type = 2;
+        $offer_history->save();
+        return true;
+    }
 
     public function paymentVerify(Request $request)
     {
@@ -251,5 +313,22 @@ class OrderController extends Controller
             $success = false;
         }
         return $success;
+    }
+
+    private function walletAmountDebit($amount,$wallet_id){
+        $wallet = Wallet::find($wallet_id);
+        if ($wallet) {
+            $wallet->amount = $wallet->amount - $amount;
+            $wallet->save();
+            $wallet_history = new WalletHistory();
+            $wallet_history->wallet_id = $wallet->id;
+            $wallet_history->transaction_type = 2;
+            $wallet_history->amount = $amount;
+            $wallet_history->total_amount = $wallet->amount;
+            $wallet_history->comment = "Amount Debited Against Purchase";
+            $wallet_history->save();
+            return true;
+        }
+        return false;
     }
 }
