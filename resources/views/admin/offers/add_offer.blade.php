@@ -76,6 +76,10 @@
                             {{ Form::label('total_user', 'How Many User')}}
                             <input type="number" name="total_user"  class="form-control" required>
                         </div>
+                        <div class="form-group" >
+                            {{ Form::label('price', 'Service Price')}}
+                            <input type="number" name="price"  class="form-control" required>
+                        </div>
                         <div id="salon_div"></div>
 
                         <div class="form-group" >
@@ -100,7 +104,12 @@
 </div>
 @endsection
 @section('script')
+<script src="{{ asset('admin/ckeditor4/ckeditor.js')}}"></script>
     <script>
+        CKEDITOR.replace( 'description', {
+            height: 200,
+        });
+
         $(function(){
             $(document).on('change',"#category", function(){
                 let category_id = $(this).val();

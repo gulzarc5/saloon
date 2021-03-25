@@ -59,6 +59,7 @@ Route::group(['namespace' => 'Api'], function () {
             Route::post('place', 'OrderController@orderPlace');
             Route::get('history', 'CustomerController@orderHistory');
             Route::post('cancel', 'CustomerController@orderCancel');
+            Route::get('vendor/cancel/accept/reject/{order_id}/{status}', 'CustomerController@orderVendorCancelAcceptReject');
         });
 
         Route::group(['prefix' =>'wish'],function(){
@@ -124,7 +125,6 @@ Route::group(['namespace' => 'Api'], function () {
         Route::group(['prefix' => 'order'],function(){
             Route::get('history', 'ClientsController@orderHistory');
             Route::post('status', 'ClientsController@orderStatus');
-            Route::get('vendor/cancel/accept/reject', 'ClientsController@orderVendorCancelAcceptReject');
         });
 
     });

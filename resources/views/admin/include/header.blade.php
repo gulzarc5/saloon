@@ -106,6 +106,7 @@
                       <a><i class="fa fa-shopping-cart" aria-hidden="true"></i> Orders <span class="fa fa-chevron-down"></span></a>
                       <ul class="nav child_menu">
                         <li><a href="{{ route('admin.orders')}}">Orders List</a></li>
+                        <li><a href="{{ route('admin.vendor_cancel_orders')}}">Vendor Cancel Orders</a></li>
                         <li><a href="{{ route('admin.refunds')}}">Refund List</a></li>
                       </ul>
                   </li>

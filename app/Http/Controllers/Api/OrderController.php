@@ -220,10 +220,8 @@ class OrderController extends Controller
                         'advance_amount' => $order->advance_amount,
                         'payment_data' => $payment_data,
                     ],
-                ];
-    
-            }  
-            
+                ];    
+            }
             return response()->json($response, 200);
         } else {
             $response = [

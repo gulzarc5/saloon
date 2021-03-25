@@ -36,7 +36,8 @@ class OfferController extends Controller
             'from_date' => 'required_if:range_type,2',
             'to_date' => 'required_if:range_type,2',
             'images' => 'nullable|image|mimes:jpeg,jpg,png,jpg,gif,svg|max:2048',
-            'total_user' => 'required|numeric'
+            'total_user' => 'required|numeric',
+            'price' => 'required|numeric'
         ]);
 
         $offer = new Offer();
@@ -49,6 +50,7 @@ class OfferController extends Controller
             $offer->from_date = $request->input('from_date');
             $offer->to_date = $request->input('to_date');
             $offer->total_user = $request->input('total_user');
+            $offer->price = $request->input('price');
             $offer->description = $request->input('description');  
             
             if ($request->hasFile('image')) {
@@ -80,7 +82,8 @@ class OfferController extends Controller
             'from_date' => 'required_if:range_type,2',
             'to_date' => 'required_if:range_type,2',
             'images' => 'nullable|image|mimes:jpeg,jpg,png,jpg,gif,svg|max:2048',
-            'total_user' => 'required|numeric'
+            'total_user' => 'required|numeric',
+            'price' => 'required|numeric'
         ]);
 
         $offer = Offer::findOrFail($request->input('offer_id'));
@@ -93,7 +96,8 @@ class OfferController extends Controller
             $offer->from_date = $request->input('from_date');
             $offer->to_date = $request->input('to_date');
             $offer->total_user = $request->input('total_user');
-            $offer->description = $request->input('description');           
+            $offer->description = $request->input('description');  
+            $offer->price = $request->input('price');         
 
             
             if ($request->hasFile('image')) {

@@ -108,6 +108,14 @@ Route::group(['namespace' => 'Admin'],function(){
         // Orders
         Route::group(['namespace' => 'Order','prefix'=>'order'], function () {
             Route::get('/list', 'OrdersController@index')->name('admin.orders');
+
+            Route::group(['prefix'=>'vendor'],function () {
+                Route::get('cancel/list', 'OrdersController@vendorCancelOrders')->name('admin.vendor_cancel_orders');
+                Route::get('change/form/{order_id}', 'OrdersController@vendorChangeForm')->name('admin.vendor_change_form');
+                Route::post('check', 'OrdersController@vendorCheck')->name('admin.vendor_check');
+                Route::post('change', 'OrdersController@vendorChange')->name('admin.vendor_change');
+            });
+
             Route::get('/details/{order_id}', 'OrdersController@orderDetails')->name('admin.order_details');
             Route::get('accept/{order_id}/{status}','OrdersController@acceptOrder')->name('admin.order_accept');
             Route::get('/cancel/{order_id}/{is_refund}/{account_id?}', 'OrdersController@orderCancel')->name('admin.order_cancel');

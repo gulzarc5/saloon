@@ -83,7 +83,9 @@
                                         @endif
                                     </td>
                                     <td id="status{{$count}}">
-                                        @if($order->order_status == '1')
+                                        @if($order->vendor_cancel_status == '2' && $order->order_status != '6' && $order->order_status != '5')
+                                            <button class='btn btn-xs btn-warning' title='Waiting For User Response'>Vendor Cancelled</button>
+                                        @elseif($order->order_status == '1')
                                             <button class='btn btn-xs btn-warning' disabled>New Order</button>
                                         @elseif($order->order_status == '2')
                                             <button class='btn btn-xs btn-primary' disabled>Accepted</button>
@@ -91,8 +93,10 @@
                                             <button class='btn btn-xs btn-info' disabled>Rescheduled</button>
                                         @elseif($order->order_status == '4')
                                             <button class='btn btn-xs btn-success' disabled>Completed</button>
-                                        @else
+                                        @elseif($order->order_status == '5')
                                             <button class='btn btn-xs btn-danger' disabled>Cancelled</button>
+                                        @elseif($order->order_status == '6')
+                                            <button class='btn btn-xs btn-info' title='User Has Requested To Change Vendor'>Vendor Reassign</button>
                                         @endif
                                     </td>
                                     <td>{{ $order->service_time }}</td>
@@ -110,6 +114,9 @@
                                                 
                                             @endif
                                           @else
+                                            @if($order->vendor_cancel_status == '2' && $order->order_status == '6')
+                                                <a href="{{route('admin.vendor_change_form',['order_id'=>$order->id])}}" class='btn btn-xs btn-warning' title='User Requested To Change Vendor'>Change Vendor</a>
+                                            @endif
                                             @if ($order->order_status != '4')
                                                 @if ($order->order_status == '5')                                                
                                                     <button class="btn btn-xs btn-danger" disabled>Cancelled</button>

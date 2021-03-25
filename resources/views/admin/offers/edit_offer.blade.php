@@ -82,6 +82,10 @@
                             {{ Form::label('total_user', 'How Many User')}}
                             <input type="number" value="{{$offer->total_user}}" name="total_user"  class="form-control" required>
                         </div>
+                        <div class="form-group" >
+                            {{ Form::label('price', 'Service Price')}}
+                            <input type="number" name="price" value="{{$offer->price}}"  class="form-control" required>
+                        </div>
 
                         {{-- <div class="form-group" >
                             {{ Form::label('salon_mobile', 'Salon Mobile')}}

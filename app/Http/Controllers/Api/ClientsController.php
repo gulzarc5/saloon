@@ -155,7 +155,8 @@ class ClientsController extends Controller
         $validator =  Validator::make($request->all(), [
             'client_id' => 'required',
             'name' => 'required',
-            'mobile' =>  'required|unique:clients,id,' . $client_id,
+            'mobile' =>  'required|unique:clients,mobile,'.$client_id,
+            'email' =>  'nullable|unique:clients,email,'.$client_id,
             'profile_image' => 'image|mimes:jpeg,png,jpg,gif|max:2048',
             'address_proof_file' => 'image|mimes:jpeg,png,jpg,gif,pdf|max:2048',
             'photo_proof_file' => 'image|mimes:jpeg,png,jpg,gif,pdf|max:2048',

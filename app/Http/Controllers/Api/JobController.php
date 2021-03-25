@@ -43,6 +43,7 @@ class JobController extends Controller
         $last_category = $request->input('last_category');
         $mrp = $request->input('mrp');
         $price = $request->input('price');
+        $description = $request->input('description');
 
         if ($request->has('main_category')) {            
             for ($i = 0; $i < count($main_category); $i++) {
@@ -63,6 +64,7 @@ class JobController extends Controller
                     $job->last_category = $last_category[$i] ?? null;
                     $job->mrp = $mrp[$i] ?? null;
                     $job->price = $price[$i] ?? null;
+                    $job->description = $description[$i] ?? null;
                     $job->save();
                 }
             }

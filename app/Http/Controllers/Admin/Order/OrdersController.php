@@ -4,8 +4,10 @@ namespace App\Http\Controllers\Admin\Order;
 
 use App\Http\Controllers\Controller;
 use App\Models\Client;
+use App\Models\ClientSchedule;
 use App\Models\Customer;
 use App\Models\InvoiceSetting;
+use App\Models\Job;
 use App\Models\Order;
 use App\Models\OrderJobs;
 use App\Models\RefundInfo;
@@ -14,13 +16,162 @@ use Illuminate\Http\Request;
 
 use App\SmsHelper\PushHelper;
 use App\SmsHelper\PushHelperVendor;
+use Carbon\Carbon;
 
 class OrdersController extends Controller
 {
     public function index()
     {
-        $orders = Order::orderBy('id', 'desc')->paginate(20);
+        $orders = Order::orderBy('id', 'desc')->where('vendor_cancel_status',1)->paginate(20);
         return view('admin.order.index', compact('orders'));
+    }
+
+    public function vendorCancelOrders()
+    {
+        $orders = Order::orderBy('id', 'desc')->where('vendor_cancel_status',2)->paginate(20);
+        return view('admin.order.vendor_cancelled_order', compact('orders'));
+    }
+
+    public function vendorChangeForm($order_id)
+    {
+        $order = Order::find($order_id);
+        return view('admin.order.vendor_change_form', compact('order'));
+    }
+
+    public function vendorCheck(Request $request)
+    {
+        $vendor_mobile = $request->input('mobile');
+        $order_id = $request->input('order_id');
+
+        $vendor = Client::where('mobile',$vendor_mobile)
+        ->where('profile_status',2)
+        ->where('verify_status',2)
+        ->where('job_status',2)
+        ->where('status',1)
+        ->first();
+        $order = Order::find($order_id);
+        if ($vendor && $order) {
+
+            $check_client_schedule = ClientSchedule::where('user_id',$order->vendor_id)
+            ->where('date',Carbon::parse($order->service_time)->toDateString())->count();
+            if ($check_client_schedule == 0) {
+                $check_service_flag = true;
+                $amount = 0;
+                foreach ($order->services as $service) {
+                    $vendor_service = $service->job;
+                    $vendor_service_check = Job::where('user_id',$vendor->id)->where('status',1);
+                    if ($vendor_service->last_category) {
+                        $vendor_service_check->where('last_category',$vendor_service->last_category);
+                    }
+                    if ($vendor_service->sub_category) {
+                        $vendor_service_check->where('sub_category',$vendor_service->sub_category);
+                    }
+                    if ($vendor_service->job_category) {
+                        $vendor_service_check->where('job_category',$vendor_service->job_category);
+                    }
+                    if ($vendor_service_check->count() == 0) {
+                        $check_service_flag = false;
+                    }
+                    $vendor_service_check=$vendor_service_check->first();
+                    $amount += $service->quantity*$vendor_service_check->price;
+                }
+                if ($check_service_flag) {
+                    $response = [
+                        'status' => true,
+                        'message' => 'Vendor Available',
+                        'data' => [
+                            'amount' => $amount,
+                            'client' => $vendor,
+                        ],
+                    ];
+                    return response()->json($response, 200);
+                }else{
+                    $response = [
+                        'status' => false,
+                        'message' => 'Sorry !! this order services not available in this vendor',
+                        'data' => null,
+                    ];
+                    return response()->json($response, 200);
+                }
+            } else {
+                $response = [
+                    'status' => false,
+                    'message' => 'Vendor Not Available At This Date',
+                    'data' => null,
+                ];
+                return response()->json($response, 200);
+            }
+            
+        } else {
+            $response = [
+                'status' => false,
+                'message' => 'Vendor Not Found',
+                'data' => null,
+            ];
+            return response()->json($response, 200);
+        }
+        
+    }
+
+    public function vendorChange(Request $request)
+    {
+        $this->validate($request, [
+            'mobile' => 'required|numeric|digits:10',
+            'order_id' => 'required|numeric',
+        ]);
+        $mobile = $request->input('mobile');
+        $vendor = Client::where('mobile',$mobile)
+        ->where('profile_status',2)
+        ->where('verify_status',2)
+        ->where('job_status',2)
+        ->where('status',1)
+        ->first();
+
+        $order_id = $request->input('order_id');
+        $vendor_check = $this->vendorCheck($request)->getContent();
+        $vendor_check = json_decode($vendor_check, true);
+        if ($vendor_check['status']) {
+            $order = Order::findOrFail($order_id);
+            foreach ($order->services as $service){
+                if($new_service_id = $this->vendorServiceFetch($service->job,$order->vendor_id)){
+                    $order_job = OrderJobs::findOrFail($service->id);
+                    $order_job->job_id = $new_service_id;
+                    $order_job->save();
+                }
+            }
+            $order->vendor_id = $vendor->id;
+            $order->order_status = 1;
+            $order->save();
+            $title = "Dear Vendor : A User Placed An Order With Order Id $order->id";
+            PushHelperVendor::notification($vendor->firsbase_token, $title, $vendor->id, 2);
+
+            $title = "Dear Customer : Your Vendor Change Request Accepted And Changed Vendor";
+            PushHelper::notification($user->firsbase_token, $title, $user->id, 1);
+            return back()->with('message',"Vendor Changed Successfully");
+        } else {
+            return back()->with('error',$vendor_check['message']);
+        }
+    }
+
+    /**
+     * vendor service fetch function used a chield function of vendor change
+     * @return service_id 
+     */
+    private function vendorServiceFetch($vendor_service,$vendor_id)
+    {
+        $vendor_service_check = Job::where('user_id',$vendor_id)->where('status',1);
+        if ($vendor_service->last_category) {
+            $vendor_service_check->where('last_category',$vendor_service->last_category);
+        }
+        if ($vendor_service->sub_category) {
+            $vendor_service_check->where('sub_category',$vendor_service->sub_category);
+        }
+        if ($vendor_service->job_category) {
+            $vendor_service_check->where('job_category',$vendor_service->job_category);
+        }
+
+        $service = $vendor_service_check->first();
+        return $service->id;
     }
 
     public function orderDetails($order_id)

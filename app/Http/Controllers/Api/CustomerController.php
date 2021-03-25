@@ -485,4 +485,45 @@ class CustomerController extends Controller
             return $response;
         }
     }
+
+    public function orderVendorCancelAcceptReject(Request $request,$order_id,$status)
+    {
+        //status 1 = cancel, 2 = change vendor
+
+        $order = Order::find($order_id);
+        if ($status == 1) {
+            if ($order) {
+                $order->order_status = 5;
+                $order->save();
+                if (($order->payment_status == 2) && ($order->advance_amount > 0)) {
+                    WalletAmountService::walletCredit($order->customer_id,$order->advance_amount,"Order Cancel Amount Credited To Wallet");
+                }elseif (($order->wallet_pay > 0)) {
+                    WalletAmountService::walletCredit($order->customer_id,$order->wallet_pay,"Order Cancel Amount Credited To Wallet");
+                }
+                // Send push
+                $user = Client::find($order->vendor_id);
+                if ($user->firsbase_token) {
+                    $client_type = $user->clientType == '1' ? 2 : 3;
+                    $title = "Dear Vendor : Your order is Cancelled With Order No : $order->id";
+                    PushHelperVendor::notification($user->firsbase_token, $title, $user->id, $client_type);
+                }
+            }
+            $response = [
+                'status' => true,
+                'message' => 'Order Cancelled And Paid Amount Credited To Wallet',
+            ];
+            return response()->json($response, 200);
+        } else {
+            if ($order) {
+                $order->order_status = 6;
+                $order->save();
+            }
+            $response = [
+                'status' => true,
+                'message' => 'Vendor Change Request Sent Successfully to admin',
+            ];
+            return response()->json($response, 200);
+        }
+        
+    }
 }

@@ -18,9 +18,9 @@
                     <div class="col-xs-12 col-sm-12 col-md-12">
                         {{--///////////////////// Company Address ///////////////////////--}}
                         <div class="col-md-4 col-sm-4 col-xs-4">
-                            {{-- <img src="uploads/logo.png" height="150" style="height: 38px;margin-bottom: 18px; margin-right: -9px;"> --}}
-                            <b style="font-size: 35px;color: #0194ea;">Sal</b>
-                            <b style="font-size: 35px;color: #262161;">oon</b>
+                            <img src="{{asset('logo/logo.png')}}" style="height: 45px;margin-bottom: 12px;margin-top: 10px;">
+                            {{-- <b style="font-size: 35px;color: #0194ea;">Salon</b>
+                            <b style="font-size: 35px;color: #262161;">ease</b> --}}
                             <table>
                                 <tr>
                                 <th>Address : </th>
@@ -66,9 +66,15 @@
                                     <th>Paid Amount : </th>
                                     <td> Rs.{{ number_format($order->advance_amount,2,".",'') }}</td>
                                 </tr>
+                                @if ($order->discount > 0)
+                                    <tr>
+                                        <th>Discount : </th>
+                                        <td> Rs.{{ number_format($order->discount,2,".",'') }}</td>
+                                    </tr>                                    
+                                @endif
                                 <tr>
                                     <th>Payable Amount : </th>
-                                    <td> Rs.{{ number_format(($order->amount-$order->advance_amount),2,".",'') }}</td>
+                                    <td> Rs.{{ number_format(($order->amount-($order->advance_amount+$order->discount)),2,".",'') }}</td>
                                 </tr>
                                 <tr>
                                     <th>Payment Status : </th>
@@ -90,20 +96,20 @@
                                 <table>
                                     <tr>
                                         <th>Name : </th>
-                                        <td>{{$order->client->name }}</td>
+                                        <td>{{$order->client->name ?? null}}</td>
                                     </tr>
 
                                     <tr>
                                         <th>Mobile : </th>
-                                        <td>{{$order->client->mobile}}</td>
+                                        <td>{{$order->client->mobile ?? null}}</td>
                                     </tr>
                                     <tr>
                                         <th>Email : </th>
-                                        <td>{{$order->client->email}}</td>
+                                        <td>{{$order->client->email ?? null}}</td>
                                     </tr>
                                     <tr>
                                         <th>Service City : </th>
-                                        <td>{{$order->client->serviceCity->name}}</td>
+                                        <td>{{$order->client->serviceCity->name ?? null}}</td>
                                     </tr>
                                     <tr>
                                         <th>Client Type : </th>
@@ -117,7 +123,7 @@
                                     </tr>
                                     <tr>
                                         <th>Address : </th>
-                                        <td>{{$order->client->address}},{{$order->client->city}},{{$order->client->state}} - {{$order->client->pin}}</td>
+                                        <td>{{$order->client->address ?? null}},{{$order->client->city ?? null}},{{$order->client->state ?? null}} - {{$order->client->pin ?? null}}</td>
                                     </tr>
                                 </table>
                             @endif
@@ -140,27 +146,27 @@
                                     <table>
                                         <tr>
                                             <th>Name :</th>
-                                            <td>{{$order->customer->name}}</td>
+                                            <td>{{$order->customer->name ?? null}}</td>
                                         </tr>
                                         <tr>
                                             <th>Email :</th>
-                                            <td>{{$order->customer->email}}</td>
+                                            <td>{{$order->customer->email ?? null}}</td>
                                         </tr>
                                         <tr>
                                             <th>Mobile :</th>
-                                            <td>{{$order->customer->mobile}}</td>
+                                            <td>{{$order->customer->mobile ?? null}}</td>
                                         </tr>
                                         <tr>
                                             <th>State :</th>
-                                            <td>{{$order->customer->state}}</td>
+                                            <td>{{$order->customer->state ?? null}}</td>
                                         </tr>
                                         <tr>
                                             <th>City :</th>
-                                            <td>{{$order->customer->city}}</td>
+                                            <td>{{$order->customer->city ?? null}}</td>
                                         </tr>
                                         <tr>
                                             <th>Address :</th>
-                                            <td>{{$order->customer->address}}</td>
+                                            <td>{{$order->customer->address ?? null}}</td>
                                         </tr>
                                     </table>
                                 </td>
@@ -170,27 +176,27 @@
                                     <table>
                                         <tr>
                                             <th>Name :</th>
-                                            <td>{{$order->address->name}}</td>
+                                            <td>{{$order->address->name ?? null}}</td>
                                         </tr>
                                         <tr>
                                             <th>Email :</th>
-                                            <td>{{$order->address->email}}</td>
+                                            <td>{{$order->address->email ?? null}}</td>
                                         </tr>
                                         <tr>
                                             <th>Mobile :</th>
-                                            <td>{{$order->address->mobile}}</td>
+                                            <td>{{$order->address->mobile ?? null}}</td>
                                         </tr>
                                         <tr>
                                             <th>State :</th>
-                                            <td>{{$order->address->state}}</td>
+                                            <td>{{$order->address->state ?? null}}</td>
                                         </tr>
                                         <tr>
                                             <th>City :</th>
-                                            <td>{{$order->address->city}}</td>
+                                            <td>{{$order->address->city ?? null}}</td>
                                         </tr>
                                         <tr>
                                             <th>Address :</th>
-                                            <td>{{$order->address->address}}</td>
+                                            <td>{{$order->address->address ?? null}}</td>
                                         </tr>
                                     </table>
                                 </td>
@@ -208,43 +214,42 @@
                         <table class="table">
                             <thead>
                                 <tr style="background-color: #0089ff;color:white ">
-                                <th style="min-width: 125px;">Name</th>
-                                <th>Service For</th>
-                                <th>Amount</th>
+                                    <th>#</th>
+                                    <th style="min-width: 125px;">Particulars</th>
+                                    <th>Amount</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 @if (isset($orderDetails) && !empty($orderDetails) && (count($orderDetails)> 0))
                                     @foreach ($orderDetails as $item)
                                         <tr>
-                                            <td>{{isset($item->job->jobCategory->name) ? $item->job->jobCategory->name : ''}}</td>
-                                            <td>
-                                                @if ($item->service_for == '1')
-                                                    Men
-                                                @elseif ($item->service_for == '2')
-                                                    Women
-                                                @elseif ($item->service_for == '3')
-                                                    Kids
-                                                @endif
-                                            </td>
+                                            <td>{{$loop->iteration}}</td>
+                                            <td>{{ $item->job->jobCategory->name ?? ''}} -> {{ $item->job->subCategory->name ?? ''}}  -> {{ $item->job->lastCategory->third_level_category_name ?? ''}}</td>
+
                                             <td>{{ number_format($item->amount,2,".",'') }}</td>
                                         </tr>
                                     @endforeach
                                 @endif
 
                                 <tr>
-                                    <td colspan='2' align='right'>Sub Total : </td>
+                                    <td align='right'>Sub Total : </td>
                                     <td>{{ number_format($order->amount,2,".",'') }}</td>
                                 </tr>
                                 @if ($order->advance_amount > 0)
                                     <tr>
-                                        <td colspan='2' align='right'>Advance Paid : (-) </td>
+                                        <td  align='right'>Advance Paid : (-) </td>
                                         <td>{{ number_format($order->advance_amount,2,".",'') }}</td>
                                     </tr>
                                 @endif
+                                @if ($order->discount > 0)
+                                    <tr>
+                                        <td  align='right'>Discount : (-) </td>
+                                        <td>{{ number_format($order->discount,2,".",'') }}</td>
+                                    </tr>
+                                @endif
                                 <tr>
-                                    <td colspan='2' align='right' >Net Payable Amount : </td>
-                                    <td>{{ number_format(($order->amount-$order->advance_amount),2,".",'') }}</td>
+                                    <td  align='right' >Net Payable Amount : </td>
+                                    <td>{{ number_format(($order->amount-($order->advance_amount+$order->discount)),2,".",'') }}</td>
                                 </tr>
                             </tbody>
                         </table>

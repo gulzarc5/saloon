@@ -19,7 +19,7 @@ class JobListResource extends JsonResource
             'category_id' => $this->job_category,
             'category_name' => isset($this->jobCategory->name) ? $this->jobCategory->name : null,
             'sub_category_name' => isset($this->subCategory->name) ? $this->subCategory->name : null,
-            'last_category_name' => isset($this->lastCategory->name) ? $this->lastCategory->name : null,
+            'last_category_name' => isset($this->lastCategory->third_level_category_name) ? $this->lastCategory->third_level_category_name : null,
             'description' => $this->description,
             'mrp' => $this->mrp,
             'price' => $this->price,

@@ -21,7 +21,6 @@ class ServiceController extends Controller
             'service_city' => 'required',
             'category_id' => 'required',
             'type' => 'required|in:1,2,3', //1 = main Category, 2 = Sub Category, 3 = third Category
-            'page' => 'required|in:1,2',
             'latitude' => 'required',
             'longitude' => 'required',
             'client_type' => 'required:in:1,2', // 1 = freelauncer , 2 = Salon
@@ -93,43 +92,44 @@ class ServiceController extends Controller
         ->where('clients.profile_status',2)
         ->where('clients.job_status',2)
         ->where('clients.verify_status',2)
-        ->count();
+        ->paginate(12);
 
-        $jobs_query = clone $jobs;
-        $total_job = $jobs->count('jobs.id');
-        $total_page = intval(ceil($total_job / 12 ));
-        $limit = ($page*12)-12;
+        // $jobs_query = clone $jobs;
+        // $total_job = $jobs->count('jobs.id');
+        // $total_page = intval(ceil($total_job / 12 ));
+        // $limit = ($page*12)-12;
 
-        if ($total_job == 0) {
-            $response = [
-                'status' => false,
-                'message' => 'Sorry No Job Found',
-                'data' => [],
-            ];
-            return response()->json($response, 200);
-        }
+        // if ($total_job == 0) {
+        //     $response = [
+        //         'status' => false,
+        //         'message' => 'Sorry No Job Found',
+        //         'data' => [],
+        //     ];
+        //     return response()->json($response, 200);
+        // }
         if (!empty($sort_by)) {
             if ($sort_by == '1') {
-                $jobs_query->orderBy('distance','asc');
+                $jobs->orderBy('distance','asc');
             } else  if ($sort_by == '2'){
-                $jobs_query->orderBy('distance','desc');
+                $jobs->orderBy('distance','desc');
             }else  if ($sort_by == '3'){
-                $jobs_query->orderBy('price','asc');
+                $jobs->orderBy('price','asc');
             }else  if ($sort_by == '4'){
-                $jobs_query->orderBy('price','desc');
+                $jobs->orderBy('price','desc');
             }
             
         }else{
-            $jobs_query->orderBy('distance','asc');
+            $jobs->orderBy('distance','asc');
         }
 
-        $job_data = $jobs_query->skip($limit)->take(12)->get();
+        $job_data = $jobs->paginate(12);
         $response = [
             'status' => true,
             'message' => 'Service List',
-            'tatal_page' => $total_page,
-            'current_page' => $page,
-            'total_item' => $total_job,
+            'total_page' => $job_data->lastPage(),
+            'current_page' =>$job_data->currentPage(),
+            'total_data' =>$job_data->total(),
+            'has_more_page' =>$job_data->hasMorePages(),
             'data' => JobListResource::collection($job_data),
         ];
         return response()->json($response, 200);
