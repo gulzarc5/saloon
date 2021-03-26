@@ -10,7 +10,7 @@ class Job extends Model
     protected $table = 'jobs';
     protected $primaryKey = 'id';
     protected $fillable = [
-        'user_id','job_category','sub_category','last_category','description','main_image','mrp','price','status',
+        'user_id','job_category','sub_category','last_category','description','main_image','mrp','price','status','is_deal','expire_date','discount'
     ];
 
     public function jobCategory()

@@ -45,6 +45,7 @@ class ClientResource extends JsonResource
             'photo_proof_file' => $this->photo_proof_file,
             'business_proof' => $this->business_proof,
             'business_proof_file' => $this->business_proof_file,
+            'max_discount' => $this->max_discount,
             'ac' => $this->ac,
             'parking' => $this->parking,
             'wifi' => $this->wifi,

@@ -8,7 +8,7 @@ class Client extends Authenticatable
 {
     protected $table ='clients';
     protected $fillable = [
-        'name','mobile','email','otp','work_experience','state','city','address','pin','image','gst','latitude','longitude','opening_time','closing_time','clientType','status','password','profile_status','api_token','service_city_id','job_status','address_proof','address_proof_file','photo_proof','photo_proof_file','business_proof','business_proof_file','verify_status','firsbase_token'
+        'name','mobile','email','otp','work_experience','state','city','address','pin','image','gst','latitude','longitude','opening_time','closing_time','clientType','status','password','profile_status','api_token','service_city_id','job_status','address_proof','address_proof_file','photo_proof','photo_proof_file','business_proof','business_proof_file','verify_status','firsbase_token','max_discount'
     ];
     protected $hidden = ['password'];
 
@@ -21,6 +21,11 @@ class Client extends Authenticatable
     public function jobs()
     {
         return $this->hasMany('App\Models\Job','user_id','id');
+    }
+
+    public function jobWithDeal()
+    {
+        return $this->hasMany('App\Models\Job','user_id','id')->where('is_deal','Y')->where('expire_date','>=',Carbon::today()->toDateString());
     }
 
     public function serviceCity()

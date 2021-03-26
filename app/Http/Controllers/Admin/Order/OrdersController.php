@@ -145,8 +145,8 @@ class OrdersController extends Controller
             $title = "Dear Vendor : A User Placed An Order With Order Id $order->id";
             PushHelperVendor::notification($vendor->firsbase_token, $title, $vendor->id, 2);
 
-            $title = "Dear Customer : Your Vendor Change Request Accepted And Changed Vendor";
-            PushHelper::notification($user->firsbase_token, $title, $user->id, 1);
+            $title = "Dear Customer : Your Vendor Change Request Accepted And Changed";
+            PushHelper::notification($order->customer->firsbase_token, $title, $order->customer_id, 1);
             return back()->with('message',"Vendor Changed Successfully");
         } else {
             return back()->with('error',$vendor_check['message']);

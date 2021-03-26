@@ -48,7 +48,6 @@ class ServiceController extends Controller
         $parking = $request->input('parking'); // 2 = yes
         $wifi = $request->input('wifi'); // 2 = yes
         $music = $request->input('music'); // 2 = yes
-        $page = $request->input('page');
         $sort_by = $request->input('sort_by'); // 1 = distance low to high, 2 = distance high to low, 3 = price low to high, 4 = price high to low
 
         $sqlDistance = DB::raw('( 111.045 * acos( cos( radians(' . $latitude . ') ) 
@@ -93,20 +92,7 @@ class ServiceController extends Controller
         ->where('clients.job_status',2)
         ->where('clients.verify_status',2)
         ->paginate(12);
-
-        // $jobs_query = clone $jobs;
-        // $total_job = $jobs->count('jobs.id');
-        // $total_page = intval(ceil($total_job / 12 ));
-        // $limit = ($page*12)-12;
-
-        // if ($total_job == 0) {
-        //     $response = [
-        //         'status' => false,
-        //         'message' => 'Sorry No Job Found',
-        //         'data' => [],
-        //     ];
-        //     return response()->json($response, 200);
-        // }
+        
         if (!empty($sort_by)) {
             if ($sort_by == '1') {
                 $jobs->orderBy('distance','asc');

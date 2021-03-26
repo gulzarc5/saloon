@@ -28,6 +28,9 @@ class ClientJobResource extends JsonResource
             'description' => $this->description,
             'mrp' => $this->mrp,
             'price' => $this->price,
+            'is_deal' => $this->is_deal,
+            'expire_date' => $this->expire_date,
+            'discount' => $this->discount,
             'status' => $this->status,
         ];
     }

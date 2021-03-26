@@ -109,11 +109,21 @@ Route::group(['namespace' => 'Api'], function () {
         //For Push Notification
         Route::get('update/firebase_token/{id}/{token}', 'ClientsController@updateFirebaseToken');
 
-        Route::get('service/list/{client_id}', 'JobController@clientServiceList');
-        Route::get('service/edit/{service_list_id}', 'JobController@clientServiceEdit');
-        Route::put('service/update/{service_list_id}', 'JobController@clientServiceUpdate');
-        Route::post('service/add', 'JobController@clientServiceAdd');
-        Route::get('service/status/update/{service_id}/{status}', 'JobController@clientServiceStatusUpdate');
+        Route::group(['prefix'=>'service'],function(){
+            Route::get('list/{client_id}', 'JobController@clientServiceList');
+            Route::get('edit/{service_list_id}', 'JobController@clientServiceEdit');
+            Route::put('update/{service_list_id}', 'JobController@clientServiceUpdate');
+            Route::post('add', 'JobController@clientServiceAdd');
+            Route::get('status/update/{service_id}/{status}', 'JobController@clientServiceStatusUpdate');
+
+            Route::group(['prefix'=>'deal'],function(){
+                Route::put('add/{service_id}','ClientDealController@add');
+                Route::put('remove/{service_id}','ClientDealController@remove');
+                Route::get('list/{client_id}','ClientDealController@list');
+            });
+            Route::get('status/update/{service_id}/{status}', 'JobController@clientServiceStatusUpdate');
+        });
+
         Route::post('schedule/update', 'ClientsController@clientScheduleUpdate');
 
         Route::post('gallery/image/add', 'ClientsController@galleryImageAdd');
