@@ -54,6 +54,9 @@ class JobController extends Controller
                 if (isset( $sub_category[$i] ) && !empty( $sub_category[$i] )) {
                     $check->where('sub_category',$sub_category[$i]);
                 }
+                if (isset( $last_category[$i] ) && !empty( $last_category[$i] )) {
+                    $check->where('last_category',$last_category[$i]);
+                }
                 if ($check->count() == 0) {
                     # code...
                     $job = new Job();
