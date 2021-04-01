@@ -9,16 +9,16 @@ class PushHelper {
 
         $notification = [
             'title' => $title,
+            "user_id" =>$user_id,
+            'user_type'=>$user_type,
             'sound' => true,
         ];
         
-        $extraNotificationData = ["message" => $notification,"user_id" =>$user_id,'user_type'=>$user_type];
 
         $fcmNotification = [
             //'registration_ids' => $tokenList, //multple token array
             'to'        => $token, //single token
-            'notification' => $notification,
-            'data' => $extraNotificationData
+            'data' => $notification
         ];
         
         $headers = [

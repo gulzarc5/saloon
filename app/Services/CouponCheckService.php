@@ -8,7 +8,7 @@ use App\Models\UserOfferCouponHistory;
 class CouponCheckService
 {
     public static function checkCoupon($coupon_id,$user_id){
-        $coupon = Coupon::find($coupon_id);
+        $coupon = Coupon::where('id',$coupon_id)->where('status',1)->first();
         if ($coupon) {
             # Coupon is for new Customer or Old 
             if ($coupon->type == '1') {

@@ -45,7 +45,13 @@
                         </td>
                         <td>
                             <a href="{{ route('admin.offer_edit_form',['offer_id' => $item->id]) }}" class="btn btn-xs btn-warning">Edit</a>                     
-                            <a href="{{ route('admin.offer_edit_salon',['offer_id' => $item->id]) }}" class="btn btn-xs btn-warning">Edit Salons</a>                                
+                            <a href="{{ route('admin.offer_edit_salon',['offer_id' => $item->id]) }}" class="btn btn-xs btn-warning">Edit Salons</a>     
+                            @if ($item->total_user <= $item->offer_received_user)  
+                            @elseif ($item->status == '1')
+                              <a href="{{ route('admin.offer_status_update',['id' => $item->id]) }}" class="btn btn-xs btn-danger">Disable</a>   
+                            @else
+                              <a href="{{ route('admin.offer_status_update',['id' => $item->id]) }}" class="btn btn-xs btn-success">Enable</a>                                 
+                            @endif                         
                         </td>
                       </tr>
                   @empty

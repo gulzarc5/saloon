@@ -97,6 +97,10 @@ Route::group(['namespace' => 'Api'], function () {
         Route::group(['prefix' => 'wallet'],function () {
             Route::get('amount/check','CustomerWalletController@walletFetch');
         });
+
+        Route::group(['prefix' => 'message'],function(){
+            Route::get('list', 'MessageController@customerMesseges');
+        });
     });
 
     // Client Regitration
@@ -121,6 +125,10 @@ Route::group(['namespace' => 'Api'], function () {
                 Route::put('remove/{service_id}','ClientDealController@remove');
                 Route::get('list/{client_id}','ClientDealController@list');
             });
+            Route::group(['prefix'=>'combo'],function(){
+                Route::post('add/update','ComboController@add');
+                Route::get('list','ComboController@list');
+            });
             Route::get('status/update/{service_id}/{status}', 'JobController@clientServiceStatusUpdate');
         });
 
@@ -135,6 +143,10 @@ Route::group(['namespace' => 'Api'], function () {
         Route::group(['prefix' => 'order'],function(){
             Route::get('history', 'ClientsController@orderHistory');
             Route::post('status', 'ClientsController@orderStatus');
+        });
+
+        Route::group(['prefix' => 'message'],function(){
+            Route::get('list', 'MessageController@clientMesseges');
         });
 
     });

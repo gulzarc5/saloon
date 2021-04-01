@@ -11,14 +11,14 @@ class OfferCheckService
 {
     public static function checkOffer($offer_id,$job_id,$vendor_id,$user_id){
         $offer = null;
-        $offer_data = Offer::find($offer_id);
+        $offer_data = Offer::where('id',$offer_id)->where('status',1)->first();
         // Check offer Validation
         if ($offer_data) {
             //Check user Has Used This offer or not
             $offer_check_user = UserOfferCouponHistory::where('customer_id',$user_id)
             ->where('offer_id',$offer_id)
             ->where('offer_type',2)->count();
-            
+
             if ($offer_check_user > 0) {
                 $response = [
                     'status' => false,

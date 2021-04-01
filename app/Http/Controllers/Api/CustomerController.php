@@ -402,11 +402,9 @@ class CustomerController extends Controller
                 WalletAmountService::walletCredit($order->customer_id,$order->wallet_pay,"Order Cancel Amount Credited To Wallet");
             }
             // Send push
-            $user = Client::find($order->vendor_id);
-            if ($user->firsbase_token) {
-                $client_type = $user->clientType == '1' ? 2 : 3;
-                $title = "Dear Vendor : Your order is Cancelled With Order No : $order->id";
-                PushHelperVendor::notification($user->firsbase_token, $title, $user->id, $client_type);
+            if (isset($order->client->firsbase_token) && !empty($order->client->firsbase_token)) {
+                $title = "Dear Vendor : An order Cancelled By ".$order->client->name." With Order Id $order->id Please Check";
+                PushHelperVendor::notification($order->client->firsbase_token, $title, $order->vendor_id, 2);
             }
         }
         $response = [

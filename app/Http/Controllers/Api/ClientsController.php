@@ -6,7 +6,6 @@ use App\Http\Controllers\Controller;
 use App\Http\Resources\ClientResource;
 use Illuminate\Http\Request;
 use App\Models\Client;
-use App\Models\SignUpOtp;
 use App\Models\ClientImage;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
@@ -19,9 +18,6 @@ use App\SmsHelper\PushHelper;
 use App\Models\Order;
 use App\Http\Resources\Order\ClientOrderHistoryResource;
 use App\Models\ClientSchedule;
-use App\Models\Customer;
-use App\Models\RefundInfo;
-use App\Models\UserBankAccount;
 
 class ClientsController extends Controller
 {
@@ -614,15 +610,14 @@ class ClientsController extends Controller
             }            
             $order->save();
             // Send push
-            $user = Customer::find($order->customer_id);
-            if ($user->firsbase_token) {
+            if (isset($order->customer->firsbase_token) && !empty($order->customer->firsbase_token)) {
                 $title = "Dear Customer : Your order Confirmed Successfully With Order No : $order->id";
                 if ($status == '4') {
                     $title = "Dear Customer : Your order Completed Successfully With Order No : $order->id";
                 } elseif ($status == '5') {
                     $title = "Dear Customer : Your order is Cancelled By Vendor Do You Want to change vendor ??";
                 }
-                PushHelper::notification($user->firsbase_token, $title, $user->id, 1);
+                PushHelper::notification($order->customer->firsbase_token, $title, $order->customer_id, 1);
             }
         }
         $response = [

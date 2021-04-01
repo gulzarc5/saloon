@@ -174,4 +174,11 @@ class OfferController extends Controller
         return back()->with('message','Salon Removed Successfully from this offer');
     }
 
+    public function offerStatusUpdate($id)
+    {
+        $offer = Offer::findOrFail($id);
+        $offer->status = $offer->status == 1 ? 2 : 1;
+        $offer->save();
+        return back();
+    }
 }

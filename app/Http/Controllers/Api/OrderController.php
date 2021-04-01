@@ -15,6 +15,7 @@ use App\Services\AdminCommissionService;
 use App\Services\CouponCheckService;
 use App\Services\OfferCheckService;
 use App\Services\WalletAmountService;
+use App\SmsHelper\PushHelper;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
 use App\SmsHelper\PushHelperVendor;
@@ -112,6 +113,7 @@ class OrderController extends Controller
 
 
         $total_amount = 0;
+        $discount = 0;
         //Order Creation
         $order = new Order();
         $order->customer_id = $user_id;
@@ -132,9 +134,21 @@ class OrderController extends Controller
                         $order_job->quantity = $quantity[$i] ?? 1;
                         $order_job->mrp = $service->mrp;
                         if ($offer && $offer_job_id == $job_id[$i]) {
-                            $order->discount = ($service->price - $offer->price);
-                            $this->offerHistory($offer->id,$user_id,$order->id);
+                            $discount = ($service->price - $offer->price);
+                            $this->offerHistory($offer->id,$user_id,$order->id,2);
                         }
+                        if ($offer && $quantity[$i] > 0) {
+                            if ($service->is_deal == 'Y' && $service->expire_date >= Carbon::today()->toDateString()) {
+                                $deal_discount = (($service->price*$quantity[$i])*$service->discount)/100;
+                                $discount+=$deal_discount;
+                            }
+                        }elseif(!$offer){
+                            if ($service->is_deal == 'Y' && $service->expire_date >= Carbon::today()->toDateString()) {
+                                $deal_discount = (($service->price*$quantity[$i])*$service->discount)/100;
+                                $discount+=$deal_discount;
+                            }
+                        }
+                        
                         $order_job->amount = $service->price*$quantity[$i];                        
                         $order_job->save();
                         $total_amount += $order_job->amount;
@@ -142,12 +156,19 @@ class OrderController extends Controller
                 }
             }
 
+            if ($coupon && $coupon->amount > 0) {
+                $coupon_discount = ($total_amount*$coupon->amount)/100;
+                $discount+=$coupon_discount;
+                $this->offerHistory($coupon->id,$user_id,$order->id,1);
+            }
+
             $order->amount = $total_amount;
+            $order->discount = $discount;
             $advance_amount = 0;
-            $total_amount = $total_amount - $order->discount;
+            $total_amount = $total_amount - $discount;
             if ($total_amount == 1) {
                 $order->advance_amount = $total_amount;
-            }elseif ($total_amount > 0) {
+            }elseif ($total_amount > 10) {
                 $admin_commission = AdminCommissionService::commissionFetch($total_amount);
                 if ($admin_commission) {
                     $order->advance_amount = (($total_amount * $admin_commission->charge_amount) / 100);
@@ -175,6 +196,15 @@ class OrderController extends Controller
             }
             
             if ($order->wallet_pay == $order->advance_amount) {
+                if (isset($order->client->firsbase_token) && !empty($order->client->firsbase_token)) {
+                    $title = "Dear Vendor : An order Placed By ".$order->client->name." With Order Id $order->id Please Accept Order";
+                    PushHelperVendor::notification($order->client->firsbase_token, $title, $order->vendor_id, 2);
+                }
+                if (isset($order->customer->firsbase_token) && !empty($order->customer->firsbase_token)) {
+                    $title = "Dear Customer : Your Order Placed Successfully With Order Id $order->id";
+                    PushHelper::notification($order->customer->firsbase_token, $title, $order->customer_id, 1);
+                }
+
                 $response = [
                     'status' => true,
                     'message' => 'Order Place',
@@ -234,12 +264,12 @@ class OrderController extends Controller
         }
     }
 
-    private function offerHistory($offer_id,$customer_id,$order_id){
+    private function offerHistory($offer_id,$customer_id,$order_id,$offer_type){
         $offer_history = new UserOfferCouponHistory();
         $offer_history->customer_id = $customer_id;
         $offer_history->offer_id = $offer_id;
         $offer_history->order_id = $order_id;
-        $offer_history->offer_type = 2;
+        $offer_history->offer_type = $offer_type;
         $offer_history->save();
         return true;
     }
@@ -279,12 +309,15 @@ class OrderController extends Controller
                 'status' => true,
                 'message' => 'Payment Success',
             ];
-            $user = Client::find($order->vendor_id);
-            if ($user->firsbase_token) {
-                $title = "Dear Vendor : A User Placed An Order With Order Id $order->id";
-                PushHelperVendor::notification($user->firsbase_token, $title, $user->id, 2);
-            }
 
+            if (isset($order->client->firsbase_token) && !empty($order->client->firsbase_token)) {
+                $title = "Dear Vendor : An order Placed By ".$order->client->name." With Order Id $order->id Please Accept Order";
+                PushHelperVendor::notification($order->client->firsbase_token, $title, $order->vendor_id, 2);
+            }
+            if (isset($order->customer->firsbase_token) && !empty($order->customer->firsbase_token)) {
+                $title = "Dear Customer : Your Order Placed Successfully With Order Id $order->id";
+                PushHelper::notification($order->customer->firsbase_token, $title, $order->customer_id, 1);
+            }
             return response()->json($response, 200);
         } else {
             $response = [

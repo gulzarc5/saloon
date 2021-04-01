@@ -107,7 +107,7 @@
                       <ul class="nav child_menu">
                         <li><a href="{{ route('admin.orders')}}">Orders List</a></li>
                         <li><a href="{{ route('admin.vendor_cancel_orders')}}">Vendor Cancel Orders</a></li>
-                        <li><a href="{{ route('admin.refunds')}}">Refund List</a></li>
+                        {{-- <li><a href="{{ route('admin.refunds')}}">Refund List</a></li> --}}
                       </ul>
                   </li>
                   <li>
@@ -123,6 +123,7 @@
                   </li>
                   <li><a href="{{route('admin.coupon_list')}}"><i class="fa fa-key" aria-hidden="true"></i>Coupon</a></li>
                   <li><a href="{{route('admin.offer_list')}}"><i class="fa fa-key" aria-hidden="true"></i>Offer</a></li>
+                  <li><a href="{{route('admin.message_list')}}"><i class="fa fa-key" aria-hidden="true"></i>Message</a></li>
                   <li>
                       <a><i class="fa fa-search-plus" aria-hidden="true"></i> Enquery <span class="fa fa-chevron-down"></span></a>
                       <ul class="nav child_menu">

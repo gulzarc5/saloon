@@ -26,6 +26,11 @@ class Job extends Model
         return $this->belongsTo('App\Models\ThirdLevelCategory','last_category','id');
     }
 
+    public function clientJobs()
+    {
+        return $this->hasMany('App\Models\ComboService','job_id','id');
+    }
+
 
     public function clientData()
     {

@@ -35,7 +35,7 @@ Route::group(['namespace' => 'Admin'],function(){
             Route::get('salon/data/fetch/{mobile}','OfferController@salonDataFetch');
             Route::post('insert/salon','OfferController@insertOfferSalon')->name('admin.insert_offer_salon');
             Route::get('salon/remove/{offer_salon_id}','OfferController@removeOfferSalon')->name('admin.remove_offer_salon');
-            // Route::put('update/{coupon_id}','OfferController@couponUpdate')->name('admin.coupon_update');
+            Route::get('status/{id}','OfferController@offerStatusUpdate')->name('admin.offer_status_update');
         });
         Route::group(['prefix' =>'admin/commission'],function(){
             Route::get('list','AdminCommissionController@commissionList')->name('admin.admin_commission_list');
@@ -180,6 +180,12 @@ Route::group(['namespace' => 'Admin'],function(){
             Route::get('/enquery', 'EnqueryController@enquery')->name('admin.enquery');
         });
 
+        Route::group(['prefix'=>'message'],function(){
+            Route::get('list','MessageController@list')->name('admin.message_list');
+            Route::get('list/ajax','MessageController@listAjax')->name('admin.message_list_ajax');
+            Route::get('send/form','MessageController@sendForm')->name('admin.message_send_form');
+            Route::post('send','MessageController@sendMessage')->name('admin.message_send');
+        });
         
     });
 });

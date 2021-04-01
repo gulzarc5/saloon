@@ -4,21 +4,21 @@ namespace App\SmsHelper;
 class PushHelperVendor {
     public static function notification($token, $title,$user_id,$user_type)
     {
+        //user type 2 = vendor, 1 = Customer
         $fcmUrl = 'https://fcm.googleapis.com/fcm/send';
         $token=$token;
 
         $notification = [
             'title' => $title,
+            "user_id" =>$user_id,
+            'user_type'=>$user_type,
             'sound' => true,
         ];
-        
-        $extraNotificationData = ["message" => $notification,"user_id" =>$user_id,'user_type'=>$user_type];
 
         $fcmNotification = [
             //'registration_ids' => $tokenList, //multple token array
             'to'        => $token, //single token
-            'notification' => $notification,
-            'data' => $extraNotificationData
+            'data' => $notification
         ];
         
         $headers = [

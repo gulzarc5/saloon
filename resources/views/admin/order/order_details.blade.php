@@ -232,23 +232,23 @@
                                 @endif
 
                                 <tr>
-                                    <td align='right'>Sub Total : </td>
+                                    <td align='right' colspan='2'>Sub Total : </td>
                                     <td>{{ number_format($order->amount,2,".",'') }}</td>
                                 </tr>
                                 @if ($order->advance_amount > 0)
                                     <tr>
-                                        <td  align='right'>Advance Paid : (-) </td>
+                                        <td  align='right' colspan='2'>Advance Paid : (-) </td>
                                         <td>{{ number_format($order->advance_amount,2,".",'') }}</td>
                                     </tr>
                                 @endif
                                 @if ($order->discount > 0)
                                     <tr>
-                                        <td  align='right'>Discount : (-) </td>
+                                        <td  align='right' colspan='2'>Discount : (-) </td>
                                         <td>{{ number_format($order->discount,2,".",'') }}</td>
                                     </tr>
                                 @endif
                                 <tr>
-                                    <td  align='right' >Net Payable Amount : </td>
+                                    <td  align='right' colspan='2'>Net Payable Amount : </td>
                                     <td>{{ number_format(($order->amount-($order->advance_amount+$order->discount)),2,".",'') }}</td>
                                 </tr>
                             </tbody>

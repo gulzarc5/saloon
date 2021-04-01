@@ -141,6 +141,7 @@ class OrdersController extends Controller
             }
             $order->vendor_id = $vendor->id;
             $order->order_status = 1;
+            $order->vendor_cancel_status = 1;
             $order->save();
             $title = "Dear Vendor : A User Placed An Order With Order Id $order->id";
             PushHelperVendor::notification($vendor->firsbase_token, $title, $vendor->id, 2);
