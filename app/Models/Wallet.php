@@ -11,6 +11,10 @@ class Wallet extends Model
         'user_id','amount'
     ];
 
+    protected $casts = [
+        'amount' => 'decimal:2',
+    ];
+
     public function user()
     {
         return $this->belongsTo('App\Models\User','user_id','id');

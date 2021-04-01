@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Api\Customer\Service\ServiceListRequest;
 use App\Http\Resources\JobListResource;
 use App\Http\Resources\JobDetailResource;
 use App\Models\Job;
@@ -15,26 +16,10 @@ use Illuminate\Support\Facades\DB;
 
 class ServiceController extends Controller
 {
-    public function serviceList(Request $request)
+    public function serviceList(ServiceListRequest $request)
     {
-        $validator =  Validator::make($request->all(),[
-            'service_city' => 'required',
-            'category_id' => 'required',
-            'type' => 'required|in:1,2,3', //1 = main Category, 2 = Sub Category, 3 = third Category
-            'latitude' => 'required',
-            'longitude' => 'required',
-            'client_type' => 'required:in:1,2', // 1 = freelauncer , 2 = Salon
-        ]);
-
-        if ($validator->fails()) {
-            $response = [
-                'status' => false,
-                'message' => 'Validation Error',
-                'error_code' => true,
-                'error_message' => $validator->errors(),
-            ];
-            return response()->json($response, 200);
-        }
+        //1 = main Category, 2 = Sub Category, 3 = third Category
+        // 1 = freelauncer , 2 = Salon
         $service_city = $request->input('service_city');
         $category_id = $request->input('category_id');
         $type = $request->input('type');

@@ -143,11 +143,14 @@ class OrdersController extends Controller
             $order->order_status = 1;
             $order->vendor_cancel_status = 1;
             $order->save();
-            $title = "Dear Vendor : A User Placed An Order With Order Id $order->id";
-            PushHelperVendor::notification($vendor->firsbase_token, $title, $vendor->id, 2);
-
-            $title = "Dear Customer : Your Vendor Change Request Accepted And Changed";
-            PushHelper::notification($order->customer->firsbase_token, $title, $order->customer_id, 1);
+            if ($vendor->firsbase_token) {
+                $title = "Dear Vendor : A User Placed An Order With Order Id $order->id";
+                PushHelperVendor::notification($vendor->firsbase_token, $title, $vendor->id, 2);
+            }
+            if ($order->customer->firsbase_token) {
+                $title = "Dear Customer : Your Vendor Change Request Accepted And Changed";
+                PushHelper::notification($order->customer->firsbase_token, $title, $order->customer_id, 1);
+            }
             return back()->with('message',"Vendor Changed Successfully");
         } else {
             return back()->with('error',$vendor_check['message']);
@@ -295,8 +298,8 @@ class OrdersController extends Controller
     {
         $client = Client::findOrFail($client_id);
         if (!empty($client->firsbase_token)) {
-            $client_type = $client->clientType == '1' ? 2 : 3;
-            PushHelperVendor::notification($client->firsbase_token, $title, $client->id, $client_type);
+            // $client_type = $client->clientType == '1' ? 2 : 3;
+            PushHelperVendor::notification($client->firsbase_token, $title, $client->id, 2);
         }
     }
 }

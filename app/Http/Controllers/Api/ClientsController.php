@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Api\Client\Order\RescheduleRequest;
 use App\Http\Resources\ClientResource;
 use Illuminate\Http\Request;
 use App\Models\Client;
@@ -18,6 +19,7 @@ use App\SmsHelper\PushHelper;
 use App\Models\Order;
 use App\Http\Resources\Order\ClientOrderHistoryResource;
 use App\Models\ClientSchedule;
+use Carbon\Carbon;
 
 class ClientsController extends Controller
 {
@@ -617,6 +619,28 @@ class ClientsController extends Controller
                 } elseif ($status == '5') {
                     $title = "Dear Customer : Your order is Cancelled By Vendor Do You Want to change vendor ??";
                 }
+                PushHelper::notification($order->customer->firsbase_token, $title, $order->customer_id, 1);
+            }
+        }
+        $response = [
+            'status' => true,
+            'message' => 'Order Status Updated Successfully',
+        ];
+        return response()->json($response, 200);
+    }
+
+    public function orderReschedule(RescheduleRequest $request)
+    {
+        $order_id = $request->input('order_id');
+        $schedule_time = $request->input('schedule_time');
+        $order = Order::find($order_id);
+        if ($order) {
+            $order->order_status = 3;         
+            $order->service_time = $schedule_time;         
+            $order->save();
+            // Send push
+            if (isset($order->customer->firsbase_token) && !empty($order->customer->firsbase_token)) {
+                $title = "Dear Customer : Your order Scheduled To ".Carbon::parse($schedule_time)->toDayDateTimeString()."With Order No : $order->id";
                 PushHelper::notification($order->customer->firsbase_token, $title, $order->customer_id, 1);
             }
         }

@@ -10,4 +10,9 @@ class WalletHistory extends Model
     protected $fillable = [
         'wallet_id','transaction_type','amount','total_amount','comment'
     ];
+
+    protected $casts = [
+        'amount' => 'decimal:2',
+        'total_amount' => 'decimal:2',
+    ];
 }

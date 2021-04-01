@@ -502,7 +502,7 @@ class CustomerController extends Controller
                 $user = Client::find($order->vendor_id);
                 if ($user->firsbase_token) {
                     $client_type = $user->clientType == '1' ? 2 : 3;
-                    $title = "Dear Vendor : Your order is Cancelled With Order No : $order->id";
+                    $title = "Dear Vendor : Your order is Cancelled By Customer With Order No : $order->id";
                     PushHelperVendor::notification($user->firsbase_token, $title, $user->id, $client_type);
                 }
             }

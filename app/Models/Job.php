@@ -13,6 +13,11 @@ class Job extends Model
         'user_id','job_category','sub_category','last_category','description','main_image','mrp','price','status','is_deal','expire_date','discount'
     ];
 
+    protected $casts = [
+        'mrp' => 'decimal:2',
+        'price' => 'decimal:2',
+    ];
+
     public function jobCategory()
     {
         return $this->belongsTo('App\Models\JobCategory','job_category','id');

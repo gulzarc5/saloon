@@ -16,8 +16,7 @@ use Illuminate\Support\Facades\Route;
 
 Route::group(['namespace' => 'Api'], function () {
     // Send otp API by Saddam
-    Route::post('send/otp', 'CustomerController@sendOtp');
-    Route::post('otp/verify', 'CustomerController@customerOtpVerify');
+  
     Route::get('service/city/list', 'AppSettingController@serviceCity');
     Route::post('app/loade/api', 'AppSettingController@AppLoadApi');
     Route::get('service/list/category', 'AppSettingController@serviceList');
@@ -43,6 +42,8 @@ Route::group(['namespace' => 'Api'], function () {
 
 
     //////////////////////////////////////////Customer Section
+    Route::post('send/otp', 'CustomerController@sendOtp');
+    Route::post('otp/verify', 'CustomerController@customerOtpVerify');
     Route::group(['middleware' => 'auth:customerApi', 'prefix' => 'customer'], function () {
 
         Route::group(['prefix' => 'registration'], function () {
@@ -96,6 +97,7 @@ Route::group(['namespace' => 'Api'], function () {
 
         Route::group(['prefix' => 'wallet'],function () {
             Route::get('amount/check','CustomerWalletController@walletFetch');
+            Route::get('history','CustomerWalletController@walletHistory');
         });
 
         Route::group(['prefix' => 'message'],function(){
@@ -122,7 +124,7 @@ Route::group(['namespace' => 'Api'], function () {
 
             Route::group(['prefix'=>'deal'],function(){
                 Route::put('add/{service_id}','ClientDealController@add');
-                Route::put('remove/{service_id}','ClientDealController@remove');
+                Route::get('remove/{service_id}','ClientDealController@remove');
                 Route::get('list/{client_id}','ClientDealController@list');
             });
             Route::group(['prefix'=>'combo'],function(){
@@ -143,6 +145,7 @@ Route::group(['namespace' => 'Api'], function () {
         Route::group(['prefix' => 'order'],function(){
             Route::get('history', 'ClientsController@orderHistory');
             Route::post('status', 'ClientsController@orderStatus');
+            Route::post('reschedule', 'ClientsController@orderReschedule');
         });
 
         Route::group(['prefix' => 'message'],function(){
