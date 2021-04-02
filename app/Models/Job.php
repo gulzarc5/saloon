@@ -36,12 +36,6 @@ class Job extends Model
     {
         return $this->hasMany('App\Models\ComboService','job_id','id');
     }
-    public function comboJobs($id)
-    {
-        return $this->hasMany('App\Models\ComboService','job_id','id');
-    }
-
-
     public function clientData()
     {
         return $this->belongsTo('App\Models\Client','user_id','id');

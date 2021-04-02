@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\Client\Combo\ComboAddRequest;
 use App\Http\Resources\Combo\ComboListResource;
+use App\Models\Client;
 use App\Models\ComboService;
 use App\Models\Job;
 use Illuminate\Http\Request;

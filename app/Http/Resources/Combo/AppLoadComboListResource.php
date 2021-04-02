@@ -30,7 +30,7 @@ class AppLoadComboListResource extends JsonResource
             'client_pin' => $this->client_pin,
             'client_work_experience' => $this->client_work_experience,
             'client_image' => $this->client_image,
-            'combo_services'=> $this->comboJobs($this->id),
+            'combo_services'=> null,
         ];
     }
 }
