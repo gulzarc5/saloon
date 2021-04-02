@@ -20,7 +20,12 @@ class Client extends Authenticatable
 
     public function jobs()
     {
-        return $this->hasMany('App\Models\Job','user_id','id');
+        return $this->hasMany('App\Models\Job','user_id','id')->where('product_type',1);
+    }
+
+    public function comboJobs()
+    {
+        return $this->hasMany('App\Models\Job','user_id','id')->where('product_type',2);
     }
 
     public function jobWithDeal()

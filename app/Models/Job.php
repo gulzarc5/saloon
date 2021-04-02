@@ -16,6 +16,7 @@ class Job extends Model
     protected $casts = [
         'mrp' => 'decimal:2',
         'price' => 'decimal:2',
+        'discount' => 'decimal:2',
     ];
 
     public function jobCategory()
@@ -32,6 +33,10 @@ class Job extends Model
     }
 
     public function clientJobs()
+    {
+        return $this->hasMany('App\Models\ComboService','job_id','id');
+    }
+    public function comboJobs($id)
     {
         return $this->hasMany('App\Models\ComboService','job_id','id');
     }

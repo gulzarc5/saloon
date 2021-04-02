@@ -23,6 +23,9 @@ class JobListResource extends JsonResource
             'description' => $this->description,
             'mrp' => $this->mrp,
             'price' => $this->price,
+            'is_deal' => $this->is_deal,
+            'expire_date' => $this->expire_date,
+            'discount' => $this->discount,
             'distance' => $this->distance ?? 0,
             'user_data' => isset($this->clientData) ? new ClientJobListResource($this->clientData) : '',
         ];

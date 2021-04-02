@@ -88,7 +88,7 @@ class JobController extends Controller
 
     public function clientServiceList($client_id)
     {
-        $service = Job::where('user_id', $client_id)->get();
+        $service = Job::where('user_id', $client_id)->where('product_type',1)->get();
         $response = [
             'status' => true,
             'message' => 'Service List',

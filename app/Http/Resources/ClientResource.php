@@ -4,6 +4,7 @@ namespace App\Http\Resources;
 
 use Illuminate\Http\Resources\Json\JsonResource;
 use App\Http\Resources\ClientJobResource;
+use App\Http\Resources\Combo\ComboListResource;
 
 class ClientResource extends JsonResource
 {
@@ -57,6 +58,8 @@ class ClientResource extends JsonResource
             'client_schedules' => isset($this->clientSchedules) ? $this->clientSchedules : [],
             'images' => isset($this->images) ? $this->images : [],
             'services' => isset($this->jobs) ? ClientJobResource::collection($this->jobs) : [],
+            'deals' => isset($this->jobWithDeal) ? ClientJobResource::collection($this->jobWithDeal) : [],
+            'comboJobs' => isset($this->comboJobs) ? ComboListResource::collection($this->comboJobs) : [],
         ];
     }
 }

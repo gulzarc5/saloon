@@ -6,7 +6,9 @@ use App\Http\Controllers\Controller;
 use App\Http\Resources\AppSetting\DealResource;
 use App\Http\Resources\AppSetting\TopClientResource;
 use App\Http\Resources\CategoryResource;
+use App\Http\Resources\Combo\AppLoadComboListResource;
 use App\Models\Client;
+use App\Models\Job;
 use App\Models\JobCategory;
 use Illuminate\Http\Request;
 use App\Models\ServiceCity;
@@ -74,8 +76,32 @@ class AppSettingController extends Controller
             }])
             ->leftJoin('jobs','jobs.user_id','clients.id')
             ->where('jobs.is_deal','Y')
+            ->where('jobs.status',1)
             ->where('jobs.expire_date','>=',Carbon::today()->toDateString())
             ->orderBy('distance')->orderBy('max_discount', 'desc')->distinct('client')->limit(10)->get();  
+        
+        $combo_services = Client::where('clients.profile_status', 2)
+        ->where('clients.job_status', 2)->where('clients.status', 1)
+        ->select(
+            'clients.name as client_name',
+            'clients.mobile as client_mobile',
+            'clients.state as client_state',
+            'clients.address as client_address',
+            'clients.pin as client_pin',
+            'clients.work_experience as client_work_experience',
+            'clients.image as client_image',
+            'jobs.*'
+            )
+        ->selectRaw("{$sqlDistance} AS distance")
+        ->withCount(['review as average_rating' => function ($query) {
+            $query->select(DB::raw('coalesce(avg(rating),0)'));
+        }])
+        ->rightJoin('jobs','jobs.user_id','clients.id')
+        ->where('jobs.product_type',2)
+        ->where('jobs.status',1)
+        ->orderBy('distance')->distinct('job.id')->limit(10)->get();  
+  
+
         $response = [
             'status' => true,
             'message' => 'Service City List',
@@ -85,6 +111,7 @@ class AppSettingController extends Controller
                 'top_saloon' => TopClientResource::collection($top_saloon),
                 'top_free_launcer' => TopClientResource::collection($top_free_launcer),
                 'deal_of_the_day' => DealResource::collection($deal_of_the_day),
+                'combo_products' => AppLoadComboListResource::collection($combo_services),
             ],
         ];
         return response()->json($response, 200);

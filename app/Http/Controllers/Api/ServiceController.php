@@ -42,7 +42,7 @@ class ServiceController extends Controller
        + sin( radians(' . $latitude  . ') ) 
        * sin( radians( clients.latitude ) ) ) )');
 
-        $jobs = Job::select('jobs.*')->where('jobs.status',1)
+        $jobs = Job::select('jobs.*')->where('jobs.status',1)->where('jobs.product_type',1)
         ->join('clients','clients.id','=','jobs.user_id')->selectRaw("{$sqlDistance} AS distance");
         if ($type == '1') {
             $jobs->where('jobs.job_category',$category_id);

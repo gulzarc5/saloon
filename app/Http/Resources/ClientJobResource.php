@@ -26,6 +26,7 @@ class ClientJobResource extends JsonResource
             'last_category' => $this->lastCategory->third_level_category_name ?? null,
             'last_category_image' => $this->lastCategory->image ?? null,
             'description' => $this->description,
+            'product_type' => $this->product_type,
             'mrp' => $this->mrp,
             'price' => $this->price,
             'is_deal' => $this->is_deal,
