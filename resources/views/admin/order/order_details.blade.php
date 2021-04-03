@@ -224,7 +224,13 @@
                                     @foreach ($orderDetails as $item)
                                         <tr>
                                             <td>{{$loop->iteration}}</td>
-                                            <td>{{ $item->job->jobCategory->name ?? ''}} -> {{ $item->job->subCategory->name ?? ''}}  -> {{ $item->job->lastCategory->third_level_category_name ?? ''}}</td>
+                                            @if ($item->job->product_type == '1')
+                                                <td>{{ $item->job->jobCategory->name ?? ''}} -> {{ $item->job->subCategory->name ?? ''}}  -> {{ $item->job->lastCategory->third_level_category_name ?? ''}}</td>
+                                            @else
+                                                <td>
+                                                    {{$item->job->description}}
+                                                </td>
+                                            @endif
 
                                             <td>{{ number_format($item->amount,2,".",'') }}</td>
                                         </tr>

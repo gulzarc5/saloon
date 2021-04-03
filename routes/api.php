@@ -32,6 +32,13 @@ Route::group(['namespace' => 'Api'], function () {
         Route::post('search', 'ServiceController@serviceSearch');
     });
 
+    Route::group(['prefix'=>'combo'],function(){
+        Route::post('view/all','ComboController@comboViewAll');
+    });
+    Route::group(['prefix'=>'deals'],function(){
+        Route::post('view/all','ClientDealController@dealsViewAll');
+    });
+
     Route::group(['prefix' => 'offer'],function(){
         Route::get('list','OfferController@index');
         Route::post('check','OfferController@offerCheck')->middleware('auth:customerApi');

@@ -34,9 +34,10 @@ class AppSettingController extends Controller
     {
         $latitude  =   "28.418715";
         $longitude =   "77.0478997";
-
-        $latitude = $request->get('latitude');
-        $longitude =  $request->get('longitude');
+        if (!empty($request->get('latitude'))) {
+            $latitude = $request->get('latitude');
+            $longitude =  $request->get('longitude');
+        }
         $Sliders = Slider::get();
         $category_list = JobCategory::where('status', 1)->get();
         // $top_saloon = Client::where('profile_status', 2)->where('job_status', 2)->where('status', 1)->where('clientType', 2)->withCount(['review as average_rating' => function ($query) {
@@ -78,10 +79,11 @@ class AppSettingController extends Controller
             ->where('jobs.is_deal','Y')
             ->where('jobs.status',1)
             ->where('jobs.expire_date','>=',Carbon::today()->toDateString())
-            ->orderBy('distance')->orderBy('max_discount', 'desc')->distinct('client')->limit(10)->get();  
+            ->orderBy('distance')->orderBy('max_discount', 'desc')->distinct('clients.id')->limit(10)->get();  
         
-        $combo_services = Client::where('clients.profile_status', 2)
-        ->where('clients.job_status', 2)->where('clients.status', 1)
+
+        $combo_services = Job::where('jobs.product_type',2)
+        ->where('jobs.status',1)
         ->select(
             'clients.name as client_name',
             'clients.mobile as client_mobile',
@@ -92,13 +94,10 @@ class AppSettingController extends Controller
             'clients.image as client_image',
             'jobs.*'
             )
+        ->rightJoin('clients','jobs.user_id','clients.id')
+        ->where('clients.job_status', 2)->where('clients.status', 1)
+        ->where('clients.profile_status', 2)
         ->selectRaw("{$sqlDistance} AS distance")
-        ->withCount(['review as average_rating' => function ($query) {
-            $query->select(DB::raw('coalesce(avg(rating),0)'));
-        }])
-        ->rightJoin('jobs','jobs.user_id','clients.id')
-        ->where('jobs.product_type',2)
-        ->where('jobs.status',1)
         ->orderBy('distance')->distinct('job.id')->limit(10)->get();  
   
 

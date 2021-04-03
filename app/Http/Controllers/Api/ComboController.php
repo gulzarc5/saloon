@@ -4,12 +4,14 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\Client\Combo\ComboAddRequest;
+use App\Http\Resources\Combo\AppLoadComboListResource;
 use App\Http\Resources\Combo\ComboListResource;
 use App\Models\Client;
 use App\Models\ComboService;
 use App\Models\Job;
 use Illuminate\Http\Request;
 use File;
+use Illuminate\Support\Facades\DB;
 use Image;
 
 class ComboController extends Controller
@@ -147,5 +149,49 @@ class ComboController extends Controller
 
         ];
         return response()->json($response, 200);
+    }
+
+
+    /**
+     * this function uses in customer frontend combo view all list    
+     * @return ComboLerviceList
+    */
+
+    public function comboViewAll(Request $request)
+    {
+        $latitude  =   "28.418715";
+        $longitude =   "77.0478997";
+        if (!empty($request->input('latitude')) && $request->get('longitude')) {
+            $latitude = $request->get('latitude');
+            $longitude =  $request->get('longitude');
+        }
+
+        $sqlDistance = DB::raw('( 111.045 * acos( cos( radians(' . $latitude . ') ) 
+        * cos( radians( clients.latitude ) ) 
+        * cos( radians( clients.longitude ) 
+        - radians(' . $longitude  . ') ) 
+        + sin( radians(' . $latitude  . ') ) 
+        * sin( radians( clients.latitude ) ) ) )');
+
+        $jobs = Job::select('jobs.*')->where('jobs.status',1)->where('jobs.product_type',2)
+        ->join('clients','clients.id','=','jobs.user_id')->selectRaw("{$sqlDistance} AS distance")
+        ->where('clients.status',1)
+        ->where('clients.profile_status',2)
+        ->where('clients.job_status',2)
+        ->where('clients.verify_status',2)
+        ->orderBy('distance','asc')
+        ->paginate(12);
+
+        $response = [
+            'status' => true,
+            'message' => 'Service List',
+            'total_page' => $jobs->lastPage(),
+            'current_page' =>$jobs->currentPage(),
+            'total_data' =>$jobs->total(),
+            'has_more_page' =>$jobs->hasMorePages(),
+            'data' => AppLoadComboListResource::collection($jobs),
+        ];
+        return response()->json($response, 200);
+ 
     }
 }
