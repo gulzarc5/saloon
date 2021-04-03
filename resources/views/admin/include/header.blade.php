@@ -124,13 +124,13 @@
                   <li><a href="{{route('admin.coupon_list')}}"><i class="fa fa-key" aria-hidden="true"></i>Coupon</a></li>
                   <li><a href="{{route('admin.offer_list')}}"><i class="fa fa-key" aria-hidden="true"></i>Offer</a></li>
                   <li><a href="{{route('admin.message_list')}}"><i class="fa fa-key" aria-hidden="true"></i>Message</a></li>
-                  <li>
+                  {{-- <li>
                       <a><i class="fa fa-search-plus" aria-hidden="true"></i> Enquery <span class="fa fa-chevron-down"></span></a>
                       <ul class="nav child_menu">
                         <li><a href="{{ route('admin.feedback')}}">Feedback</a></li>
                         <li><a href="{{ route('admin.enquery')}}">Enquery</a></li>
                       </ul>
-                  </li>
+                  </li> --}}
                   <li><a href="{{route('admin.change_password_form')}}"><i class="fa fa-key" aria-hidden="true"></i>Change Password</a></li>
                 </ul>
               </div>
