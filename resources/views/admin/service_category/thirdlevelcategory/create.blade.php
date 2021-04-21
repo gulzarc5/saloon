@@ -37,7 +37,7 @@
                                         @if (isset($service_categories) && !empty($service_categories))
                                             @foreach ($service_categories as $category)
                                                 @if (isset($thirdCategory) && !empty($thirdCategory))
-                                                    <option value="{{ $category->id }}" {{ $thirdCategory->id == $category->id ? 'selected' : '' }}>{{ $category->name }}</option>
+                                                    <option value="{{ $category->id }}" {{ $thirdCategory->top_category_id == $category->id ? 'selected' : '' }}>{{ $category->name }}</option>
                                                 @else
                                                     <option value="{{ $category->id }}" {{ old('category') == $category->id  ? 'selected' : '' }}>{{ $category->name }}</option>
                                                 @endif
@@ -54,6 +54,11 @@
                                     <label for="name">Select Sub Category</label>
                                     <select name="sub_category" id="sub_category" class="form-control">
                                         <option value="" selected disabled>--Select Sub Category--</option>
+                                        @if (isset($sub_category) && !empty($sub_category))
+                                            @foreach ($sub_category as $item)
+                                                <option value="{{$item->id}}" {{$item->id == $thirdCategory->sub_category_id ? ' selected' : ''}}>{{$item->name}}</option>
+                                            @endforeach
+                                        @endif
                                     </select>
                                     @if($errors->has('sub_category'))
                                         <span class="invalid-feedback" role="alert" style="color:red">
@@ -63,7 +68,7 @@
                                 </div>
                                 <div class="col-md-4 col-sm-12 col-xs-12 mb-3">
                                     <label for="name">Name</label>
-                                    <input type="text" class="form-control" name="name" value="{{ old('name') }}"  placeholder="Enter The Product Name">
+                                    <input type="text" class="form-control" name="name" value="{{ isset($thirdCategory) ? $thirdCategory->third_level_category_name : old('name')}}"  placeholder="Enter The Product Name">
                                     @if($errors->has('name'))
                                         <span class="invalid-feedback" role="alert" style="color:red">
                                             <strong>{{ $errors->first('name') }}</strong>

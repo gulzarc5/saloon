@@ -51,12 +51,12 @@ class SubCategoryController extends Controller
         
         if ($request->hasfile('image')) {
             $image = $request->file('image');
-            $destination = base_path() . '/public/admin/service_category/sub_category';
+            $destination = public_path() . '/admin/service_category/sub_category';
             $image_extension = $image->getClientOriginalExtension();
             $image_name = md5(date('now') . time()) . "." . $image_extension;
             $original_path = $destination . $image_name;
             Image::make($image)->save($original_path);
-            $thumb_path = base_path() . '/public/admin/service_category/sub_category/thumb/' . $image_name;
+            $thumb_path = public_path() . '/admin/service_category/sub_category/thumb/' . $image_name;
             Image::make($image)
                 ->resize(346, 252)
                 ->save($thumb_path);
@@ -132,12 +132,12 @@ class SubCategoryController extends Controller
                 'image' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
             ]);
             $image = $request->file('image');
-            $destination = base_path() . '/public/admin/service_category/sub_category';
+            $destination = public_path() . '/admin/service_category/sub_category';
             $image_extension = $image->getClientOriginalExtension();
             $image_name = md5(date('now') . time()) . "." . $image_extension;
             $original_path = $destination . $image_name;
             Image::make($image)->save($original_path);
-            $thumb_path = base_path() . '/public/admin/service_category/sub_category/thumb/' . $image_name;
+            $thumb_path = public_path() . '/admin/service_category/sub_category/thumb/' . $image_name;
             Image::make($image)
                 ->resize(346, 252)
                 ->save($thumb_path);
@@ -147,6 +147,10 @@ class SubCategoryController extends Controller
             if ($sub_category->image) {
                 //Delete
                 $image_path = "admin/service_category/sub_category/thumb/" . $sub_category->image;
+                if (File::exists($image_path)) {
+                    File::delete($image_path);
+                }
+                $image_path = "admin/service_category/sub_category/" . $sub_category->image;
                 if (File::exists($image_path)) {
                     File::delete($image_path);
                 }
