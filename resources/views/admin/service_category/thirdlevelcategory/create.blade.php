@@ -7,7 +7,11 @@
         <div class="col-md-12" style="margin-top:50px;">
             <div class="x_panel">
                 <div class="x_title">
-                        <h2>Add Third Level Category</h2>
+                        @if (isset($thirdCategory) && !empty($thirdCategory))
+                            <h2>Edit Third Level Category</h2>                            
+                        @else                            
+                            <h2>Add Third Level Category</h2>
+                        @endif
                     <div class="clearfix"></div>
                 </div>
                     @if (Session::has('message'))
@@ -16,8 +20,14 @@
                     @if (Session::has('error'))
                     <div class="alert alert-danger">{{ Session::get('error') }}</div>
                     @endif
-                <div class="x_content">
-                        {{ Form::open(['method' => 'post','route'=>'level.store', 'enctype'=>'multipart/form-data']) }}
+                    <div class="x_content">
+                       
+
+                        @if (isset($thirdCategory) && !empty($thirdCategory))
+                                {{ Form::open(['method'=> 'PUT', 'route'=>['admin.categoryUpdate', $thirdCategory], 'enctype'=>'multipart/form-data']) }}
+                        @else
+                            {{ Form::open(['method' => 'post','route'=>'level.store', 'enctype'=>'multipart/form-data']) }}
+                        @endif
                         <div class="well" style="overflow: auto">
                             <div class="form-row">
                                 <div class="col-md-4 col-sm-12 col-xs-12 mb-3">
@@ -26,7 +36,11 @@
                                         <option value="" selected disabled>--Select Service Category--</option>
                                         @if (isset($service_categories) && !empty($service_categories))
                                             @foreach ($service_categories as $category)
-                                                <option value="{{ $category->id }}" {{ old('category') == $category->name ? 'selected' : '' }}>{{ $category->name }}</option>
+                                                @if (isset($thirdCategory) && !empty($thirdCategory))
+                                                    <option value="{{ $category->id }}" {{ $thirdCategory->id == $category->id ? 'selected' : '' }}>{{ $category->name }}</option>
+                                                @else
+                                                    <option value="{{ $category->id }}" {{ old('category') == $category->id  ? 'selected' : '' }}>{{ $category->name }}</option>
+                                                @endif
                                             @endforeach
                                         @endif
                                     </select>

@@ -153,7 +153,7 @@ class OfferController extends Controller
             'salon_mobile' => 'required|numeric|digits:10',
             'offer_id' => 'required',
         ]);
-        $salon = Client::select('id')->where('mobile',$request->input('salon_mobile',))->where('clientType',2)->first();
+        $salon = Client::select('id')->where('mobile',$request->input('salon_mobile'))->where('clientType',2)->first();
         if ($salon) {
             $check_salon = OfferSalon::where('client_id',$salon->id)->where('offer_id',$request->input('offer_id'))->count();
             if ($check_salon == 0) {

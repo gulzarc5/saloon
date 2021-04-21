@@ -103,6 +103,9 @@ Route::group(['namespace' => 'Admin'],function(){
                 Route::post('sub/category', 'ThirdLevelCategoryController@fetchSubCategory')->name('fetch_sub_category');
                 Route::post('ajax/category', 'ThirdLevelCategoryController@fetchThirdCategoryAjax')->name('admin.fetch_third_category_ajax');
                 Route::get('third/category', 'ThirdLevelCategoryController@fetchThirdCategory')->name('admin.ajax.thirdcategory');
+                Route::get('status/update/{id}', 'ThirdLevelCategoryController@statusUpdate')->name('admin.third_category_status_update');
+                Route::get('category/edit/{id}', 'ThirdLevelCategoryController@categoryEdit')->name('admin.categoryEdit');
+                Route::put('category/update/{id}', 'ThirdLevelCategoryController@categoryUpdate')->name('admin.categoryUpdate');
             });
         });
         // Orders

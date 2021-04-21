@@ -75,50 +75,7 @@ class ThirdLevelCategoryController extends Controller
         }
     }
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function show($id)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function edit($id)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request, $id)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy($id)
-    {
-        //
-    }
+    
 
     public function fetchSubCategory(Request $request)
     {
@@ -179,15 +136,36 @@ class ThirdLevelCategoryController extends Controller
                 })
                 ->addColumn('action', function ($row) {
                     if ($row->status == '1') {
-                        $action = '<a href="' . route('category.show', $row) . '" class="btn btn-danger">Disable</a>';
+                        $action = '<a href="' . route('admin.third_category_status_update', $row->id) . '" class="btn btn-danger">Disable</a>';
                     } else {
-                        $action = '<a href="' . route('category.show', $row) . '" class="btn btn-primary">Enable</a>';
+                        $action = '<a href="' . route('admin.third_category_status_update', $row->id) . '" class="btn btn-primary">Enable</a>';
                     }
-                    $action .= '<a  href="' . route('category.edit', $row) . '" class="btn btn-info">Edit</a>';
+                    $action .= '<a  href="' . route('admin.categoryEdit', $row->id) . '" class="btn btn-info">Edit</a>';
                     return $action;
                 })
                 ->rawColumns(['action', 'category', 'photo', 'top_category', 'sub_category'])
                 ->make(true);
         }
+    }
+
+    public function statusUpdate($id)
+    {
+        $category = ThirdLevelCategory::findOrFail($id);
+        $category->status = $category->status == 1 ? 2 : 1;
+        $category->save();
+        return back();
+    }
+
+    public function categoryEdit($id)
+    {
+        $thirdCategory = ThirdLevelCategory::with('subCategory')->findOrFail($id);
+        // dd($thirdCategory);
+        $service_categories = JobCategory::whereStatus(1)->latest()->get();
+        return view('admin.service_category.thirdlevelcategory.create', compact('thirdCategory', 'service_categories'));
+    }
+
+    public function categoryUpdate(Request $request,$category_id)
+    {
+        
     }
 }
