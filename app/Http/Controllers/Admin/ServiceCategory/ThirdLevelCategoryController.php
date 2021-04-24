@@ -162,7 +162,7 @@ class ThirdLevelCategoryController extends Controller
         $thirdCategory = ThirdLevelCategory::with('subCategory')->findOrFail($id);
         // dd($thirdCategory);
         $service_categories = JobCategory::whereStatus(1)->latest()->get();
-        $sub_category = SubCategory::where('category_id',$thirdCategory->top_category_id)->get();
+        $sub_category = SubCategory::where('category_id',$thirdCategory->top_category_id)->whereStatus(1)->get();
         return view('admin.service_category.thirdlevelcategory.create', compact('thirdCategory', 'service_categories','sub_category'));
     }
 
