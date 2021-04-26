@@ -84,7 +84,7 @@ class CustomerController extends Controller
         $check = $customer->count();
         if ($check > 0) {
             $customer_data = $customer->first();
-            if ($customer_data->is_registered = 2) {
+            if ($customer_data->is_registered == 2) {
                 $customer_data->api_token = Str::random(60);
                 $customer_data->save();
             }
