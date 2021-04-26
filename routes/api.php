@@ -51,10 +51,10 @@ Route::group(['namespace' => 'Api'], function () {
     //////////////////////////////////////////Customer Section
     Route::post('send/otp', 'CustomerController@sendOtp');
     Route::post('otp/verify', 'CustomerController@customerOtpVerify');
+    Route::post('customer/registration/update/details', 'CustomerController@updateDetailsRegistration');
     Route::group(['middleware' => 'auth:customerApi', 'prefix' => 'customer'], function () {
 
         Route::group(['prefix' => 'registration'], function () {
-            Route::post('update/details', 'CustomerController@updateDetailsRegistration');
             Route::post('address', 'CustomerController@updateAddressRegistration');
         });
 
