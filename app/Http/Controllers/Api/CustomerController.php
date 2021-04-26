@@ -84,19 +84,6 @@ class CustomerController extends Controller
         $check = $customer->count();
         if ($check > 0) {
             $customer_data = $customer->first();
-            $customer_data->api_token = Str::random(60);
-            $customer_data->save();
-
-            $customer_check = $customer->where('is_registered', 1);
-            if ($customer_check->count() > 0) {
-                Wallet::firstOrCreate([
-                    'user_id' => $customer_data->id
-                ]);
-                $customer = $customer->first();
-                $customer->is_registered = 2;
-                $customer->save();
-            } 
-
             $response = [
                 'status' => true,
                 'message' => 'Success',
@@ -124,8 +111,7 @@ class CustomerController extends Controller
             'user_id' => 'required',
             'name' => 'required|string',
             'gender' => 'required',
-            'lat' => 'required',
-            'long' => 'required'
+            'email' => 'nullable|email',
         ]);
         if ($validator->fails()) {
             $response = [
@@ -139,18 +125,25 @@ class CustomerController extends Controller
         $user_id = $request->input('user_id');
         $name = $request->input('name');
         $gender = $request->input('gender');
-        $lat = $request->input('lat');
-        $long = $request->input('long');
+        $email = $request->input('email');
 
         $customer = Customer::find($user_id);
         $customer->name = $name;
         $customer->gender = $gender;
-        $customer->latitude = $lat;
-        $customer->longitude = $long;
+        $customer->email = $email;
+        $customer->api_token = Str::random(60);
+        $customer->is_registered = 2;
         if ($customer->save()) {
+            $customer->save();          
+            Wallet::firstOrCreate([
+                'user_id' => $customer->id
+            ]);
             $response = [
-                'status' => true,
+                'status' => false,
                 'message' => 'Registration Details Updated Successfully!',
+                'error_code' => false,
+                'error_message' => null,
+                'data' => $customer
             ];
             return response()->json($response, 200);
         }
