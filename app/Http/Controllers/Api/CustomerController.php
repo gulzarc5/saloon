@@ -143,7 +143,7 @@ class CustomerController extends Controller
                 'user_id' => $customer->id
             ]);
             $response = [
-                'status' => false,
+                'status' => true,
                 'message' => 'Registration Details Updated Successfully!',
                 'error_code' => false,
                 'error_message' => null,
