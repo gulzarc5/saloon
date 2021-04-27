@@ -21,9 +21,9 @@ class OfferController extends Controller
                 ->where('payment_status',2)
                 ->where('order_status',"!=",5)->count();
         if ( $customer_order > 0) {
-            $coupon = Coupon::where('status',1)->where('type',2)->get();
+            $coupon = Coupon::where('status',1)->where('type',2)->first();
         }else{
-            $coupon = Coupon::where('status',1)->where('type',1)->get();
+            $coupon = Coupon::where('status',1)->where('type',1)->first();
         }
         $data = [
             'admin_commissions' => AdminCommission::all(),
