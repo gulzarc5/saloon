@@ -39,11 +39,7 @@ Route::group(['namespace' => 'Api'], function () {
         Route::post('view/all','ClientDealController@dealsViewAll');
     });
 
-    Route::group(['prefix' => 'offer'],function(){
-        Route::get('list','OfferController@index');
-        Route::post('check','OfferController@offerCheck')->middleware('auth:customerApi');
-        Route::post('coupon/check','OfferController@couponCheck')->middleware('auth:customerApi');
-    });
+
 
 
 
@@ -53,6 +49,12 @@ Route::group(['namespace' => 'Api'], function () {
     Route::post('otp/verify', 'CustomerController@customerOtpVerify');
     Route::post('customer/registration/update/details', 'CustomerController@updateDetailsRegistration');
     Route::group(['middleware' => 'auth:customerApi', 'prefix' => 'customer'], function () {
+
+        Route::group(['prefix' => 'offer'],function(){
+            Route::get('list','OfferController@index');
+            Route::post('check','OfferController@offerCheck')->middleware('auth:customerApi');
+            Route::post('coupon/check','OfferController@couponCheck')->middleware('auth:customerApi');
+        });
 
         Route::group(['prefix' => 'registration'], function () {
             Route::post('address', 'CustomerController@updateAddressRegistration');

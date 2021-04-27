@@ -14,11 +14,19 @@ use Illuminate\Http\Request;
 
 class OfferController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     { 
+        $customer_order = Order::where('customer_id',$request->user()->id)
+                ->where('payment_status',2)
+                ->where('order_status',"!=",5)->count();
+        if ( $customer_order > 0) {
+            $coupon = Coupon::where('status',1)->where('type',2)->get();
+        }else{
+            $coupon = Coupon::where('status',1)->where('type',1)->get();
+        }
         $data = [
             'admin_commissions' => AdminCommission::all(),
-            'coupons' => Coupon::where('status',1)->get(),
+            'coupons' => $coupon,
             'offers' => OfferResource::collection(Offer::where('status',1)->get()),
         ];
 
