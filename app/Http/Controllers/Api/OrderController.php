@@ -191,6 +191,19 @@ class OrderController extends Controller
                         $order->save();
                         $this->walletAmountDebit($order->wallet_pay,$wallet['data']->id);
                     }
+                }elseif ($wallet['status'] && $total_amount < 10)) {
+                    $wallet_amount = $wallet['data']->amount;
+                    if ($wallet_amount > 0) {
+                        if ($wallet_amount >= $order->advance_amount) {
+                            $order->wallet_pay = $order->advance_amount;
+                            $order->payment_method = 2;
+                            $order->payment_status = 2;
+                        }else{
+                            $order->wallet_pay = $wallet['data']->amount;
+                        }
+                        $order->save();
+                        $this->walletAmountDebit($order->wallet_pay,$wallet['data']->id);
+                    }
                 }
             }
             
