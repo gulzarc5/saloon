@@ -97,6 +97,13 @@ class ClientDealController extends Controller
         + sin( radians(' . $latitude  . ') ) 
         * sin( radians( clients.latitude ) ) ) )');
 
+    //    $sqlDistance = DB::raw('
+    //         ST_Distance_Sphere(
+    //             point(clients.longitude , clients.latitude),
+    //             point('.$longitude.', '.$latitude.')
+    //         ) /1000
+    //     ');
+
         $deal_of_the_day = Client::where('clients.profile_status', 2)
         ->where('clients.job_status', 2)->where('clients.status', 1)
         ->select('clients.*')

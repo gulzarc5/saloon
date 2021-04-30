@@ -122,8 +122,7 @@ class OrderController extends Controller
             $order->customer_address_id = $address_id;
         }
         $order->service_time = $request->input('service_time');
-        if ($order->save()) {
-            
+        if ($order->save()) {            
             for ($i = 0; $i < count($job_id); $i++) {
                 if (isset($job_id[$i]) && !empty($job_id[$i]) && isset($quantity[$i]) && !empty($quantity[$i])) {
                     $service = Job::where('id', $job_id[$i])->where('user_id',$vendor_id)->where('status', 1)->first();
@@ -166,9 +165,9 @@ class OrderController extends Controller
             $order->discount = $discount;
             $advance_amount = 0;
             $total_amount = $total_amount - $discount;
-            if ($total_amount == 1) {
+            if ($total_amount < 10) {
                 $order->advance_amount = $total_amount;
-            }elseif ($total_amount > 10) {
+            }elseif ($total_amount >= 10) {
                 $admin_commission = AdminCommissionService::commissionFetch($total_amount);
                 if ($admin_commission) {
                     $order->advance_amount = (($total_amount * $admin_commission->charge_amount) / 100);
@@ -218,39 +217,56 @@ class OrderController extends Controller
                         'payment_data' => null,
                     ],
                 ];
-            } else {
-                $api = new Api(config('services.razorpay.id'), config('services.razorpay.key'));
-                $orders = $api->order->create(array(
-                    'receipt' => $order->id,
-                    'amount' => $order->advance_amount * 100,
-                    'currency' => 'INR',
-                ));
+            } else{
+                if (($total_amount < 10) && (($order->advance_amount - $order->wallet_pay) >= 1)) {
+                    $api = new Api(config('services.razorpay.id'), config('services.razorpay.key'));
+                    $orders = $api->order->create(array(
+                        'receipt' => $order->id,
+                        'amount' => ($order->advance_amount - $order->wallet_pay) * 100,
+                        'currency' => 'INR',
+                    ));
 
-                $order->payment_request_id = $orders['id'];
-                $order->online_pay = ($order->advance_amount - $order->wallet_pay);
-                $order->save();
-                $payment_data = [
-                    'key_id' => config('services.razorpay.id'),
-                    'amount' => ($order->advance_amount - $order->wallet_pay) * 100,
-                    'order_id' => $orders['id'],
-                    'name' => $order->customer->name,
-                    'email' => $order->customer->email ?? null,
-                    'mobile' => $order->customer->mobile,
-                ];
-    
-                $response = [
-                    'status' => true,
-                    'message' => 'Order Place',
-                    'error_code' => false,
-                    'error_message' => null,
-                    'data' => [
-                        'order_id' => $order->id,
-                        'payment_status' => 1,
-                        'amount' => $order->amount,
-                        'advance_amount' => $order->advance_amount,
-                        'payment_data' => $payment_data,
-                    ],
-                ];    
+                    $order->payment_request_id = $orders['id'];
+                    $order->online_pay = ($order->advance_amount - $order->wallet_pay);
+                    $order->save();
+                    $payment_data = [
+                        'key_id' => config('services.razorpay.id'),
+                        'amount' => ($order->advance_amount - $order->wallet_pay) * 100,
+                        'order_id' => $orders['id'],
+                        'name' => $order->customer->name,
+                        'email' => $order->customer->email ?? null,
+                        'mobile' => $order->customer->mobile,
+                    ];
+        
+                    $response = [
+                        'status' => true,
+                        'message' => 'Order Place',
+                        'error_code' => false,
+                        'error_message' => null,
+                        'data' => [
+                            'order_id' => $order->id,
+                            'payment_status' => 1,
+                            'amount' => $order->amount,
+                            'advance_amount' => $order->advance_amount,
+                            'payment_data' => $payment_data,
+                        ],
+                    ];
+                }else{
+                    $response = [
+                        'status' => true,
+                        'message' => 'Order Place',
+                        'error_code' => false,
+                        'error_message' => null,
+                        'data' => [
+                            'order_id' => $order->id,
+                            'payment_status' => 2, // 1 = pay online 2 = paid by wallet
+                            'amount' => $order->amount,
+                            'advance_amount' => $order->advance_amount,
+                            'payment_data' => null,
+                        ],
+                    ];
+                }
+                    
             }
             return response()->json($response, 200);
         } else {

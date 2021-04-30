@@ -41,6 +41,13 @@ class ServiceController extends Controller
        - radians(' . $longitude  . ') ) 
        + sin( radians(' . $latitude  . ') ) 
        * sin( radians( clients.latitude ) ) ) )');
+       
+    //    $sqlDistance = DB::raw('
+    //         ST_Distance_Sphere(
+    //             point(clients.longitude , clients.latitude),
+    //             point('.$longitude.', '.$latitude.')
+    //         ) /1000
+    //     ');
 
         $jobs = Job::select('jobs.*')->where('jobs.status',1)->where('jobs.product_type',1)
         ->join('clients','clients.id','=','jobs.user_id')->selectRaw("{$sqlDistance} AS distance");
@@ -88,7 +95,6 @@ class ServiceController extends Controller
             }else  if ($sort_by == '4'){
                 $jobs->orderBy('price','desc');
             }
-            
         }else{
             $jobs->orderBy('distance','asc');
         }
@@ -134,6 +140,13 @@ class ServiceController extends Controller
        - radians(' . $longitude  . ') ) 
        + sin( radians(' . $latitude  . ') ) 
        * sin( radians( clients.latitude ) ) ) )');
+     
+    //    $sqlDistance = DB::raw('
+    //         ST_Distance_Sphere(
+    //             point(clients.longitude , clients.latitude),
+    //             point('.$longitude.', '.$latitude.')
+    //         ) /1000
+    //     ');
 
         $client = Client::select('clients.*')->where('clients.status',1)
         ->where('clients.profile_status',2)
@@ -159,12 +172,12 @@ class ServiceController extends Controller
         return response()->json($response, 200);
     }
 
-    public function serviceDetails($service_id){
-        $jobs = Job::find($service_id);
+    public function serviceDetails($client_id){
+        $clientData = Client::find($client_id);
         $response = [
             'status' => true,
-            'message' => 'Service Details',
-            'data' => new JobDetailResource($jobs),
+            'message' => 'Client Details',
+            'data' => new ClientResource($clientData),
         ];
         return response()->json($response, 200);
     }

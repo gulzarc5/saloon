@@ -49,6 +49,13 @@ class AppSettingController extends Controller
        - radians(' . $longitude  . ') ) 
        + sin( radians(' . $latitude  . ') ) 
        * sin( radians( clients.latitude ) ) ) )');
+       
+       //    $sqlDistance = DB::raw('
+       //         ST_Distance_Sphere(
+       //             point(clients.longitude , clients.latitude),
+       //             point('.$longitude.', '.$latitude.')
+       //         ) /1000
+       //     ');
         $top_saloon =  Client::where('profile_status', 2)
             ->where('job_status', 2)->where('status', 1)
             ->where('clientType', 2)->select('clients.*')

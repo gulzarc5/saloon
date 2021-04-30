@@ -173,6 +173,13 @@ class ComboController extends Controller
         + sin( radians(' . $latitude  . ') ) 
         * sin( radians( clients.latitude ) ) ) )');
 
+    //    $sqlDistance = DB::raw('
+    //         ST_Distance_Sphere(
+    //             point(clients.longitude , clients.latitude),
+    //             point('.$longitude.', '.$latitude.')
+    //         ) /1000
+    //     ');
+
         $jobs = Job::select('jobs.*')->where('jobs.status',1)->where('jobs.product_type',2)
         ->join('clients','clients.id','=','jobs.user_id')->selectRaw("{$sqlDistance} AS distance")
         ->where('clients.status',1)
