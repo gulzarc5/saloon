@@ -136,16 +136,21 @@ class OrderController extends Controller
                             $discount = ($service->price - $offer->price);
                             $this->offerHistory($offer->id,$user_id,$order->id,2);
                         }
-                        if ($offer && $quantity[$i] > 0) {
-                            if ($service->is_deal == 'Y' && $service->expire_date >= Carbon::today()->toDateString()) {
-                                $deal_discount = (($service->price*$quantity[$i])*$service->discount)/100;
-                                $discount+=$deal_discount;
-                            }
-                        }elseif(!$offer){
-                            if ($service->is_deal == 'Y' && $service->expire_date >= Carbon::today()->toDateString()) {
-                                $deal_discount = (($service->price*$quantity[$i])*$service->discount)/100;
-                                $discount+=$deal_discount;
-                            }
+                        // if ($offer && $quantity[$i] > 0) {
+                        //     if ($service->is_deal == 'Y' && $service->expire_date >= Carbon::today()->toDateString()) {
+                        //         $deal_discount = (($service->price*$quantity[$i])*$service->discount)/100;
+                        //         $discount+=$deal_discount;
+                        //     }
+                        // }elseif(!$offer){
+                        //     if ($service->is_deal == 'Y' && $service->expire_date >= Carbon::today()->toDateString()) {
+                        //         $deal_discount = (($service->price*$quantity[$i])*$service->discount)/100;
+                        //         $discount+=$deal_discount;
+                        //     }
+                        // }
+
+                        if (!$offer && $service->is_deal == 'Y' && $service->expire_date >= Carbon::today()->toDateString()) {
+                            $deal_discount = (($service->price*$quantity[$i])*$service->discount)/100;
+                            $discount+=$deal_discount;
                         }
                         
                         $order_job->amount = $service->price*$quantity[$i];                        
@@ -155,7 +160,7 @@ class OrderController extends Controller
                 }
             }
 
-            if ($coupon && $coupon->amount > 0) {
+            if (!$offer && $coupon && $coupon->amount > 0) {
                 $coupon_discount = ($total_amount*$coupon->amount)/100;
                 $discount+=$coupon_discount;
                 $this->offerHistory($coupon->id,$user_id,$order->id,1);
@@ -163,14 +168,13 @@ class OrderController extends Controller
 
             $order->amount = $total_amount;
             $order->discount = $discount;
-            $advance_amount = 0;
-            $total_amount = $total_amount - $discount;
-            if ($total_amount < 10) {
-                $order->advance_amount = $total_amount;
-            }elseif ($total_amount >= 10) {
-                $admin_commission = AdminCommissionService::commissionFetch($total_amount);
+            $total_amount = $total_amount;
+            if (($total_amount - $discount) < 10) {
+                $order->advance_amount = ($total_amount - $discount);
+            }elseif (($total_amount - $discount) >= 10) {
+                $admin_commission = AdminCommissionService::commissionFetch(($total_amount- $discount));
                 if ($admin_commission) {
-                    $order->advance_amount = (($total_amount * $admin_commission->charge_amount) / 100);
+                    $order->advance_amount = ((($total_amount - $discount) * $admin_commission->charge_amount) / 100);
                 }
             }
             $order->save();
@@ -179,19 +183,6 @@ class OrderController extends Controller
             if ($is_wallet == 1) {
                 $wallet = WalletAmountService::walletFetch($user_id);
                 if ($wallet['status'] && ($order->advance_amount >= 1)) {
-                    $wallet_amount = $wallet['data']->amount;
-                    if ($wallet_amount > 0) {
-                        if ($wallet_amount >= $order->advance_amount) {
-                            $order->wallet_pay = $order->advance_amount;
-                            $order->payment_method = 2;
-                            $order->payment_status = 2;
-                        }else{
-                            $order->wallet_pay = $wallet['data']->amount;
-                        }
-                        $order->save();
-                        $this->walletAmountDebit($order->wallet_pay,$wallet['data']->id);
-                    }
-                }elseif ($wallet['status'] && ($total_amount < 10)) {
                     $wallet_amount = $wallet['data']->amount;
                     if ($wallet_amount > 0) {
                         if ($wallet_amount >= $order->advance_amount) {
@@ -231,108 +222,38 @@ class OrderController extends Controller
                     ],
                 ];
             } else{
-                if (($total_amount < 10)) {
-                    if ($is_wallet == '2' && (($total_amount - $order->wallet_pay) >= 1)) {
-                        $api = new Api(config('services.razorpay.id'), config('services.razorpay.key'));
-                        $orders = $api->order->create(array(
-                            'receipt' => $order->id,
-                            'amount' => ($total_amount - $order->wallet_pay) * 100,
-                            'currency' => 'INR',
-                        ));
+                $api = new Api(config('services.razorpay.id'), config('services.razorpay.key'));
+                $orders = $api->order->create(array(
+                    'receipt' => $order->id,
+                    'amount' => $order->advance_amount * 100,
+                    'currency' => 'INR',
+                ));
+
+                $order->payment_request_id = $orders['id'];
+                $order->online_pay = $order->advance_amount;
+                $order->save();
+                $payment_data = [
+                    'key_id' => config('services.razorpay.id'),
+                    'amount' => $order->advance_amount * 100,
+                    'order_id' => $orders['id'],
+                    'name' => $order->customer->name,
+                    'email' => $order->customer->email ?? null,
+                    'mobile' => $order->customer->mobile,
+                ];
     
-                        $order->payment_request_id = $orders['id'];
-                        $order->online_pay = ($total_amount - $order->wallet_pay);
-                        $order->save();
-                        $payment_data = [
-                            'key_id' => config('services.razorpay.id'),
-                            'amount' => ($total_amount - $order->wallet_pay) * 100,
-                            'order_id' => $orders['id'],
-                            'name' => $order->customer->name,
-                            'email' => $order->customer->email ?? null,
-                            'mobile' => $order->customer->mobile,
-                        ];
-            
-                        $response = [
-                            'status' => true,
-                            'message' => 'Order Place',
-                            'error_code' => false,
-                            'error_message' => null,
-                            'data' => [
-                                'order_id' => $order->id,
-                                'payment_status' => 1,
-                                'amount' => $order->amount,
-                                'advance_amount' => $order->advance_amount,
-                                'payment_data' => $payment_data,
-                            ],
-                        ];
-                    }else{
-                        $response = [
-                            'status' => true,
-                            'message' => 'Order Place',
-                            'error_code' => false,
-                            'error_message' => null,
-                            'data' => [
-                                'order_id' => $order->id,
-                                'payment_status' => 2, // 1 = pay online 2 = paid by wallet
-                                'amount' => $order->amount,
-                                'advance_amount' => $order->advance_amount,
-                                'payment_data' => null,
-                            ],
-                        ];
-                    }
-                   
-                }else{
-                    if ($order->advance_amount >= 1) {
-                        $api = new Api(config('services.razorpay.id'), config('services.razorpay.key'));
-                        $orders = $api->order->create(array(
-                            'receipt' => $order->id,
-                            'amount' => ($order->advance_amount - $order->wallet_pay) * 100,
-                            'currency' => 'INR',
-                        ));
-
-                        $order->payment_request_id = $orders['id'];
-                        $order->online_pay = ($order->advance_amount - $order->wallet_pay);
-                        $order->save();
-                        $payment_data = [
-                            'key_id' => config('services.razorpay.id'),
-                            'amount' => ($order->advance_amount - $order->wallet_pay) * 100,
-                            'order_id' => $orders['id'],
-                            'name' => $order->customer->name,
-                            'email' => $order->customer->email ?? null,
-                            'mobile' => $order->customer->mobile,
-                        ];
-            
-                        $response = [
-                            'status' => true,
-                            'message' => 'Order Place',
-                            'error_code' => false,
-                            'error_message' => null,
-                            'data' => [
-                                'order_id' => $order->id,
-                                'payment_status' => 1,
-                                'amount' => $order->amount,
-                                'advance_amount' => $order->advance_amount,
-                                'payment_data' => $payment_data,
-                            ],
-                        ];
-                    }else{
-
-                        $response = [
-                            'status' => true,
-                            'message' => 'Order Place',
-                            'error_code' => false,
-                            'error_message' => null,
-                            'data' => [
-                                'order_id' => $order->id,
-                                'payment_status' => 2, // 1 = pay online 2 = paid by wallet
-                                'amount' => $order->amount,
-                                'advance_amount' => $order->advance_amount,
-                                'payment_data' => null,
-                            ],
-                        ];
-                    }
-                    
-                }
+                $response = [
+                    'status' => true,
+                    'message' => 'Order Place',
+                    'error_code' => false,
+                    'error_message' => null,
+                    'data' => [
+                        'order_id' => $order->id,
+                        'payment_status' => 1,
+                        'amount' => $order->amount,
+                        'advance_amount' => $order->advance_amount,
+                        'payment_data' => $payment_data,
+                    ],
+                ];
                     
             }
             return response()->json($response, 200);
