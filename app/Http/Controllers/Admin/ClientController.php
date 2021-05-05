@@ -114,7 +114,7 @@ class ClientController extends Controller
 
     public function clientServicesEdit($client_id)
     {
-        $client_services = Job::where('user_id',$client_id)->get();
+        $client_services = Job::where('user_id',$client_id)->where('product_type',1)->get();
         $service_category = JobCategory::where('status',1)->get();
         return view('admin.client.client_services',compact('client_services','service_category','client_id'));
     }

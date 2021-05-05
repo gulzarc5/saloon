@@ -156,10 +156,59 @@
                             <tbody>
                                 @foreach ($client->jobs as $item)
                                     <tr>
-                                        <td>{{$item->jobCategory->name ?? null}}</td>
+                                        <td>{{$item->jobCategory->name ?? null}}  
+                                            @if (($item->is_deal == 'Y') && \Carbon\Carbon::parse($item->expire_date)->gte(\Carbon\Carbon::today()) )
+                                                (Special DisCount: {{$item->discount}}%)
+                                            @endif
+                                        </td>
                                         <td>{{$item->subCategory->name ?? null}}</td>
                                         <td>{{$item->lastCategory->third_level_category_name ?? null}}</td>
                                         <td>{{$item->description}}</td>
+                                        <td>{{$item->mrp}}</td>
+                                        <td>{{$item->price}}</td>
+                                       
+                                        <td>
+                                            @if($item->status == 1)
+                                               <label class="label label-success">Enabled</label>
+                                           @else
+                                            <label class="label label-danger">Disabled</label>
+                                           @endif
+                                        </td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                            </table>
+                        </div>
+                    @endif
+
+                    @if ($client->comboJobs->count() > 0)
+                        <div class="col-md-12">
+                            <hr>
+                            <h3>Combo Service List </h3>
+                            <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Category</th>
+                                    <th>Combo Name</th>
+                                    <th>Combo Details</th>
+                                    <th>M.R.P.</th>
+                                    <th>Price</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach ($client->comboJobs as $item)
+                                    <tr>
+                                        <td>{{$item->jobCategory->name ?? null}}  {{$item->product_type == 2 ? "( Combo Services )" : ""}}</td>
+                                        <td>{{$item->description}}</td>
+                                        <td>
+                                            @if ($item->clientJobs->count() > 0)
+                                                @foreach ($item->clientJobs as $combo_service)
+                                                    <p>{{$combo_service->name ?? null}}
+                                                @endforeach
+                                            @endif
+                                        </td>
+                                        <td>{{$item->lastCategory->third_level_category_name ?? null}}</td>
                                         <td>{{$item->mrp}}</td>
                                         <td>{{$item->price}}</td>
                                        
