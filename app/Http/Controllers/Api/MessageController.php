@@ -18,6 +18,7 @@ class MessageController extends Controller
                 $q->whereNull('vendor_type')
                 ->where('type','V');
             })
+            ->latest()
             ->paginate(20);
         } else{
             $message = Message::where('vendor_type','S')
@@ -25,6 +26,7 @@ class MessageController extends Controller
                 $q->whereNull('vendor_type')
                 ->where('type','V');
             })
+            ->latest()
             ->paginate(20);
         }
 
@@ -41,7 +43,7 @@ class MessageController extends Controller
     }
     public function customerMesseges(Request $request)
     {
-        $message = Message::where('type','C')->paginate(20);
+        $message = Message::where('type','C')->latest()->paginate(20);
 
         $response = [
             'status' => true,
