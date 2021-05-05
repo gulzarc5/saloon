@@ -38,6 +38,10 @@ Route::group(['namespace' => 'Api'], function () {
     Route::group(['prefix'=>'deals'],function(){
         Route::post('view/all','ClientDealController@dealsViewAll');
     });
+    Route::group(['prefix'=>'top'],function(){
+        Route::post('freelancer/view/all','AppSettingController@freelancerViewAll');
+        Route::post('salon/view/all','AppSettingController@salonViewAll');
+    });
 
 
 

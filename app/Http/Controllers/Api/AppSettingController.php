@@ -56,8 +56,11 @@ class AppSettingController extends Controller
        //             point('.$longitude.', '.$latitude.')
        //         ) /1000
        //     ');
+
         $top_saloon =  Client::where('profile_status', 2)
-            ->where('job_status', 2)->where('status', 1)
+            ->where('job_status', 2)
+            ->where('status', 1)
+            ->where('clients.verify_status',2)
             ->where('clientType', 2)->select('clients.*')
             ->selectRaw("{$sqlDistance} AS distance")
             ->withCount(['review as average_rating' => function ($query) {
@@ -66,7 +69,9 @@ class AppSettingController extends Controller
             ->orderBy('distance')->limit(10)->get();
 
         $top_free_launcer =  Client::where('profile_status', 2)
-            ->where('job_status', 2)->where('status', 1)
+            ->where('job_status', 2)
+            ->where('status', 1)
+            ->where('clients.verify_status',2)
             ->where('clientType', 1)->select('clients.*')
             ->selectRaw("{$sqlDistance} AS distance")
             ->withCount(['review as average_rating' => function ($query) {
@@ -76,7 +81,9 @@ class AppSettingController extends Controller
         
 
         $deal_of_the_day = Client::where('clients.profile_status', 2)
-            ->where('clients.job_status', 2)->where('clients.status', 1)
+            ->where('clients.job_status', 2)
+            ->where('clients.status', 1)
+            ->where('clients.verify_status',2)
             ->select('clients.*')
             ->selectRaw("{$sqlDistance} AS distance")
             ->withCount(['review as average_rating' => function ($query) {
@@ -101,8 +108,9 @@ class AppSettingController extends Controller
             'clients.image as client_image',
             'jobs.*'
             )
-        ->rightJoin('clients','jobs.user_id','clients.id')
+        ->leftJoin('clients','jobs.user_id','clients.id')
         ->where('clients.job_status', 2)->where('clients.status', 1)
+        ->where('clients.verify_status',2)
         ->where('clients.profile_status', 2)
         ->selectRaw("{$sqlDistance} AS distance")
         ->orderBy('distance')->distinct('job.id')->limit(10)->get();  
@@ -150,6 +158,97 @@ class AppSettingController extends Controller
             'status' => true,
             'message' => 'Sub Category List',
             'data' => $category_list,
+        ];
+        return response()->json($response, 200);
+    }
+
+    public function freelancerViewAll(Request $request)
+    {
+        $latitude  =   "28.418715";
+        $longitude =   "77.0478997";
+        if (!empty($request->get('latitude'))) {
+            $latitude = $request->get('latitude');
+            $longitude =  $request->get('longitude');
+        }
+        $sqlDistance = DB::raw('( 111.045 * acos( cos( radians(' . $latitude . ') ) 
+       * cos( radians( clients.latitude ) ) 
+       * cos( radians( clients.longitude ) 
+       - radians(' . $longitude  . ') ) 
+       + sin( radians(' . $latitude  . ') ) 
+       * sin( radians( clients.latitude ) ) ) )');
+       
+       //    $sqlDistance = DB::raw('
+       //         ST_Distance_Sphere(
+       //             point(clients.longitude , clients.latitude),
+       //             point('.$longitude.', '.$latitude.')
+       //         ) /1000
+       //     ');
+
+        $top_free_launcer =  Client::where('profile_status', 2)
+            ->where('job_status', 2)
+            ->where('status', 1)
+            ->where('verify_status',2)
+            ->where('clientType', 1)
+            ->select('clients.*')
+            ->selectRaw("{$sqlDistance} AS distance")
+            ->withCount(['review as average_rating' => function ($query) {
+                $query->select(DB::raw('coalesce(avg(rating),0)'));
+            }])
+            ->orderBy('distance')->paginate(12);
+        $response = [
+            'status' => true,
+            'message' => 'Order FreeLancer List',
+            'total_page' => $top_free_launcer->lastPage(),
+            'current_page' =>$top_free_launcer->currentPage(),
+            'total_data' =>$top_free_launcer->total(),
+            'has_more_page' =>$top_free_launcer->hasMorePages(),
+            'data' => TopClientResource::collection($top_free_launcer),
+        ];
+        return response()->json($response, 200);
+           
+    }
+
+    public function salonViewAll(Request $request)
+    {
+        $latitude  =   "28.418715";
+        $longitude =   "77.0478997";
+        if (!empty($request->get('latitude'))) {
+            $latitude = $request->get('latitude');
+            $longitude =  $request->get('longitude');
+        }
+        $sqlDistance = DB::raw('( 111.045 * acos( cos( radians(' . $latitude . ') ) 
+       * cos( radians( clients.latitude ) ) 
+       * cos( radians( clients.longitude ) 
+       - radians(' . $longitude  . ') ) 
+       + sin( radians(' . $latitude  . ') ) 
+       * sin( radians( clients.latitude ) ) ) )');
+       
+       //    $sqlDistance = DB::raw('
+       //         ST_Distance_Sphere(
+       //             point(clients.longitude , clients.latitude),
+       //             point('.$longitude.', '.$latitude.')
+       //         ) /1000
+       //     ');
+
+        $top_salon =  Client::where('profile_status', 2)
+            ->where('job_status', 2)
+            ->where('status', 1)
+            ->where('verify_status',2)
+            ->where('clientType', 2)
+            ->select('clients.*')
+            ->selectRaw("{$sqlDistance} AS distance")
+            ->withCount(['review as average_rating' => function ($query) {
+                $query->select(DB::raw('coalesce(avg(rating),0)'));
+            }])
+            ->orderBy('distance')->paginate(12);
+        $response = [
+            'status' => true,
+            'message' => 'Top Salon List',
+            'total_page' => $top_salon->lastPage(),
+            'current_page' =>$top_salon->currentPage(),
+            'total_data' =>$top_salon->total(),
+            'has_more_page' =>$top_salon->hasMorePages(),
+            'data' => TopClientResource::collection($top_salon),
         ];
         return response()->json($response, 200);
     }

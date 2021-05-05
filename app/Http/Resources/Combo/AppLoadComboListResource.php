@@ -16,6 +16,7 @@ class AppLoadComboListResource extends JsonResource
     {
         return [
             'id' => $this->id,
+            'client_id' => $this->user_id,
             'category_id' => $this->job_category,
             'category_name' => $this->jobCategory->name ?? null,
             'combo_name' => $this->description,
