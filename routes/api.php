@@ -116,7 +116,9 @@ Route::group(['namespace' => 'Api'], function () {
         Route::group(['prefix' => 'message'],function(){
             Route::get('list', 'MessageController@customerMesseges');
         });
+
     });
+    Route::post('contact/mail/send','ContactMailController@insert');
 
     // Client Regitration
     Route::post('client/registration', 'ClientsController@clientRegistration');

@@ -93,7 +93,7 @@ class AppSettingController extends Controller
             ->where('jobs.is_deal','Y')
             ->where('jobs.status',1)
             ->where('jobs.expire_date','>=',Carbon::today()->toDateString())
-            ->orderBy('distance')->orderBy('max_discount', 'desc')->distinct('clients.id')->limit(10)->get();  
+            ->orderBy('distance')->orderBy('max_discount', 'desc')->distinct('clients.id')->limit(10)->get();
         
 
         $combo_services = Job::where('jobs.product_type',2)

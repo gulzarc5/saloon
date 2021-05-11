@@ -189,6 +189,11 @@ Route::group(['namespace' => 'Admin'],function(){
             Route::get('send/form','MessageController@sendForm')->name('admin.message_send_form');
             Route::post('send','MessageController@sendMessage')->name('admin.message_send');
         });
+
+        Route::group(['prefix' => 'mail'],function(){
+            Route::get('list','ContactMailController@index')->name('admin.contact_mail_list');
+            Route::get('list/ajax','ContactMailController@indexAjax')->name('admin.contact_mail_list_ajax');
+        });
         
     });
 });
