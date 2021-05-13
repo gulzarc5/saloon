@@ -38,7 +38,7 @@ class OrderController extends Controller
             'quantity' => 'required|array|min:1',
             'quantity.*' => 'required',
             'address_id' => 'nullable|numeric',
-            'service_time' => 'required',
+            'service_time' => 'required|date_format:Y-m-d H:i:s',
         ]);
 
         if ($validator->fails()) {
@@ -79,7 +79,7 @@ class OrderController extends Controller
 
         //check Vendor is available or not in scheduled date
 
-        $service_date_check = Carbon::parse(Carbon::now())->toDateString();
+        $service_date_check = Carbon::parse($service_time)->toDateString();
         if (!empty($service_date_check)) {
             $checkSchedule = ClientSchedule::where('user_id', $vendor_id)->where('date', $service_date_check)->count();
             if ($checkSchedule > 0) {
