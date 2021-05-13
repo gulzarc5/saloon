@@ -73,7 +73,9 @@ class OrdersController extends Controller
                         $check_service_flag = false;
                     }
                     $vendor_service_check=$vendor_service_check->first();
-                    $amount += $service->quantity*$vendor_service_check->price;
+                    if ($vendor_service_check) {
+                        $amount += $service->quantity*$vendor_service_check->price;
+                    }
                 }
                 if ($check_service_flag) {
                     $response = [
