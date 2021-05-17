@@ -60,10 +60,8 @@ class MessagePush {
             curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($fcmNotification));
             $result = curl_exec($ch);
             curl_close($ch);
-            dd($result);
             return $result;
         }
-dd(1);
        
     }
 }
