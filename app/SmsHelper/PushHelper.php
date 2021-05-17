@@ -8,7 +8,7 @@ class PushHelper {
         $token=$token;
 
         $notification = [
-            'title' => $title,
+            'message' => $title,
             "user_id" =>$user_id,
             'user_type'=>$user_type,
             'sound' => true,
