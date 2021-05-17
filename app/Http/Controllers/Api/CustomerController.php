@@ -40,14 +40,16 @@ class CustomerController extends Controller
             ];
             return response()->json($response, 200);
         }
-        $random = mt_rand(100000, 999999);
-        $random = 11111;
+        $random = rand(11111, 99999);
+        // $random = 11111;
         // $otp_code = $this->otp($ot, $request->input('mobile'));
         $user = Customer::firstOrCreate([
             'mobile' => $request->input('mobile')
         ]);
         if ($user) {
-            $message = "OTP is $random . Please do not share with anyone";
+            $message = "Your OTP is $random , Please Do Not Share This OTP To Any One
+Thank you
+Salon Ease Team";
             Sms::smsSend($mobile,$message);
             $user->otp = $random;
             $user->save();
