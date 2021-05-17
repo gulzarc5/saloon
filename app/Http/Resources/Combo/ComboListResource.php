@@ -24,6 +24,7 @@ class ComboListResource extends JsonResource
             'price' => $this->price,
             'status' => $this->status,
             'combo_services'=> $this->clientJobs,
+            'client_type' => $this->clientData->clientType ?? null,
         ];
     }
 }

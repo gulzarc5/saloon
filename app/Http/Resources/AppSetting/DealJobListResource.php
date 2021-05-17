@@ -26,6 +26,7 @@ class DealJobListResource extends JsonResource
             'is_deal' => $this->is_deal,
             'expire_date' => $this->expire_date,
             'discount' => $this->discount,
+            'client_type' => $this->clientData->clientType ?? null,
         ];
     }
 }
