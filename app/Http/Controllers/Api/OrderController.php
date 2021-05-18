@@ -304,7 +304,10 @@ class OrderController extends Controller
             $request->input('razorpay_payment_id'),
             $request->input('razorpay_signature')
         );
-        if ($verify) {
+
+        $capture = $this->paymentCapture($request->input('razorpay_payment_id'),$request->input('order_id'));
+
+        if ($verify && $capture) {
             $order = Order::find($request->input('order_id'));
             $order->payment_id =  $request->input('razorpay_payment_id');
             $order->payment_status = 2;
@@ -345,6 +348,22 @@ class OrderController extends Controller
             $api->utility->verifyPaymentSignature($attributes);
             $success = true;
         } catch (\Exception $e) {
+            $success = false;
+        }
+        return $success;
+    }
+
+
+    private function paymentCapture($payment_id,$order_id)
+    {
+        try {
+            $api = new Api(config('services.razorpay.id'), config('services.razorpay.key'));
+            $order = Order::find($order_id);
+            $amount = $order->online_pay * 100;
+            $payment = $api->payment->fetch($payment_id);
+            $payment->capture(array('amount' => $amount, 'currency' => "INR"));
+            $success = true;
+        }catch(\Exception $e){
             $success = false;
         }
         return $success;
