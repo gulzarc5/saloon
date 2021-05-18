@@ -12,6 +12,7 @@ use App\Models\Order;
 use App\Models\OrderJobs;
 use App\Models\RefundInfo;
 use App\Models\UserBankAccount;
+use App\Services\WalletAmountService;
 use Illuminate\Http\Request;
 
 use App\SmsHelper\PushHelper;
@@ -218,6 +219,7 @@ class OrdersController extends Controller
             //client Push
             $title = "Dear Client : Your Order is Completed By Saloon Ease With Order Id : $order->id";
             $this->sendPushClient($order->vendor_id, $title);
+            $this->referral_check($order->customer_id);
         }
         elseif ($status == '5') {
             $title = "Dear Customer : Your Order is Cancelled With Order Id : $order->id";
@@ -229,6 +231,18 @@ class OrdersController extends Controller
         }
 
         return 1;
+    }
+
+    private function referral_check($customer_id){
+        $customer = Customer::where('id',$customer_id)->whereNotNull('referral_id')->where('refferal_credit_status',1)->first();
+        if ($customer) {
+            $refferar = Customer::find($customer->referral_id);
+            $referral_amount = ReferralSetting::find(1);
+            if ($refferar && $referral_amount) {
+                WalletAmountService::walletCredit($refferar->id,$referral_amount->amount,"Referral Amount Credited");
+            }
+        }
+        return true;
     }
 
     public function orderCancel($order_id, $is_refund, $bank_account_id = null)

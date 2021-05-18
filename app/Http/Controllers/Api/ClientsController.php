@@ -19,6 +19,9 @@ use App\SmsHelper\PushHelper;
 use App\Models\Order;
 use App\Http\Resources\Order\ClientOrderHistoryResource;
 use App\Models\ClientSchedule;
+use App\Models\Customer;
+use App\Models\ReferralSetting;
+use App\Services\WalletAmountService;
 use Carbon\Carbon;
 
 class ClientsController extends Controller
@@ -614,10 +617,12 @@ Salon Ease Team";
             }            
             $order->save();
             // Send push
+            
             if (isset($order->customer->firsbase_token) && !empty($order->customer->firsbase_token)) {
                 $title = "Dear Customer : Your order Confirmed Successfully With Order No : $order->id";
                 if ($status == '4') {
                     $title = "Dear Customer : Your order Completed Successfully With Order No : $order->id";
+                    $this->referral_check($order->customer_id);
                 } elseif ($status == '5') {
                     $title = "Dear Customer : Your order is Cancelled By Vendor Do You Want to change vendor ??";
                 }
@@ -629,6 +634,20 @@ Salon Ease Team";
             'message' => 'Order Status Updated Successfully',
         ];
         return response()->json($response, 200);
+    }
+
+    private function referral_check($customer_id){
+        $customer = Customer::where('id',$customer_id)->whereNotNull('referral_id')->where('refferal_credit_status',1)->first();
+        if ($customer) {
+            $refferar = Customer::find($customer->referral_id);
+            $referral_amount = ReferralSetting::find(1);
+            if ($refferar && $referral_amount) {
+                $customer->refferal_credit_status = 2;
+                $customer->save();
+                WalletAmountService::walletCredit($refferar->id,$referral_amount->amount,"Referral Amount Credited");
+            }
+        }
+        return true;
     }
 
     public function orderReschedule(RescheduleRequest $request)

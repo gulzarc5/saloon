@@ -118,6 +118,7 @@ Salon Ease Team";
             'name' => 'required|string',
             'gender' => 'required',
             'email' => 'nullable|email',
+            'referral_id' => 'nullable|numeric',
         ]);
         if ($validator->fails()) {
             $response = [
@@ -137,6 +138,7 @@ Salon Ease Team";
         $customer->name = $name;
         $customer->gender = $gender;
         $customer->email = $email;
+        $customer->referral_id = $request->input('referral_id');
         $customer->api_token = Str::random(60);
         $customer->is_registered = 2;
         if ($customer->save()) {
