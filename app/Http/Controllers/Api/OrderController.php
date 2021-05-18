@@ -227,6 +227,7 @@ class OrderController extends Controller
                     'receipt' => $order->id,
                     'amount' => $order->advance_amount * 100,
                     'currency' => 'INR',
+                    'payment_capture' => 0,
                 ));
 
                 $order->payment_request_id = $orders['id'];
