@@ -42,6 +42,11 @@ Route::group(['namespace' => 'Admin'],function(){
             Route::get('edit/{commission_id}','AdminCommissionController@commissionEdit')->name('admin.admin_commission_edit');
             Route::put('update/{commission_id}','AdminCommissionController@commissionUpdate')->name('admin.admin_commission_update');
         });
+        Route::group(['prefix' =>'referral'],function(){
+            Route::get('list','ReferralController@index')->name('admin.referral_list');
+            Route::get('edit/{referral_id}','ReferralController@referralEdit')->name('admin.referral_edit');
+            Route::put('update/{referral_id}','ReferralController@referralUpdate')->name('admin.referral_update');
+        });
 
         //Password Request
         Route::get('/password/request', 'DashboardController@passwordRequest')->name('admin.password_request');
