@@ -161,6 +161,7 @@ class ComboController extends Controller
     {
         $latitude  =   "28.418715";
         $longitude =   "77.0478997";
+        $service_city = $request->input('service_city');
         if (!empty($request->input('latitude')) && $request->get('longitude')) {
             $latitude = $request->get('latitude');
             $longitude =  $request->get('longitude');
@@ -185,8 +186,11 @@ class ComboController extends Controller
         ->where('clients.status',1)
         ->where('clients.profile_status',2)
         ->where('clients.job_status',2)
-        ->where('clients.verify_status',2)
-        ->orderBy('distance','asc')
+        ->where('clients.verify_status',2);
+        if (!empty($service_city)) {
+            $jobs->where('clients.service_city_id',$service_city);
+        }
+        $jobs = $jobs->orderBy('distance','asc')
         ->paginate(12);
 
         $response = [

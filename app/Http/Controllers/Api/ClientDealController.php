@@ -85,6 +85,7 @@ class ClientDealController extends Controller
     {
         $latitude  =   "28.418715";
         $longitude =   "77.0478997";
+        $service_city = $request->input('service_city');
         if (!empty($request->input('latitude')) && $request->get('longitude')) {
             $latitude = $request->get('latitude');
             $longitude =  $request->get('longitude');
@@ -113,8 +114,11 @@ class ClientDealController extends Controller
         }])
         ->leftJoin('jobs','jobs.user_id','clients.id')
         ->where('jobs.is_deal','Y')
-        ->where('jobs.status',1)
-        ->where('jobs.expire_date','>=',Carbon::today()->toDateString())
+        ->where('jobs.status',1);
+        if (!empty($service_city)) {
+            $deal_of_the_day->where('clients.service_city_id',$service_city);
+        }
+        $deal_of_the_day = $deal_of_the_day->where('jobs.expire_date','>=',Carbon::today()->toDateString())
         ->orderBy('distance')->orderBy('max_discount', 'desc')->distinct('clients.id')->paginate(12);;  
 
         $response = [

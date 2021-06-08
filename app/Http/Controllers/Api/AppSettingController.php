@@ -38,6 +38,7 @@ class AppSettingController extends Controller
             $latitude = $request->get('latitude');
             $longitude =  $request->get('longitude');
         }
+        $service_city = $request->input('service_city');
         $Sliders = Slider::get();
         $category_list = JobCategory::where('status', 1)->get();
         // $top_saloon = Client::where('profile_status', 2)->where('job_status', 2)->where('status', 1)->where('clientType', 2)->withCount(['review as average_rating' => function ($query) {
@@ -61,8 +62,11 @@ class AppSettingController extends Controller
             ->where('job_status', 2)
             ->where('status', 1)
             ->where('clients.verify_status',2)
-            ->where('clientType', 2)->select('clients.*')
-            ->selectRaw("{$sqlDistance} AS distance")
+            ->where('clientType', 2)->select('clients.*');
+        if (!empty($service_city)) {
+            $top_saloon->where('clients.service_city_id',$service_city);
+        }
+        $top_saloon = $top_saloon->selectRaw("{$sqlDistance} AS distance")
             ->withCount(['review as average_rating' => function ($query) {
                 $query->select(DB::raw('coalesce(avg(rating),0)'));
             }])
@@ -71,20 +75,26 @@ class AppSettingController extends Controller
         $top_free_launcer =  Client::where('profile_status', 2)
             ->where('job_status', 2)
             ->where('status', 1)
-            ->where('clients.verify_status',2)
-            ->where('clientType', 1)->select('clients.*')
+            ->where('clients.verify_status',2);
+        if (!empty($service_city)) {
+            $top_free_launcer->where('clients.service_city_id',$service_city);
+        }
+        $top_free_launcer = $top_free_launcer->where('clientType', 1)->select('clients.*')
             ->selectRaw("{$sqlDistance} AS distance")
             ->withCount(['review as average_rating' => function ($query) {
                 $query->select(DB::raw('coalesce(avg(rating),0)'));
             }])
             ->orderBy('distance')->limit(10)->get();       
-        
+
 
         $deal_of_the_day = Client::where('clients.profile_status', 2)
             ->where('clients.job_status', 2)
             ->where('clients.status', 1)
-            ->where('clients.verify_status',2)
-            ->select('clients.*')
+            ->where('clients.verify_status',2);
+            if (!empty($service_city)) {
+                $deal_of_the_day->where('clients.service_city_id',$service_city);
+            }
+            $deal_of_the_day = $deal_of_the_day->select('clients.*')
             ->selectRaw("{$sqlDistance} AS distance")
             ->withCount(['review as average_rating' => function ($query) {
                 $query->select(DB::raw('coalesce(avg(rating),0)'));
@@ -111,8 +121,11 @@ class AppSettingController extends Controller
         ->leftJoin('clients','jobs.user_id','clients.id')
         ->where('clients.job_status', 2)->where('clients.status', 1)
         ->where('clients.verify_status',2)
-        ->where('clients.profile_status', 2)
-        ->selectRaw("{$sqlDistance} AS distance")
+        ->where('clients.profile_status', 2);
+        if (!empty($service_city)) {
+            $combo_services->where('clients.service_city_id',$service_city);
+        }
+        $combo_services = $combo_services->selectRaw("{$sqlDistance} AS distance")
         ->orderBy('distance')->distinct('job.id')->limit(10)->get();  
   
 
@@ -166,6 +179,7 @@ class AppSettingController extends Controller
     {
         $latitude  =   "28.418715";
         $longitude =   "77.0478997";
+        $service_city = $request->input('service_city');
         if (!empty($request->get('latitude'))) {
             $latitude = $request->get('latitude');
             $longitude =  $request->get('longitude');
@@ -188,8 +202,11 @@ class AppSettingController extends Controller
             ->where('job_status', 2)
             ->where('status', 1)
             ->where('verify_status',2)
-            ->where('clientType', 1)
-            ->select('clients.*')
+            ->where('clientType', 1);
+            if (!empty($service_city)) {
+                $top_free_launcer->where('clients.service_city_id',$service_city);
+            }
+            $top_free_launcer = $top_free_launcer->select('clients.*')
             ->selectRaw("{$sqlDistance} AS distance")
             ->withCount(['review as average_rating' => function ($query) {
                 $query->select(DB::raw('coalesce(avg(rating),0)'));
@@ -212,6 +229,7 @@ class AppSettingController extends Controller
     {
         $latitude  =   "28.418715";
         $longitude =   "77.0478997";
+        $service_city = $request->input('service_city');
         if (!empty($request->get('latitude'))) {
             $latitude = $request->get('latitude');
             $longitude =  $request->get('longitude');
@@ -234,8 +252,11 @@ class AppSettingController extends Controller
             ->where('job_status', 2)
             ->where('status', 1)
             ->where('verify_status',2)
-            ->where('clientType', 2)
-            ->select('clients.*')
+            ->where('clientType', 2);
+            if (!empty($service_city)) {
+                $top_salon->where('clients.service_city_id',$service_city);
+            }
+            $top_salon = $top_salon->select('clients.*')
             ->selectRaw("{$sqlDistance} AS distance")
             ->withCount(['review as average_rating' => function ($query) {
                 $query->select(DB::raw('coalesce(avg(rating),0)'));
