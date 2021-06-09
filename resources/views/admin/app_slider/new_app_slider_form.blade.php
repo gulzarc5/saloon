@@ -31,6 +31,18 @@
                             <div class="well" style="overflow: auto" id="image_div">
                                 <div class="form-row mb-10">
                                     <div class="col-md-12 col-sm-12 col-xs-12 mb-3">
+                                        <label for="size">Type </label>
+                                        <select name="type" id="" required class="form-control">
+                                            <option value="1">Home Page</option>
+                                            <option value="2">Offer</option>
+                                        </select>
+                                        @if($errors->has('type'))
+                                            <span class="invalid-feedback" role="alert" style="color:red">
+                                                <strong>{{ $errors->first('type') }}</strong>
+                                            </span>
+                                        @enderror
+                                    </div>
+                                    <div class="col-md-12 col-sm-12 col-xs-12 mb-3">
                                         <label for="size">Images <span><b style="color: red"> *  Image Dimension Should Be (1920x504) </b></span></label>
                                         <input type="file" name="images[]" class="form-control" multiple required>
                                         @if($errors->has('images'))

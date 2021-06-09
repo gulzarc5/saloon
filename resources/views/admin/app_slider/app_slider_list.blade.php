@@ -19,6 +19,7 @@
                             <tr>
                               <th>Sl</th>
                               <th>Image</th>
+                              <th>Type</th>
                               <th>Action</th>
                             </tr>
                           </thead>
@@ -29,11 +30,19 @@
                             @endphp
                                 @foreach ($sliders as $item)
                                     <tr>
-                                        <td>{{$count++}}</td>
+                                      <td>{{$count++}}</td>
 
-                                        <td>
-                                            <img src="{{asset('images/slider/thumb/'.$item->image.'')}}" height="100" />
-                                        </td>
+                                      <td>
+                                          <img src="{{asset('images/slider/thumb/'.$item->image.'')}}" height="100" />
+                                      </td>
+
+                                      <td>
+                                        @if ($item->type == 1)
+                                            <label class="label label-success">Home Page</label>
+                                        @else
+                                          <label class="label label-warning">Offer</label>
+                                        @endif
+                                      </td>
 
                                       <td>
                                         <a href="{{route('admin.slider_delete',['id'=>$item->id])}}" class="btn btn-danger">Delete</a>

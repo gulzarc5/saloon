@@ -25,6 +25,7 @@ class SliderController extends Controller
     {
         $this->validate($request, [
             'images.*' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'type' => 'required|numeric|in:1,2',
         ]);
 
         if ($request->hasfile('images')) {
@@ -51,6 +52,7 @@ class SliderController extends Controller
 
                 $sliders = new Slider;
                 $sliders->image = $image_name;
+                $sliders->type = $request->input('type');
                 $sliders->save();
             }
         }

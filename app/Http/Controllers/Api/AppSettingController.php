@@ -39,7 +39,8 @@ class AppSettingController extends Controller
             $longitude =  $request->get('longitude');
         }
         $service_city = $request->input('service_city');
-        $Sliders = Slider::get();
+        $Sliders = Slider::where('type',1)->get();
+        $offer_sliders = Slider::where('type',2)->get();
         $category_list = JobCategory::where('status', 1)->get();
         // $top_saloon = Client::where('profile_status', 2)->where('job_status', 2)->where('status', 1)->where('clientType', 2)->withCount(['review as average_rating' => function ($query) {
         //     $query->select(DB::raw('coalesce(avg(rating),0)'));
@@ -134,6 +135,7 @@ class AppSettingController extends Controller
             'message' => 'Service City List',
             'data' => [
                 'sliders' => $Sliders,
+                'offer_sliders' => $offer_sliders,
                 'category' => CategoryResource::collection($category_list),
                 'top_saloon' => TopClientResource::collection($top_saloon),
                 'top_free_launcer' => TopClientResource::collection($top_free_launcer),
