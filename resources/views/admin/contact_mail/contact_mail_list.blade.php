@@ -47,8 +47,20 @@
             columns: [
                 {data: 'booking_date', name: 'booking_date'},
                 {data: 'category.name', name: 'category.name',searchable: true},
-                {data: 'sub_category.name', name: 'sub_category.name',searchable: true},
-                {data: 'third_category.third_level_category_name', name: 'third_category.third_level_category_name',searchable: true},
+                {data: 'sub_category.name', name: 'subCategory.name',searchable: true,render:function(data,type,raw){
+                  if (raw.sub_category) {
+                    return raw.sub_category.name
+                  }else{
+                    return null;
+                  }
+                }},
+                {data: 'third_category.third_level_category_name', name: 'thirdCategory.third_level_category_name',searchable: true,render:function(data,type,raw){
+                  if (raw.third_category) {
+                    return raw.third_category.third_level_category_name
+                  }else{
+                    return null;
+                  }
+                }},
                 {data: 'name', name: 'name',searchable: true},
                 {data: 'mobile', name: 'mobile', orderable: false, searchable: false},
                 {data: 'message', name: 'message', orderable: false, searchable: false},
