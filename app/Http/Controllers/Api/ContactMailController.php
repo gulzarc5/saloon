@@ -4,6 +4,9 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\ContactMail;
+use App\Models\JobCategory;
+use App\Models\SubCategory;
+use App\Models\ThirdLevelCategory;
 use Illuminate\Http\Request;
 use Validator;
 
@@ -29,6 +32,47 @@ class ContactMailController extends Controller
                 'error_message' => $validator->errors(),
             ];
             return response()->json($response, 200);
+        }
+
+        if (!empty($request->input('category_id'))) {
+            $check_category = JobCategory::where('id', $request->input('category_id'))->count();
+
+            if ($check_category == 0) {
+                $response = [
+                    'status' => false,
+                    'message' => 'Sorry Category Not Found. Please Check category id you are sending',
+                    'error_code' => true,
+                    'error_message' => null,
+                ];
+                return response()->json($response, 200);
+            }
+        }
+
+        if (!empty($request->input('sub_category_id'))) {
+            $check_category = SubCategory::where('id', $request->input('sub_category_id'))->count();
+
+            if ($check_category == 0) {
+                $response = [
+                    'status' => false,
+                    'message' => 'Sorry Sub Category Not Found. Please Check Sub category id you are sending',
+                    'error_code' => true,
+                    'error_message' => null,
+                ];
+                return response()->json($response, 200);
+            }
+        }
+        if (!empty($request->input('third_category_id'))) {
+            $check_category = ThirdLevelCategory::where('id', $request->input('third_category_id'))->count();
+
+            if ($check_category == 0) {
+                $response = [
+                    'status' => false,
+                    'message' => 'Sorry Third Category Not Found. Please Check Third category id you are sending',
+                    'error_code' => true,
+                    'error_message' => null,
+                ];
+                return response()->json($response, 200);
+            }
         }
 
         $contact_mail = new ContactMail();
