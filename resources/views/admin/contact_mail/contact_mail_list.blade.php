@@ -46,7 +46,13 @@
             ajax: "{{ route('admin.contact_mail_list_ajax') }}",
             columns: [
                 {data: 'booking_date', name: 'booking_date'},
-                {data: 'category.name', name: 'category.name',searchable: true},
+                {data: 'category.name', name: 'category.name',searchable: true,rander:function(data,type,raw){
+                  if (raw.category) {
+                    return reaw.category.name
+                  } else {
+                    return null
+                  }
+                }},
                 {data: 'sub_category.name', name: 'subCategory.name',searchable: true,render:function(data,type,raw){
                   if (raw.sub_category) {
                     return raw.sub_category.name
