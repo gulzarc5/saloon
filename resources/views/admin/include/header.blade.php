@@ -123,7 +123,7 @@
                       </ul>
                   </li>
                   <li><a href="{{route('admin.coupon_list')}}"><i class="fa fa-key" aria-hidden="true"></i>Coupon</a></li>
-                  <li><a href="{{route('admin.contact_mail_list')}}"><i class="fa fa-key" aria-hidden="true"></i>Contact Mail</a></li>
+                  <li><a href="{{route('admin.contact_mail_list')}}"><i class="fa fa-key" aria-hidden="true"></i>Enquery</a></li>
                   <li><a href="{{route('admin.offer_list')}}"><i class="fa fa-key" aria-hidden="true"></i>Offer</a></li>
                   <li><a href="{{route('admin.message_list')}}"><i class="fa fa-key" aria-hidden="true"></i>Message</a></li>
                   {{-- <li>
