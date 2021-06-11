@@ -48,7 +48,7 @@
                 {data: 'booking_date', name: 'booking_date'},
                 {data: 'category.name', name: 'category.name',searchable: true,rander:function(data,type,raw){
                   if (raw.category) {
-                    return reaw.category.name
+                    return raw.category.name
                   } else {
                     return null
                   }

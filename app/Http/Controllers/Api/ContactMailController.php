@@ -12,9 +12,9 @@ class ContactMailController extends Controller
     public function insert(Request $request)
     {
         $validator =  Validator::make($request->all(), [
-            'category_id' => 'required',
-            'sub_category_id' => 'nullable',
-            'third_category_id' => 'nullable',
+            'category_id' => 'required|numeric',
+            'sub_category_id' => 'nullable|numeric',
+            'third_category_id' => 'nullable|numeric',
             'name' => 'required',
             'mobile' => 'required|numeric|digits:10',
             'message' => 'nullable|string',
