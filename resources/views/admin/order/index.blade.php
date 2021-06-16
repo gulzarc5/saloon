@@ -99,9 +99,9 @@
                                     <td>{{ $order->created_at }}</td>
                                     <td>
                                         <b id="action{{$count}}">
-                                            @php
+                                            {{-- @php
                                                 $bank_account = isset($order->customer->bankAccount) ? $order->customer->bankAccount : [];
-                                            @endphp
+                                            @endphp --}}
                                           @if ($order->payment_status == '1')
                                             @if ($order->order_status == '5')                                                
                                                 <button class="btn btn-xs btn-danger" disabled>Cancelled</button>
@@ -114,7 +114,7 @@
                                                 @if ($order->order_status == '5')                                                
                                                     <button class="btn btn-xs btn-danger" disabled>Cancelled</button>
                                                 @else
-                                                    <button class="btn btn-xs btn-danger" onclick="openModelCancel({{$order->id}},{{$bank_account}},{{$count}})">Cancel</button>
+                                                    <button class="btn btn-xs btn-danger" onclick="openModelCancel({{$order->id}},{{$count}})">Cancel</button>
                                                 @endif
                                             @endif
                                             @if ($order->order_status < '2')
@@ -155,7 +155,7 @@
         <div class="modal-header">
           <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span>
           </button>
-          <h4 class="modal-title" id="myModalLabel2">Select Account Number</h4>
+          <h4 class="modal-title" id="myModalLabel2">Cancel Form</h4>
         </div>
         <div class="modal-body">
           <input type="hidden" name="order_id" id="model_order_id">
@@ -168,14 +168,6 @@
                   No : <input type="radio" name="is_refund"  value="1"    checked/>
               </p>
           </div>
-
-            <div class="col-md-12 col-sm-12 col-xs-12 mb-3" id="account_no_div" style="display: none;">
-                <label for="prescription">Select Account No</label>
-                <select name="account_no" class="form-control" id="account_no_model" ></select> 
-                <span id="account_error"></span>
-            </div>
-
-          
         </div>
 
         <div class="modal-footer">
@@ -285,7 +277,7 @@
 
     {{-- // Cancel Order --}}
     <script>
-        function openModelCancel(order_id,bank_account,action_id) {
+        function openModelCancel(order_id,action_id) {
             $('#myModel').modal({
                 keyboard: false,
                 backdrop: 'static'
@@ -293,14 +285,6 @@
             $('#myModel').on('shown.bs.modal', function (e) {
                 $("#model_order_id").val(order_id);
                 $("#action_input_id").val(action_id);
-                if (bank_account.length > 0) {
-                    $("#account_no_model").html('<option value="">Please Select Customer Account Number</option>');
-                    var cus_account = "";
-                    $.each(bank_account, function(key,item){
-                        cus_account+= `<option value="${item.id}">${item.ac_no}</option>`;
-                    });
-                    $("#account_no_model").append(cus_account);
-                }
                 $(this).off('shown.bs.modal');
             })
         }
@@ -308,11 +292,7 @@
         function checkModelInput() {
             $("#account_error").html('');
             if($("input[name='is_refund']:checked").val() == '2'){
-                if (!$('#account_no_model').val()) {
-                    $("#account_error").html('<p style="color:red">Please Select Account No</p>');
-                }else{
                     hideModelCancel();
-                }
             }else{
                 hideModelCancel();
             }
@@ -322,17 +302,13 @@
             $('#myModel').modal('hide');
             $('#myModel').on('hidden.bs.modal', function (e) {
                 var model_order_id = $("#model_order_id").val();
-                var account_no_id =  $("#account_no_model").val();
                 var action_input =  $("#action_input_id").val();
                 var is_refund =  $("input[name='is_refund']:checked").val();
-                console.log('account_no_id '+account_no_id);
-                console.log('model_order_id '+model_order_id);
-                console.log('is_refund '+is_refund);
-                console.log('action_input '+action_input);
+              
                 if (model_order_id && is_refund) {
                     $.ajax({
                         type:"GET",
-                        url:"{{url('admin/order/cancel/')}}"+"/"+model_order_id+"/"+is_refund+"/"+account_no_id,
+                        url:"{{url('admin/order/cancel/')}}"+"/"+model_order_id+"/"+is_refund,
 
                         beforeSend: function() {
                             // setting a timeout

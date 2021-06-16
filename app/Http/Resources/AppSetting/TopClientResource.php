@@ -32,7 +32,7 @@ class TopClientResource extends JsonResource
             'parking' => $this->parking,
             'wifi' => $this->wifi,
             'music' => $this->music,
-            'avarage_rating' => isset($this->review) ? $this->review->avg('rating') : 0,
+            'avarage_rating' => isset($this->review) ? $this->review->avg('rating') ?? 0 : 0,
             'distance' => $this->distance ?? 0,
         ];
     }

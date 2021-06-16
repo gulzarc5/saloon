@@ -252,15 +252,17 @@ class OrdersController extends Controller
         $order->order_status = 5;
         if ($order->save()) {
             if ($is_refund == '2') {
-                $user_account = UserBankAccount::where('user_id', $order->customer_id)->first();
-                $refund = new RefundInfo();
-                $refund->order_id = $order->id;
-                $refund->account_id = $user_account->id;
-                $refund->amount = $order->advance_amount;
-                if ($refund->save()) {
-                    $order->refund_request = 2;
+                // $user_account = UserBankAccount::where('user_id', $order->customer_id)->first();
+                // $refund = new RefundInfo();
+                // $refund->order_id = $order->id;
+                // $refund->account_id = $user_account->id;
+                // $refund->amount = $order->advance_amount;
+                // if ($refund->save()) {
+                    $order->refund_request = 3;
                     $order->save();
-                }
+                // }
+                $comment = "Order Advance Amount refunded Due To Cancellation against order id - $order->id";
+                WalletAmountService::walletCredit($order->customer_id,$order->advance_amount,$comment);
             }
         }
 
