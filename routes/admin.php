@@ -180,6 +180,11 @@ Route::group(['namespace' => 'Admin'],function(){
                 Route::get('invoice', 'ConfigurationController@invoiceForm')->name('admin.invoice_form');
                 Route::post('invoice/update/', 'ConfigurationController@invoiceUpdate')->name('admin.invoiceUpdate');
             });
+            Route::group(['prefix'=>'app/setting'],function(){
+                Route::get('user/form', 'ConfigurationController@appSettingUserForm')->name('admin.app_setting_user_form');
+                Route::post('user/submit/', 'ConfigurationController@appSettingUpdate')->name('admin.app_setting_submit');
+                Route::get('vendor/form', 'ConfigurationController@appSettingVendorForm')->name('admin.app_setting_vendor_form');
+            });
         });
 
         // Enquery

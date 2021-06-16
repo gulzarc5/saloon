@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin\Configuration;
 
 use App\Http\Controllers\Controller;
+use App\Models\AppDescription;
 use Illuminate\Http\Request;
 use Validator;
 use App\Models\State;
@@ -241,5 +242,41 @@ class ConfigurationController extends Controller
 
         $invoice->save();
         return redirect()->back()->with('message', 'invoice Data Updated Successfully');
+    }
+
+    public function appSettingUserForm(Request $request)
+    {
+        $description = AppDescription::findOrFail(1);
+        return view('admin.configuration.app_setting_user',compact('description'));
+    }
+    public function appSettingVendorForm(Request $request)
+    {
+        $description = AppDescription::findOrFail(2);
+        return view('admin.configuration.app_setting_vendor',compact('description'));
+    }
+
+    public function appSettingUpdate(Request $request)
+    {
+        $this->validate($request, [
+            'set_id' => 'required|numeric',
+            'about_us' => 'required',
+            'refund' => 'required',
+            'disclaimers' => 'required',
+            'privacy_policy' => 'required',
+            'tc' => 'required',
+            'faq' => 'required'
+        ]);
+
+        $id = $request->input('set_id');
+        $description = AppDescription::findOrFail($id);
+        $description->about_us = $request->input('about_us');
+        $description->refund_cancellation = $request->input('refund');
+        $description->disclaimers = $request->input('disclaimers');
+        $description->privacy_policy = $request->input('privacy_policy');
+        $description->tc = $request->input('tc');
+        $description->faq = $request->input('faq');
+
+        $description->save();
+        return back()->with('message','Data Updated Successfully');
     }
 }

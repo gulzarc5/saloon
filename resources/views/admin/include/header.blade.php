@@ -120,6 +120,8 @@
                         <li class="sub_menu"><a href="{{route('admin.invoice_form')}}">Invoice Setting</a></li>
                         <li class="sub_menu"><a href="{{route('admin.admin_commission_list')}}">Admin Commission</a></li>
                         <li class="sub_menu"><a href="{{route('admin.referral_list')}}">Referral Setting</a></li>
+                        <li class="sub_menu"><a href="{{route('admin.app_setting_user_form')}}">User App Setting</a></li>
+                        <li class="sub_menu"><a href="{{route('admin.app_setting_vendor_form')}}">Vendor App Setting</a></li>
                       </ul>
                   </li>
                   <li><a href="{{route('admin.coupon_list')}}"><i class="fa fa-key" aria-hidden="true"></i>Coupon</a></li>

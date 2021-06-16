@@ -123,6 +123,8 @@ Route::group(['namespace' => 'Api'], function () {
     // Client Regitration
     Route::post('client/registration', 'ClientsController@clientRegistration');
     Route::post('client/login', 'ClientsController@clientLogin');
+    Route::get('client/app/load', 'ClientsController@clientAppLoad');
+
     Route::group(['middleware' => ['auth:clientApi'],'prefix'=>'client'], function () {
         Route::get('profile/{id}', 'ClientsController@clientProfile');
         Route::post('profile/update', 'ClientsController@clientProfileUpdate');

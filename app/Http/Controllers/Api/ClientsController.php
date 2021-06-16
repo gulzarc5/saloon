@@ -18,6 +18,7 @@ use App\SmsHelper\PushHelper;
 
 use App\Models\Order;
 use App\Http\Resources\Order\ClientOrderHistoryResource;
+use App\Models\AppDescription;
 use App\Models\ClientSchedule;
 use App\Models\Customer;
 use App\Models\ReferralSetting;
@@ -690,5 +691,16 @@ Salon Ease Team";
             ];
             return response()->json($response, 200);
         }
+    }
+
+    public function clientAppLoad()
+    {
+        $description = AppDescription::findOrFail(2);
+        $response = [
+            'status' => true,
+            'message' => 'Client App Setting Data',
+            'app_setting' => $description,
+        ];
+        return response()->json($response, 200);
     }
 }
