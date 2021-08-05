@@ -22,7 +22,9 @@ class UsersController extends Controller
             ->addIndexColumn()
             ->addColumn('action', function($row){
                 $btn ='<a href="'.route('admin.customer_edit',['id'=>$row->id]).'" class="btn btn-info btn-sm" target="_blank">View</a>
-                <a href="'.route('admin.customer_wallet_history',['user_id'=>$row->id]).'" class="btn btn-success btn-sm" target="_blank">Wallet history</a>';
+                <a href="'.route('admin.customer_wallet_history',['user_id'=>$row->id]).'" class="btn btn-success btn-sm" target="_blank">Wallet history</a>
+                <a href="'.route('admin.user_wallet_credit_form',['user'=>$row->id]).'" class="btn btn-primary btn-sm" target="_blank">Credit Wallet</a>
+                <a href="'.route('admin.user_wallet_debit_form',['user'=>$row->id]).'" class="btn btn-warning btn-sm" target="_blank">Debit Wallet</a>';
                 if ($row->status == '1') {
                     $btn .='<a href="'.route('admin.customer_status_update',['id'=>$row->id,2]).'" class="btn btn-danger btn-sm" >Disable</a>';
                 } else {

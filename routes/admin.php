@@ -85,6 +85,14 @@ Route::group(['namespace' => 'Admin'],function(){
             Route::get('/customer/status/update/{id}/{status}', 'UsersController@updateCustomerStatus')->name('admin.customer_status_update');
 
             Route::get('/wallet/history/{user_id}', 'UsersController@walletHistory')->name('admin.customer_wallet_history');
+            Route::prefix('user/wallet')->group(function(){
+                Route::get('credit/{user}','WalletController@walletCreditForm')->name('admin.user_wallet_credit_form');
+                Route::post('credit/submit','WalletController@walletCreditSubmit')->name('admin.user_wallet_credit_submit');
+               
+
+                Route::get('debit/{user}','WalletController@walletDebitForm')->name('admin.user_wallet_debit_form');
+                Route::post('debit/submit','WalletController@walletDebitSubmit')->name('admin.user_wallet_debit_submit');
+            });
         });
 
         // Service Category
